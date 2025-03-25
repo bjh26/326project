@@ -117,6 +117,16 @@
 
 }
 
+@media (max-width: 768px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .right-column {
+    grid-column: 1;
+  }
+}
+
 /* from https://getcssscan.com/css-buttons-examples */
 
 .nav-button, #search {
