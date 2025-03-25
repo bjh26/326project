@@ -5,40 +5,58 @@
 }
 
 #navbar {
-    grid-row: 1;
-    grid-column: 1 / -1;
-    width: 100vw; /* Full width */
-    padding: 10px 20px; /* Adds some spacing */
-    position: fixed; /* Keeps it at the top when scrolling */
-    top: 10px;
-    left: 0;
-    right: 0;
-    display: flex; /* Use flexbox */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    gap: 25%; /* Space between elements */
+  width: 100%;
+  padding: 10px 40px; /* Add padding to prevent edge overflow */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  box-sizing: border-box;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .search-container {
-    position: relative;
-    display: inline-block;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  max-width: 500px;
+  width: 100%;
+}
+
+/* Limits button width so they don’t stretch */
+.nav-button {
+  min-width: 80px; /* Ensures visibility */
+  max-width: 120px; /* Prevents excessive stretching */
+  text-align: center;
 }
 
 #search {
-    min-width: 500px;
-    padding: 10px 40px 10px 20px; /* Padding to make space for the icon */
-    border: 2px solid maroon;
-    border-radius: 24px;
+  width: 100%; /* Ensures it fills the container but doesn't exceed max-width */
+  max-width: 500px; /* Hard limit */
+  padding: 10px 40px 10px 20px; /* Keeps space for the search icon */
+  border: 2px solid maroon;
+  border-radius: 24px;
+  box-sizing: border-box;
 }
 
 .search-icon {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    pointer-events: none; /* Prevent clicks on the icon */
+  position: absolute;
+  right: 10px; /* Keeps icon inside input field */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none; /* Prevents interaction issues */
 }
 
 .left-column {
