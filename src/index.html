@@ -8,7 +8,7 @@
         <h1>ResearchConnect</h1>
         <div class = "dashboard">
             <h2>Create Profile</h2>
-            <form>
+            <form class="short-response">
                 <label for = "name">Name<input type = "text" id = "name"></label>
                 <label for = "department">Department</label>
                 <select id = "department">
@@ -17,10 +17,22 @@
                     <option value = "computer-science">Computer Science</option>
                 </select>
             </form>
-            <form>
+            <div class="long-response">
                 <label for = "bio">Bio</label>
                 <textarea id = "bio"></textarea>
-            </form>
+            </div>
+            <div class = "upload-documents">
+                <button class="profile-button">
+                    <span class="dot"></span>
+                    <svg width = "200" height = "200" class = "circle" id="profile">
+                        <circle cx="100" cy="100" r="99"></circle>
+                        <text x="100" y="100" text-anchor="middle" dy=".3em" font-size="16" fill="#881111" stroke="#881111" stroke-width="1px">
+                            upload profile img
+                        </text>
+                    </svg>
+                </button>
+                <label for = "resume" class="resume-upload">Resume: <input type="file" id="resume" accept=".pdf, .doc, .docx"> </label>
+            </div>
         </div>
     </body>
 </html>
