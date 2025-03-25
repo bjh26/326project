@@ -75,6 +75,7 @@
     margin: 20% auto;
     /* animation: pulse 4s infinite; */
     opacity: 50%;
+    transition: opacity 0.3s ease; 
 }
 
 @keyframes pulse {
@@ -107,10 +108,13 @@
     min-height: 200px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 10px;
+    transition: opacity 0.3s ease; 
 }
 
 .dot:hover, .research-element:hover {
     opacity: 100%;
+    transition: opacity 0.3s ease; 
+
 }
 
 /* from https://getcssscan.com/css-buttons-examples */
