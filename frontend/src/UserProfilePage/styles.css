@@ -38,6 +38,7 @@
   min-width: 80px; /* Ensures visibility */
   max-width: 120px; /* Prevents excessive stretching */
   text-align: center;
+  margin: 0 20px; /* Adds space around buttons */
 }
 
 #search {
