@@ -3,11 +3,18 @@
     <head>
         <title>Research Connect -- Create New User</title>
         <link rel = "stylesheet" href = "style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
         <h1>ResearchConnect</h1>
         <div class = "dashboard">
             <h2>Create Profile</h2>
+            <div class = "upload-documents">
+                <button class="profile-button">upload img here</button>
+                <label for="resume" class="resume-upload">upload your resume
+                    <input type="file" id="resume" accept=".pdf, .doc, .docx" style="display:none">
+                </label>
+            </div>
             <form class="short-response">
                 <label for = "name">Name<input type = "text" id = "name"></label>
                 <label for = "department">Department</label>
@@ -21,12 +28,7 @@
                 <label for = "bio">Bio</label>
                 <textarea id = "bio"></textarea>
             </div>
-            <div class = "upload-documents">
-                <button class="profile-button">upload img here</button>
-                <label for="resume" class="resume-upload">upload your resume
-                    <input type="file" id="resume" accept=".pdf, .doc, .docx" style="display:none">
-                </label>
-            </div>
+            
         </div>
     </body>
 </html>
