@@ -113,7 +113,6 @@
 
 @media (max-width: 768px) {
   .main-grid {
-    /* grid-template-columns: 1fr; */
     display: flex;
     flex-direction: column;
   }
