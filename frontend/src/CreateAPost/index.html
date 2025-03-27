@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Post Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Create a Post</h2>
+    <form id = "CreateAPostForm" action="/submit_form" method="POST">
+        <div class="post-form">
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title">
+        </div>
+
+        <div class="post-form">
+            <label for="description">Research Description</label>
+            <textarea type="text" name="description" id="description" rows="6" cols="50"></textarea>
+        </div>
+
+        <div class="post-form">
+            <label for="responsibilities">Role Responsibilities</label>
+            <textarea type="text" name="responsibilities" id="responsibilities" rows="6" cols="50"></textarea>
+        </div>
+
+        <div class="post-form">
+            <label for="qualifications-and-requirements">Qualifications and Requirements</label>
+            <textarea type="text" name="qualifications-and-requirements" id="qualifications-and-requirements" rows="6" cols="50"></textarea>
+        </div>
+
+        <div class="post-form">
+            <label for="compensation">Compensation</label>
+            <input type="text" name="compensation" id="compensation">
+        </div>
+
+        <div class="post-form">
+            <label for="hiring-period">Hiring Period</label>
+            <input type="text" name="hiring-period" id="hiring-period">
+        </div>
+
+        <div class="post-form">
+            <label for="application-instructions">Application Instructions</label>
+            <textarea type="text" name="application-instructions" id="application-instructions" rows="6" cols="50"></textarea>
+        </div>
+
+        <div class="post-form">
+            <label for="deadline">Application Deadline</label>
+            <input type="date" name="deadline" id="deadline">
+        </div>
+
+        <div class="post-form">
+            <label for="contact-name">Contact Name</label>
+            <input type="text" name="contact-name" id="contact-name">
+        </div>
+
+        <div class="post-form">
+            <label for="contact-email">Contact Email</label>
+            <input type="email" name="contact-email" id="contact-email">
+        </div>
+
+        <input type="submit" value="Post">
+
+    </form>
+</body>
