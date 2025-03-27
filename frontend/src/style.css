@@ -78,7 +78,12 @@ textarea {
     justify-items: center;
 }
 
-.profile-button:hover, .resume-upload:hover, .create-button:hover{
+.resume-upload:hover, .create-button:hover{
+    background-color: #720e0e;
+    color: white;
+}
+
+.profile-button:hover{
     background-color: gray;
 }
 
@@ -104,8 +109,8 @@ textarea {
     width: 150px;
     height: 20px;
     display: inline-block;
-    background-color: lightgray;  
-    color: gray;            
+    background-color: #881111;  
+    color: white;            
     text-align: center;
     border-radius: 10px;      
     text-decoration: none;
@@ -123,11 +128,11 @@ textarea {
 .create-button {
     width: 200px;
     height: 50px;
-    background-color: lightgray;
+    background-color: #881111;
     display: inline-block;
     border-radius: 4px;
     border: none; 
-    color: gray; 
+    color: white; 
     font-size: 16px; 
     cursor: pointer; 
     transition: background-color 0.3s ease; 
