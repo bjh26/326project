@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+        <title>Home Page</title>
+        <link rel="stylesheet" href="/frontend/src/HomePageScreen/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    </head>
+    <body>
+        <div class="page-container">
+            <header>
+                <div id="logo">
+                    <img src="assets/logo.png" alt="Logo" class="img-fluid">
+                </div>
+                
+                
+                <div class="header-actions">
+                    <button type="button" id="saved_posts">Saved</button>
+                    <div class="dropdown profile-dropdown">
+                        <button type="button" id="profile-button">
+                            <img src="assets/default_profile.png" alt="Profile" class="img-fluid">
+                        </button> <!-- add a event listener to this button to show the drown down below -->
+                        <div class="dropdown-content" id="profile-dropdown-menu">
+                            <a href="#">View Profile</a>
+                            <a href="#">Applied Researches</a>
+                            <a href="#">Settings</a>
+                            <a href="#">Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="search-container sticky">
+                <div class="search-wrapper">
+                    <input type="text" id="search-input" placeholder="Search for Posts">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path fill="aqua" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 119.5 5a4.5 4.5 0 010 9z"/>
+                    </svg>
+                </div>
+                <div class="dropdown filter-dropdown">
+                    <button id="filter-button" type="button" class="search-buttons">Filter</button> <!-- add a event listener to this button to show the drown down below -->
+                    <div class="dropdown-content" id="filter-dropdown-menu">
+                        <strong>Majors:</strong>
+                        <div class="major-search-container">
+                            <input type="text" id="major-search-input" placeholder="Search Majors">
+                            <div id="major-search-results" class="major-results"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown sort-dropdown">
+                    <button id="sort-button" type="button" class="search-buttons">Sort</button> <!-- add a event listener to this button to show the drown down below -->
+                    <div class="dropdown-content" id="sort-dropdown-menu">
+                        <form>
+                            <input type="radio" id="Newest" name="sort" value="Newest" checked>
+                            <label for="Newest">Newest</label><br>
+                            <input type="radio" id="Oldest" name="sort" value="Oldest">
+                            <label for="Oldest">Oldest</label><br>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="job-postings-container">
+                <div class="job-listings-column">
+                    <div class="job-listings-header">
+                        <h2>Research Opportunities</h2>
+                    </div>
+                    <div class="job-listings">
+                        <!-- First Page of Job Postings -->
+                        <div class="job-post">
+                            <div class="job-post-header">
+                                <h3>Software Engineering Research Assistant</h3>
+                                <i class="far fa-bookmark bookmark-icon"></i>
+                            </div>
+                            <div class="job-post-details">
+                                <p>Prof. Emily Rodriguez</p>
+                                <p>$15/hour</p>
+                                <p>01/15/2024 - 05/30/2024</p>
+                            </div>
+                        </div>
+                        <div class="job-post">
+                            <div class="job-post-header">
+                                <h3>Machine Learning Research Position</h3>
+                                <i class="far fa-bookmark bookmark-icon"></i>
+                            </div>
+                            <div class="job-post-details">
+                                <p>Prof. Michael Chang</p>
+                                <p>$18/hour</p>
+                                <p>02/01/2024 - 06/15/2024</p>
+                            </div>
+                        </div>
+                        <!-- Repeat similar job posts to fill 15 posts -->
+                        <!-- ... (other job posts) ... -->
+                    </div>
+                    <div class="job-listings-footer">
+                        <div class="pagination">
+                            <button type="button" class="prev-page"><</button>
+                            <span class="page-number">Page 1 of 2</span>
+                            <button type="button"class="next-page">></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="job-details-column">
+                    <div class="job-details-container">
+                        <div class="job-details-header">
+                            <h2>Software Engineering Research Assistant</h2>
+                            <div class="job-meta-info">
+                                <p>Posted 3 days ago</p>
+                                <p>Application Deadline: 02/15/2024</p>
+                            </div>
+                        </div>
+                        <div class="job-full-description">
+                            <h3>Job Description</h3>
+                            <p>We are seeking a motivated undergraduate student to assist in a cutting-edge software engineering research project. The ideal candidate will have strong programming skills and an interest in innovative technology research.</p>
+                            
+                            <h3>Responsibilities</h3>
+                            <ul>
+                                <li>Assist in data collection and analysis</li>
+                                <li>Develop prototype software applications</li>
+                                <li>Participate in weekly research meetings</li>
+                                <li>Document research findings and progress</li>
+                            </ul>
+                            
+                            <h3>Requirements</h3>
+                            <ul>
+                                <li>Computer Science or related major</li>
+                                <li>Proficiency in Python and/or Java</li>
+                                <li>Basic understanding of machine learning concepts</li>
+                                <li>Strong attention to detail</li>
+                            </ul>
+                            
+                            <h3>Compensation</h3>
+                            <p>$15/hour</p>
+
+                            <h3>Application Instructions</h3>
+                            <p>Please submit your resume and a brief cover letter to the contact below. Include any relevant coursework or experience in software engineering or machine learning.</p>
+
+                            <h3>Contact Information</h3>
+                            <div class="contact-info">
+                                <p><strong>Dr. Sarah Johnson:</strong> <a href="mailto:sarah.johnson@example.com">sarah.johnson@example.com</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="job-details-modal">
+                <div class="job-details-content">
+                    <button type="button" class="close-modal">&times;</button>
+                    <div class="job-details-container">
+                        <!-- Job details will be dynamically populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <script>
+            let searchBar = document.getElementById("search-input");
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        console.log("intersecting");
+                        searchBar.classList.remove("sticky");
+                    } else {
+                        searchBar.classList.add("sticky");
+                       console.log("not intersecting");
+                    }
+                })
+            }, {threshold: 1});
+            obs.observe(searchBar);
+        </script> -->
+    </body>
+</html>
