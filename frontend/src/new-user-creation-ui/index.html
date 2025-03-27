@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Research Connect -- Create New User</title>
+        <link rel = "stylesheet" href = "style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <h1>ResearchConnect</h1>
+        <div class = "dashboard">
+            <h2>Create Profile</h2>
+            <div class = "upload-documents">
+                <button class="profile-button">upload img here</button>
+                <label for="resume" class="resume-upload">upload your resume
+                    <input type="file" id="resume" accept=".pdf, .doc, .docx" style="display:none">
+                </label>
+            </div>
+            <form class="short-response">
+                <label for = "name">Name<input type = "text" id = "name"></label>
+                <label for="username">Username</label><input type="text" id="username" value="username" readonly>
+                <label for = "department">Department</label>
+                <select id = "department">
+                    <option value = "biology">Biology</option>
+                    <option value = "political-science">Political Science</option>
+                    <option value = "computer-science">Computer Science</option>
+                </select>
+            </form>
+            <div class="long-response">
+                <label for = "bio">Bio</label>
+                <textarea id = "bio"></textarea>
+            </div>   
+        </div>
+    </body>
+</html>
