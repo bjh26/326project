@@ -22,7 +22,7 @@ As undergraduates, the idea of research is appealing but the cold-emailing can b
 
 ### Blair Huang
 Role: Project Manager\
-Issues: fields of study, new user creation, user profile page
+Issues: fields of study, new user creation, user profile page, drag and drop feature
 
 ### Elizabeth O’Brien
 Role: Timekeeper\
