@@ -10,6 +10,9 @@ feature backgrounds: #FFFFFF
 
 # Forms
 box-shadow: 0 4px 8px rgba(0,0,0,0.1)
+before completion: #A24857
+after completion: #881111
+on hover/on click: darker shade of #881111
 
 # Button
 ```
