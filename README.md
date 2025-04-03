@@ -32,7 +32,7 @@ Issues: saved postings, create a post, login page, home page screen, multi-step 
 
 ### Nishil Adina
 Role: Meeting Coordinator\
-Issues: new user page, user profile page, user data structure
+Issues: new user page, user profile page, user data structure, multi-step profile creation/update form
 
 ### Khang Nguyen
 Role: Tasks Tracker\
