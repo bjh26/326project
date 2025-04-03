@@ -1,8 +1,14 @@
+# Fonts
+inside button: `font-family: "Google Sans",Roboto,Arial,sans-serif;`
+text: `font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;`
+
+
 # Colors
 #881111
 
 
 # Button
+```
 .button {
   background-color: #fff;
   border-radius: 24px;
@@ -34,3 +40,4 @@
   outline: none;
   border: 2px solid #881111;
 }
+```
