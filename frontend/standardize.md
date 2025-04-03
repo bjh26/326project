@@ -73,9 +73,6 @@ on hover/on click: darker shade of #881111
   width: 100%; /* Ensures it fills the container but doesn't exceed max-width */
   max-width: 500px; /* Hard limit */
   padding: 10px 40px 10px 20px; /* Keeps space for the search icon */
-  border: 2px solid maroon;
-  border-radius: 24px;
-  box-sizing: border-box;
 }
 
 .search-icon {
@@ -112,6 +109,6 @@ on hover/on click: darker shade of #881111
 
 .nav-button:focus, #search:focus {
   outline: none;
-  border: 2px solid maroon;
+  border: 2px solid #881111;
 }
 ```
