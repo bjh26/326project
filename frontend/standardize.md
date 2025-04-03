@@ -4,9 +4,10 @@ text: `font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;`
 
 
 # Colors
-#881111
+UMass red: #881111
 background-color: #F9F9F9
 feature backgrounds: #FFFFFF
+button text inactive: #3c4043
 
 # Forms
 box-shadow: 0 4px 8px rgba(0,0,0,0.1)
