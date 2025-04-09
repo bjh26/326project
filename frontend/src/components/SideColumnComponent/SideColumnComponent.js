@@ -2,11 +2,10 @@ import { BaseComponent } from "../BaseComponent/BaseComponent";
 
 export class SideColumnComponent extends BaseComponent {
 
-    constructor(firstName, lastName, bio, includeEmail, email) {
+    constructor(firstName, lastName, bio, email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.bio = bio;
-        this.includeEmail = includeEmail;
         this.email = email;
         super();
     }
@@ -18,7 +17,7 @@ export class SideColumnComponent extends BaseComponent {
     render() {
         const sideColumn = document.createElement('div');
         sideColumn.classList.add('left-column');
-        if(this.includeEmail) {
+        if(this.email) {
             sideColumn.innerHTML = 
             `
             <div id="pfp">
