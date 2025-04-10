@@ -5,33 +5,41 @@ import { EventHub } from '../../eventhub/EventHub.js';
 
 export class AppControllerComponent {
   #container = null; // Private container for the component
-  #currentView = 'main'; // Track the current view ('main' or 'simple')
-  #taskListComponent = null; // Instance of the main task list component
-  #taskInputComponent = null; // Instance of the task input component
-  #simpleTaskListViewComponent = null; // Instance of the simple view component
+  #currentView = 'main'; // Track the current view ('main' or 'edit')
+  // #taskListComponent = null; // Instance of the main task list component
+  // #taskInputComponent = null; // Instance of the task input component
+  // #simpleTaskListViewComponent = null; // Instance of the simple view component
   #hub = null; // EventHub instance for managing events
+  #navBarComponent = null; // Instance of the navigation bar component
+  #sideColumnComponent = null; // Instance of the side column component
+  #mainBodyComponent = null; // Instance of the main body component
 
   constructor() {
     this.#hub = EventHub.getInstance();
-    this.#taskListComponent = new TaskListComponent();
-    this.#taskInputComponent = new TaskInputComponent();
-    this.#simpleTaskListViewComponent = new SimpleTaskListViewComponent();
+    // this.#taskListComponent = new TaskListComponent();
+    // this.#taskInputComponent = new TaskInputComponent();
+    // this.#simpleTaskListViewComponent = new SimpleTaskListViewComponent();
+    this.#navBarComponent = new NavBarComponent();;
+    this.#sideColumnComponent = new SideColumnComponent();
+    this.#mainBodyComponent = new MainBodyComponent();
   }
 
   // Render the AppController component and return the container
   render() {
     this.#createContainer();
-    this.#setupContainerContent();
-    this.#attachEventListeners();
+    // this.#setupContainerContent();
+    // this.#attachEventListeners();
 
-    this.#taskInputComponent.render();
-    this.#taskListComponent.render();
-    this.#simpleTaskListViewComponent.render();
-
-    // Initially render the main view
-    this.#renderCurrentView();
+    // start with profile view
+    this.#renderProfileView(); // adds navbar, side column, and main body
 
     return this.#container;
+  }
+
+  #renderProfileView() {
+    this.#container.appendChild(this.#navBarComponent.render());
+    this.#container.appendChild(this.#sideColumnComponent.render());
+    this.#container.appendChild(this.#mainBodyComponent.render());
   }
 
   // Creates the main container element
@@ -42,10 +50,9 @@ export class AppControllerComponent {
 
   // Sets up the HTML structure for the container
   #setupContainerContent() {
-    this.#container.innerHTML = `
-      <div id="viewContainer"></div>
-      <button id="switchViewBtn">Switch to Simple View</button>
-    `;
+    this.#container.appendChild(this.#navBarComponent.render());
+    this.#container.appendChild(this.#sideColumnComponent.render());
+    this.#container.appendChild(this.#mainBodyComponent.render());
   }
 
   // Attaches the necessary event listeners
