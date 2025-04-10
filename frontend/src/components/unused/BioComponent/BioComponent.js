@@ -1,4 +1,4 @@
-import { BaseComponent } from "../BaseComponent/BaseComponent";
+import { BaseComponent } from "../../BaseComponent/BaseComponent";
 
 export class BioComponent extends BaseComponent {
     constructor(bio) {
