@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Edit Profile</title>
+        <link rel="stylesheet" href="styles.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div class="app-container">
+            <div id="info-form" class="form">
+                <h1>Edit Profile</h1>
+                <form id="userInfoForm">
+                    <label for="firstName">First Name</label> 
+                    <input  type="text" id="firstName" class="user-input" required>
+                    <label for="lastName">Last Name</label> 
+                    <input  type="text" id="lastName" class="user-input" required>
+                    <label for="email">UMass Email</label>
+                    <div class="email-row">
+                        <input type="email" id="email" class="user-input" required>
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="displayEmail" class="styled-checkbox">
+                            <label for="displayEmail" class="non-bold">Display on profile</label>
+                        </div>
+                    </div>
+                    <label for="department">Department</label>
+                    <select id = "department" class="user-input">
+                        <option value = "biology">Biology</option>
+                        <option value = "political-science">Political Science</option>
+                        <option value = "computer-science">Computer Science</option>
+                    </select>
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" class="user-input"></textarea>
+                </form>
+                <div class="form-actions">
+                    <input type="button" class="save-button button" value="Save">
+                    <input type="submit" class="next-button button" value="Next">
+                </div>
+            </div>
+            
+        </div>
+    </body>
+</html>
