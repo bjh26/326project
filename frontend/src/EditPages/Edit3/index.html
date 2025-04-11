@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
-        <div class="app-container">
+        <div class="app">
             <div id="info-form" class="form">
                 <h1>Add Research Interests</h1>
                 <form id="researchBlockForm" class="form-grid">
@@ -16,14 +16,14 @@
                             <input type="text" id="title" class="user-input" required>
                         </div>
                         <div>
-                            <label for="link">Link</label> 
-                            <input type="text" id="link" class="user-input" required>
+                            <label for="link">Link (optional)</label> 
+                            <input type="text" id="link" class="user-input">
                         </div>
                         <div>
                             <label for="type">Type</label>
                             <select id="type" class="user-input">
-                                <option value="lab">Lab</option>
                                 <option value="paper">Paper</option>
+                                <option value="lab">Lab</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
