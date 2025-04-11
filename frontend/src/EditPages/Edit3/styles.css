@@ -166,3 +166,30 @@ label:first-of-type {
     width: 100% !important;
     margin-top: 20px;
 }
+
+.research-item {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 20px;
+    margin: 50px 0px;
+}
+
+.research-item-actions {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+.research-item-actions button {
+    font-weight: bold;
+    background-color: #A24857;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+}
+.research-item-actions button:hover {
+    background-color: #881111; /* slightly darker maroon */
+}

@@ -10,14 +10,8 @@ await DataBase.open("MyDB", 1, (db) => {
     }
 });
 
-// // Use the wrapper to interact with the "tasks" store
-// await DataBase.add("tasks", { id: 1, title: "Write docs" });
-// const task = await DataBase.get("tasks", 1);
-// console.log(task); // { id: 1, title: "Write docs" }
-
-// await DataBase.put("view", { id: 1, title: "main" });
-
-let page = await DataBase.get(objStoreName, "currentPage"); // undefined, "main", "edit1", "edit2", or "edit3"
+// Get current page from database, or default to "main"
+let page = await DataBase.get(objStoreName, "currentPage");
 
 if (!page) { // if undefined, default to "main"
     console.log("Page not found, defaulting to main.");
@@ -27,8 +21,8 @@ if (!page) { // if undefined, default to "main"
     page = page.title;
 }
 
+// Initialize app controller
 const app = new AppController(document);
 
-app.loadPage("edit1");
-
-
+// Load the current page (which will also set up event listeners and load saved data)
+app.loadPage(page);

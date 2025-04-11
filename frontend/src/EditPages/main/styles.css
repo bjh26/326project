@@ -4,6 +4,10 @@
     grid-template-columns: 1fr 4fr;
 }
 
+body {
+  background-color: #f4f4f9;
+}
+
 #navbar {
   width: 100%;
   padding: 10px 40px; /* Add padding to prevent edge overflow */
@@ -14,7 +18,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: #f4f4f9;
   box-sizing: border-box;
 }
 
