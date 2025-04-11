@@ -1,6 +1,7 @@
 ﻿# Team 25: Research Connect
-## Milestone 4 Slides
-https://docs.google.com/presentation/d/16nZfw48o_uI1C_hrMXpN-gYvfu1tI0B_KnUVseFKxoU/edit?usp=sharing
+## Slides
+[Milestone 5](https://docs.google.com/presentation/d/1OlBOJ9-sP_x-JOfePhgwUFvVw8XBChhxRksLWmSPO9Q/edit?usp=sharing)\
+[Milestone 4](https://docs.google.com/presentation/d/16nZfw48o_uI1C_hrMXpN-gYvfu1tI0B_KnUVseFKxoU/edit?usp=sharing)
 
 ## Project Description
 
