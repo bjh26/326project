@@ -185,7 +185,7 @@ async function searchPosts(query = '', filters = {}, sortOption = 'latest') {
             const postEndDate = new Date(`${endYear}-${endMonth}-${endDay}`);
             
             // Check if the post's period overlaps with the selected date range
-            return (postStartDate <= toDate && postEndDate >= fromDate);
+            return (postStartDate >= fromDate && postEndDate <= toDate);
         });
     }
     
