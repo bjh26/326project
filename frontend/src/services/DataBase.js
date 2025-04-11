@@ -72,4 +72,4 @@ export class DataBase {
             request.onerror = () => reject(request.error);
         });
     }
-  }
+}
