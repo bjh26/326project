@@ -525,8 +525,7 @@ button:focus, #search-input:focus {
 
     .dropdown-content {
         position: absolute; /* Use absolute positioning */
-        left:50%; /* Center the dropdown */
-        transform: translateX(7%); /*  Center adjustment */
+        transform: translateX(11%); /*  Center adjustment */
         margin-top: 0; /* Remove any extra margin */
         top: calc(100% + 12px); /* Position below the button with a 12px gap */
         width: calc(100% - 40px); /* Full width minus padding */
