@@ -2,8 +2,8 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: "Google Sans",Roboto,Arial,sans-serif;
-    background-color: #f4f4f4;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
 }
 
 .page-container {
@@ -25,14 +25,8 @@ header {
 }
 
 #logo img {
-    max-height: 40px;
+    max-height: 60px;
     max-width: 120px;
-}
-
-.header-title h1 {
-    margin: 0;
-    font-size: 1rem;
-    white-space: nowrap;
 }
 
 .header-actions {
@@ -41,31 +35,36 @@ header {
     gap: 10px;
 }
 
-#saved_posts {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    padding: 10px 15px;
-    border-radius: 4px;
+button, #search-input {
+    background-color: #fff;
+    border-radius: 24px;
+    border-style: none;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0;
+    box-sizing: border-box;
+    color: #3c4043;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#saved_posts:hover {
-    background-color: #f1f1f1;
-}
-
-#profile-button {
-    background-color: #ffffff;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#profile-button:hover {
-    background-color: #f1f1f1;
+    font-family: "Google Sans",Roboto,Arial,sans-serif;
+    font-size: 14px;
+    height: 48px;
+    letter-spacing: .25px;
+    line-height: normal;
+    max-width: 100%;
+    padding: 2px 24px;
+  }
+  
+button:hover {
+    background: #F6F9FE;
+    color: #881111;
+  }
+  
+button:active, #search-input:active {
+    box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
+    outline: none;
+  }
+  
+button:focus, #search-input:focus {
+    outline: none;
+    border: 2px solid #881111;
 }
 
 .search-container {
@@ -82,83 +81,230 @@ header {
     position: relative;
     width: 100%;
     max-width: 500px;
+    flex: 1;
+    display: flex;
+    justify-content: center;
 }
 
 #search-input {
-    width: 90%;
-    height: 25px;
-    padding: 10px 40px 10px 15px;
+    width: 100%; /* Ensures it fills the container but doesn't exceed max-width */
+    max-width: 500px; /* Hard limit */
+    padding: 10px 40px 10px 20px; /* Keeps space for the search icon */
+    border: 2px solid transparent;
+    outline: none;
     border-radius: 24px;
+    box-sizing: border-box;
+    
 }
 
 .search-icon {
-    position:absolute;
-    right: 10px; /* Adjust this value based on the search input's position */
+    position: absolute;
+    right: 10px; /* Keeps icon inside input field */
     top: 50%;
     transform: translateY(-50%);
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+    /* pointer-events: none; Prevents interaction issues */
 }
 
-
-.search-buttons {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    height: 50px;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    padding: 10px 15px;
-    border-radius: 15px;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    flex: 1;
-    max-width: 200px;
+/* Dropdown styling improvements */
+.dropdown-content {
+    margin-top: 8px; /* Creates space between the button and dropdown */
+    display: none; /* Hidden by default */
+    position: absolute;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px, rgba(0, 0, 0, .14) 0 6px 10px 0;
+    border-radius: 8px;
+    z-index: 1000;
+    padding: 16px;
+    min-width: 250px;
+    max-width: 300px;
+    font-family: "Google Sans", Roboto, Arial, sans-serif;
 }
 
-.search-buttons:hover {
-    background-color: #f1f1f1;
+/* Show dropdown when the 'show' class is added */
+.dropdown-content.show {
+    display: block;
 }
 
-
-
-/* Dropdown styling */
+/* Ensure dropdown is positioned relative to its parent */
 .dropdown {
     position: relative;
 }
 
-.dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: white;
-    min-width: 250px;
-    max-height: 300px;
-    overflow-y: auto;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    z-index: 1000;
-    border: 1px solid #e0e0e0;
-    margin-top: 5px;
+/* Filter sections styling */
+.filter-section {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 15px;
 }
 
+.filter-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.filter-section strong {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #3c4043;
+    font-weight: 500;
+}
+
+/* Major search container */
 .major-search-container {
-    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
 }
 
+/* Style the major search input to match main search */
 #major-search-input {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    height: 40px;
+    padding: 2px 12px;
+    border: none;
+    border-radius: 24px;
+    font-size: 14px;
+    font-family: "Google Sans", Roboto, Arial, sans-serif;
+    background-color: #fff;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px, rgba(0, 0, 0, .14) 0 6px 10px 0;
+    color: #3c4043;
     box-sizing: border-box;
 }
 
+#major-search-input:focus {
+    outline: none;
+    border: 2px solid #881111;
+}
+
 .major-results {
-    max-height: 250px;
+    max-height: 200px;
     overflow-y: auto;
+    margin-top: 10px;
+}
+
+.selected-majors-header {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.major-item {
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.major-item:last-child {
+    border-bottom: none;
+}
+
+.major-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Larger checkboxes */
+.major-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #881111;
+}
+
+/* Location filter and date picker styling */
+.location-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #3c4043;
+}
+
+#on-campus-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #881111;
+}
+
+.date-range-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.date-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-input label {
+    min-width: 50px;
+    font-size: 14px;
+    color: #3c4043;
+}
+
+.date-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 14px;
+    font-family: "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.sort-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.sort-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #881111;
+}
+
+.sort-option label {
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #3c4043;
+}
+
+/* No results message */
+.no-results {
+    padding: 12px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    font-size: 14px;
+}
+
+/* Active filters indication */
+.search-buttons.active {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+}
+
+/* Bookmark icon styling */
+.bookmark-icon.fas {
+    color: #881111; /* Highlight color when bookmarked */
+}
+
+/* Improve dropdown positioning */
+.filter-dropdown .dropdown-content,
+.sort-dropdown .dropdown-content {
+    width: 250px;
+    right: auto;
+    left: 0;
 }
 
 .sticky {
@@ -220,6 +366,11 @@ header {
     border-bottom: 1px solid #e0e0e0;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+
+.job-post.active {
+    background-color: #f9f9f9;
+    border-left: 3px solid #881111;
 }
 
 .job-post:hover {
@@ -358,11 +509,10 @@ header {
 
     .search-buttons {
         flex: 1;
-        max-width: none;
     }
 
-    #search-input {
-        width: 100%;
+    .search-icon {
+        right: 25px; /* Adjusted for mobile */
     }
 
     .job-postings-container {
@@ -371,5 +521,38 @@ header {
     
     .job-details-column {
         display: none; /* Hide details on mobile */
+    }
+
+    .dropdown-content {
+        position: absolute; /* Use absolute positioning */
+        transform: translateX(11%); /*  Center adjustment */
+        margin-top: 0; /* Remove any extra margin */
+        top: calc(100% + 12px); /* Position below the button with a 12px gap */
+        width: calc(100% - 40px); /* Full width minus padding */
+        max-width: none; /* Allow it to be responsive */
+        z-index: 1000; /* Ensure it appears above other elements */
+        display: none; /* Ensure the dropdown is visible */
+    }
+
+    .dropdown-content.show {
+        display: block; /* Show the dropdown when active */
+    }
+
+    .dropdown{
+        position: relative;
+    }
+    
+    /* Specific positioning for filter dropdown */
+    .filter-dropdown .dropdown-content {
+        top: calc(100% + 12px); /* Adjust to appear below the button */
+    }   
+    
+    /* Specific positioning for sort dropdown */
+    .sort-dropdown .dropdown-content {
+        top: calc(100% + 12px); /* Adjust to appear below the button */
+    }
+    
+    .date-range-filter {
+        flex-direction: column;
     }
 }
