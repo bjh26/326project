@@ -30,8 +30,15 @@ app.get("/profile/:id", (request, response) => {
     }
 });
 
-app.get("/profile", (request, response) => {
+app.post("/profile", (request, response) => {
     const profile = request.body;
-    profiles.push(profile);
+
+    const userProfileIndex = profiles.findIndex(profile => profile.email === id);
+    if (userProfileIndex === -1) { // user's profile is not already stored
+        profiles.push(profile);
+    } else { // update the user's profile
+        profiles[userProfileIndex] = profile;
+    }
+    
     response.json({message: "Success"});
 })

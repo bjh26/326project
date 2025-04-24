@@ -24,6 +24,7 @@ export class AppController {
           </div>
           <div id="info" class="side-column-text">
               <b id="fullName"></b>
+              <p id="departmentDisplay"></p>
               <p id="emailDisplay"></p>
           </div>
           <div id="bio" class="side-column-text">
@@ -52,9 +53,9 @@ export class AppController {
                     </div>
                     <label for="department">Department</label>
                     <select id = "department" class="user-input">
-                        <option value = "biology">Biology</option>
-                        <option value = "political-science">Political Science</option>
-                        <option value = "computer-science">Computer Science</option>
+                        <option value = "Biology">Biology</option>
+                        <option value = "Political Science">Political Science</option>
+                        <option value = "Computer Science">Computer Science</option>
                     </select>
                     <label for="bio">Bio</label>
                     <textarea id="bio" class="user-input"></textarea>
@@ -179,6 +180,11 @@ export class AppController {
                     const fullNameElement = this.#document.getElementById("fullName");
                     if (fullNameElement) {
                         fullNameElement.textContent = `${profileData.firstName || 'FirstName'} ${profileData.lastName || 'LastName'}`; // default values if name not found
+                    }
+
+                    const departmentDisplay = this.#document.getElementById("departmentDisplay");
+                    if (departmentDisplay && profileData.department) {
+                        departmentDisplay.textContent = profileData.department;
                     }
                     
                     const emailDisplay = this.#document.getElementById("emailDisplay");
@@ -390,6 +396,10 @@ export class AppController {
             // For edit2, we're not implementing file upload functionality
             this.showSaveMessage("Profile picture and resume settings saved");
         }
+    }
+
+    async saveAllDataToServer() { // new for milestone 6, use fetch with 
+
     }
 
     setupEventListeners() {
