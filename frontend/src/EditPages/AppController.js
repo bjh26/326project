@@ -23,26 +23,14 @@ export class AppController {
               <span class="dot"></span>
           </div>
           <div id="info" class="side-column-text">
-              <b id="fullName">FirstName LastName</b>
+              <b id="fullName"></b>
               <p id="emailDisplay"></p>
           </div>
           <div id="bio" class="side-column-text">
-              <p id="bioDisplay">bio paragraph here</p>
+              <p id="bioDisplay"></p>
           </div>
         </div>
         <div id="mainBody" class="right-column">
-          <div id="research1" class="research-element">
-              <h1>Research Paper 1</h1>
-          </div>
-          <div id="research2" class="research-element">
-              <h1>Research Paper 2</h1>
-          </div>
-          <div id="research3" class="research-element">
-              <h1>Research Paper 3</h1>
-          </div>
-          <div id="research4" class="research-element">
-              <h1>Research Lab</h1>
-          </div>
         </div>
       </div>
     `,
@@ -190,7 +178,7 @@ export class AppController {
                 if (profileData) {
                     const fullNameElement = this.#document.getElementById("fullName");
                     if (fullNameElement) {
-                        fullNameElement.textContent = `${profileData.firstName || 'FirstName'} ${profileData.lastName || 'LastName'}`;
+                        fullNameElement.textContent = `${profileData.firstName || 'FirstName'} ${profileData.lastName || 'LastName'}`; // default values if name not found
                     }
                     
                     const emailDisplay = this.#document.getElementById("emailDisplay");
@@ -213,16 +201,17 @@ export class AppController {
                 const researchData = await DataBase.get("storage", "researchData");
                 if (researchData && researchData.items && researchData.items.length > 0) {
                     // Update research items in the main view
-                    for (let i = 0; i < Math.min(researchData.items.length, 4); i++) {
-                        const researchElement = this.#document.getElementById(`research${i+1}`);
-                        if (researchElement) {
-                            const item = researchData.items[i];
-                            researchElement.innerHTML = `
-                                <h1>${item.title || `Research ${i+1}`}</h1>
-                                <p>${item.description || ""}</p>
-                                ${item.link ? `<a href="${item.link}" target="_blank">View More</a>` : ""}
-                            `;
-                        }
+                    for (let i = 0; i < researchData.items.length; i++) {
+                        const researchElement = this.#document.createElement("div");
+                        researchElement.id = `research${i+1}`;
+                        researchElement.className = "research-element";
+                        const item = researchData.items[i];
+                        researchElement.innerHTML = `
+                            <h1>${item.title || `Research ${i+1}`}</h1>
+                            <p>${item.description || ""}</p>
+                            ${item.link ? `<a href="${item.link}" target="_blank">View More</a>` : ""}
+                        `;
+                        this.#document.getElementById("mainBody").appendChild(researchElement);
                     }
                 }
             } else if (page === 'edit1') {
