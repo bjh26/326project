@@ -45,7 +45,7 @@ export class AppController {
                     <input  type="text" id="lastName" class="user-input" required>
                     <label for="email">UMass Email</label>
                     <div class="email-row">
-                        <input type="email" id="email" class="user-input" required>
+                        <input type="email" id="email" class="user-input" required readonly>
                         <div class="checkbox-container">
                             <input type="checkbox" id="displayEmail" class="styled-checkbox">
                             <label for="displayEmail" class="non-bold">Display on profile</label>
@@ -169,6 +169,21 @@ export class AppController {
         link.rel = "stylesheet";
         link.href = cssPath;
         this.#document.head.appendChild(link);
+    }
+
+    async loadDataFromServer(email) {
+        const page = "main";
+        this.#currentPage = page;
+        this.loadCSS(`./${page}/styles.css`);
+
+        const response = await fetch(`/profile/${email}`);
+        if (response.status === 404) {
+            this.#container.innerHTML = "Profile not found";
+        } else {
+            this.#profileData = await response.json();
+            await this.saveProfileData();
+            await this.loadPage(page);
+        }
     }
 
     async loadSavedData(page) {
@@ -426,8 +441,8 @@ export class AppController {
             console.log(this.#profileData);
 
             // upload to server
-            await fetch("/profile", {
-                method: "POST",
+            await fetch(`/profile/${this.#profileData.email}`, {
+                method: "PUT",
                 headers: { 
                     "Content-Type": "application/json" 
                 },

@@ -24,5 +24,14 @@ if (!page) { // if undefined, default to "main"
 // Initialize app controller
 const app = new AppController(document);
 
+const emailOfRequestedProfile = "nadina@umass.edu"; // currently hardcoded but will eventually be a parameter
+// eventually you'll be able to click on a person's name from a post they made and it will take you to their profile
+// when clicked, it'll use that person's email to load their profile page
+
 // Load the current page (which will also set up event listeners and load saved data)
-app.loadPage(page);
+if (page !== "main") {
+    app.loadPage(page);
+} else {
+    // load the requested user's profile page
+    app.loadDataFromServer(emailOfRequestedProfile);
+}

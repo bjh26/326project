@@ -47,21 +47,37 @@ app.get("/profile/:id", (request, response) => {
     }
 });
 
-app.post("/profile", (request, response) => {
-    const profile = request.body;
+app.put("/profile/:id", (request, response) => {
+    // use the given id to find the corresponding user's profile info (stored in memory for now -- will switch to SQLite next milestone)
+    // update that profile info based on the request body
+    const id = request.params.id; // use email as id
+    const updatedProfile = request.body;
 
-    // save to in-memory array
-    const userProfileIndex = profiles.findIndex(p => p.email === profile.email);
-    if (userProfileIndex === -1) { // user's profile is not already stored
-        // this won't happen once the profile creation form is integrated
-        console.log("not found, making new");
-        profiles.push(profile);
-    } else { // update the user's profile
-        console.log("found and overwriting");
-        profiles[userProfileIndex] = profile;
+    const userProfileIndex = profiles.findIndex(profile => profile.email === id);
+    if (userProfileIndex !== -1) { // if there's a user with that id
+        profiles[userProfileIndex] = updatedProfile;
+        response.json({message: "Profile updated successfully"});
+    } else {
+        response.status(404).json({message: "User not found"});
     }
-
-    console.log("all profiles:\n", profiles);
-
-    response.json({message: "Success"});
 });
+
+// ignore this
+// app.post("/profile", (request, response) => {
+//     const profile = request.body;
+
+//     // save to in-memory array
+//     const userProfileIndex = profiles.findIndex(p => p.email === profile.email);
+//     if (userProfileIndex === -1) { // user's profile is not already stored
+//         // this won't happen once the profile creation form is integrated
+//         console.log("not found, making new");
+//         profiles.push(profile);
+//     } else { // update the user's profile
+//         console.log("found and overwriting");
+//         profiles[userProfileIndex] = profile;
+//     }
+
+//     console.log("all profiles:\n", profiles);
+
+//     response.json({message: "Success"});
+// });
