@@ -18,11 +18,13 @@
                         <option value="create" selected>Create</option>
                         <option value="edit">Edit</option>
                     </select>
+                    <input type="hidden" id="mode" name="mode" value="create">
+
                 </div>
 
                 <div class="post-form">
                     <label for="unique-id">Unique ID</label>
-                    <input type="text" name="unique-id" id="unique-id">
+                    <input type="text" name="unique-id" id="unique-id" data-optional>
                 </div>
 
                 <div class="post-form">
