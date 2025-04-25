@@ -3,7 +3,6 @@ import express from "express";
 const app = express();
 const PORT = 3000;
 
-
 app.use(express.static("../frontend/src/NewUserCreation"));
 app.use(express.static("../frontend/src/assets"));
 app.use(express.json());
