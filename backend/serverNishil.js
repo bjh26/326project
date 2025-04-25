@@ -10,7 +10,20 @@ app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-const profiles = []; // array of objects where each object corresponds to a user's profile
+// const profiles = []; // array of objects where each object corresponds to a user's profile
+const profiles = 
+[
+    {
+      type: 'profileData',
+      researchItems: [],
+      firstName: 'Nishil',
+      lastName: 'Adina',
+      email: 'nadina@umass.edu',
+      displayEmail: true,
+      department: 'Computer Science',
+      bio: 'hi'
+    }
+]; // fake data to start with
 
 const Profile = (firstName, lastName, email, displayEmail, bio, researchItems) => ({
     firstName,
@@ -20,6 +33,7 @@ const Profile = (firstName, lastName, email, displayEmail, bio, researchItems) =
     bio,
     researchItems,
 }); // returns an object containing each field
+// this is just how the profile object is structured
 
 app.get("/profile/:id", (request, response) => {
     // use the given id to find the corresponding user's profile info (stored in memory for now -- will switch to SQLite next milestone)
@@ -39,6 +53,7 @@ app.post("/profile", (request, response) => {
     // save to in-memory array
     const userProfileIndex = profiles.findIndex(p => p.email === profile.email);
     if (userProfileIndex === -1) { // user's profile is not already stored
+        // this won't happen once the profile creation form is integrated
         console.log("not found, making new");
         profiles.push(profile);
     } else { // update the user's profile
