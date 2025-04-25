@@ -424,21 +424,17 @@ export class AppController {
         }
     }
 
-    async saveAllDataToServer() { // new for milestone 6, use fetch to POST user's profile data 
+    async saveAllDataToServer() { // new for milestone 6, use fetch to PUT user's profile data into server
         try {
             // load from IndexedDB
             this.#profileData = await DataBase.get("storage", "profileData") || {
                 researchItems: []
             };
             
-            // Make sure researchItems exists
+            // make sure researchItems exists
             if (!this.#profileData.researchItems) {
                 this.#profileData.researchItems = [];
             }
-
-            console.log("saving all data to server");
-            console.log("here is the data:");
-            console.log(this.#profileData);
 
             // upload to server
             await fetch(`/profile/${this.#profileData.email}`, {
