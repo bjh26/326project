@@ -1,0 +1,37 @@
+/* /frontend/src/screens/HomePage/style.css */
+.job-postings-container {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 150px); /* Subtract header + search bar height */
+    background-color: #f4f4f4;
+  }
+  
+  .job-listings-column {
+    width: 40%;
+    border-right: 1px solid #e0e0e0;
+    overflow: hidden;
+  }
+  
+  .job-details-column {
+    width: 60%;
+    overflow: hidden;
+  }
+  
+  /* Make sure your responsive styles also target these class names */
+
+@media (max-width: 768px) {
+    .job-postings-container {
+        display: block; /* Override grid layout */
+        height: auto;
+    }
+    
+    .job-listings-column {
+        width: 100%;
+        border-right: none;
+    }
+    
+    /* Remove any empty space */
+    .job-details-column {
+        display: none;
+    }
+}
