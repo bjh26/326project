@@ -134,7 +134,8 @@ async function addUser() {
     };
 
     if(document.getElementById('email').value === '' || document.getElementById('email').value === null){
-        alert("Please enter in your email.")
+        alert("Please enter in your email.");
+        return;
     }
 
     try {
