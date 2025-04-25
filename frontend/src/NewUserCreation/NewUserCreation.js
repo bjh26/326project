@@ -1,105 +1,91 @@
 document.addEventListener("DOMContentLoaded", () => {
-    uploadImage();
-    uploadResume();
-    const savedResume = (localStorage.getItem('resume'));
-    const savedProfile = localStorage.getItem('profileImage');
-    if(savedResume){
-        document.getElementById('uploadResume').textContent = `${savedResume} uploaded`;
-        document.getElementById('uploadResume').style.backgroundColor = '#881111';
-        document.getElementById('uploadResume').style.color = 'white';
-    }
-    if (savedProfile) {
-        document.getElementById('dummyProfileImage').src = savedProfile;
-    }
-    localStorage.clear();
+    restorePage();
+    dragAndDrop("uploadProfileImage", "profileImage");
+    dragAndDrop("uploadResume", "resume");
+    change("uploadProfileImage", "profileImage");
+    change("uploadResume", "resume");
 });
 
-// can make the upload feature more general, TODO for next milestone
-function uploadImage(){
-    const imgDrop = document.getElementById("uploadProfileImage");
-    imgDrop.addEventListener("dragover", (e) => {
+function restorePage() {
+    try{
+        const savedResume = (localStorage.getItem('uploadResume'));
+        const savedProfile = localStorage.getItem('uploadProfileImage');
+        if(savedResume){
+            document.getElementById('uploadResume').style.backgroundColor = '#881111';
+            document.getElementById('uploadResume').style.color = 'white';
+        }
+        if(savedProfile){
+            document.getElementById('dummyProfileImage').src = savedProfile;
+        }
+    } catch (err) {
+        console.error("Error restoring uploads from localStorage:", err, "or nothing saved yet");
+    }
+   
+}
+
+function dragAndDrop(element, inputElementId) {
+    const dropSpace = document.getElementById(element);
+    const dropItem = document.getElementById(inputElementId);
+   
+    dropSpace.addEventListener("dragover", (e) => {
         e.preventDefault(); 
-        imgDrop.style.backgroundColor = "gray";
+        dropSpace.style.backgroundColor = "#881111";
     });
 
-    imgDrop.addEventListener("dragleave", () => {
-        imgDrop.style.backgroundColor = "#aaa";
+    dropSpace.addEventListener("dragleave", () => {
+        dropSpace.style.backgroundColor = "lightgray";
+        dropSpace.style.color = "white";
     });
 
-    imgDrop.addEventListener("drop", (e) => {
+    dropSpace.addEventListener("drop", (e) => {
         e.preventDefault();
-        imgDrop.style.borderColor = "#aaa";
         const files = e.dataTransfer.files; 
-        console.log('saved to local storage')
+        console.log('saved to local storage'); 
         for (let i = 0; i < files.length; ++i) {
             console.log("Dropped file:", files[i].name, files[i].type, files[i].size);
+            const file = files[i];
             if(files[i]){
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    let img = document.getElementById('dummyProfileImage');
-                    img.src = e.target.result;
-                    localStorage.setItem('profileImage', e.target.result);
+                    const fileType = file.type; 
+                    console.log(fileType)
+                    if (fileType.startsWith("image/")) {
+                        document.getElementById('dummyProfileImage').src = e.target.result;
+                        dropItem.textContent = ""; 
+                    } else {
+                        dropItem.src = "";
+                    }
+                    localStorage.setItem(element, e.target.result);
                 }
-                reader.readAsDataURL(files[i]);
+                reader.readAsDataURL(file);
             }
             // eventually will upload the files and send it to the backend server
         }
     });
-    
-    // for when the user uploads the file when they click the input field
-    imgDrop.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        console.log("Dropped file: ", file.name, file.type, file.size);
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('dummyProfileImage').src = e.target.result;
-                localStorage.setItem('profileImage', e.target.result);
-                console.log('saved to local storage')
-            }
-            reader.readAsDataURL(file);
-        }
-    });
 }
 
-function uploadResume(){
-    const resumeDrop = document.getElementById("uploadResume");
-
-    resumeDrop.addEventListener("dragover", (e) => {
-        e.preventDefault(); 
-        resumeDrop.style.color = "white";
-        resumeDrop.style.backgroundColor = "#881111";
-    });
-
-    resumeDrop.addEventListener("dragleave", () => {
-        resumeDrop.style.color = "white";
-        resumeDrop.style.backgroundColor = "#881111";
-    });
-
-    resumeDrop.addEventListener("drop", (e) => {
-        e.preventDefault();
-        const files = e.dataTransfer.files; 
-        resumeDrop.style.color = "white";
-        resumeDrop.style.backgroundColor = "#881111";
-        resumeDrop.textContent = `${files[0].name} uploaded`;
-        localStorage.setItem('resume', files[0].name);
-        console.log('saved to local storage')
-        console.log("Dropped file:", files[0].name, files[0].type, files[0].size);
-        // eventually will upload the files and send it to the backend server
-    });
-    
-    // for when the user uploads the file when they click the input field
-    // this implementation only allows for one upload using direct clicking, 
-    // however once the live viewer is loaded, it will allow for multiple uploads like the image upload
-    document.getElementById('resume').addEventListener('change', (e) => {
+function change(element, inputElementId) {
+    const dropSpace = document.getElementById(element);
+    const dropItem = document.getElementById(inputElementId);
+    console.log(dropSpace, dropItem); 
+    dropItem.addEventListener('change', (e) => {
         const file = e.target.files[0];
-        if(file){
-            resumeDrop.textContent = `${file.name} uploaded`;
-            resumeDrop.style.color = "white";
-            resumeDrop.style.backgroundColor = "#881111"; 
-            localStorage.setItem('resume', file.name);
+        console.log("Dropped file:", file.name, file.type, file.size);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const fileType = file.type; 
+            if (fileType.startsWith("image/")) {
+                document.getElementById('dummyProfileImage').src = e.target.result;
+                dropItem.textContent = ""; 
+            } else {
+                dropItem.src = "";
+                dropSpace.style.backgroundColor = "#881111";
+                dropSpace.style.color = "white";
+            }
+            localStorage.setItem(element, e.target.result);
             console.log('saved to local storage');
-            console.log("Dropped file: ", file.name, file.type, file.size);
         }
+        reader.readAsDataURL(file);
+        e.target.value = '';
     });
 }

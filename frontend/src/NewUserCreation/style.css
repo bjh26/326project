@@ -148,7 +148,7 @@ textarea {
     height: 20px;
     display: inline-block;
     border: 3px dashed #881111;
-    background-color: white;
+    background-color: lightgray;
     color: black;            
     text-align: center;
     border-radius: 10px;      
