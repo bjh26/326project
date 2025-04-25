@@ -15,7 +15,7 @@ export class NavBarComponent extends BaseComponents {
     
     this.parent.innerHTML = `
       <div id="logo">
-        <img src="../frontend/src/assets/logo.png" alt="Logo" class="img-fluid">
+        <img src="../../src/assets/logo.png" alt="Logo" class="img-fluid">
       </div>
       
       <div class="header-actions">
