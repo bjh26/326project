@@ -1,4 +1,4 @@
-import { DataBase } from "../services/DataBase.js";
+import { DataBase } from "./DataBase.js";
 import { AppController } from "./AppController.js";
 
 const objStoreName = "storage";

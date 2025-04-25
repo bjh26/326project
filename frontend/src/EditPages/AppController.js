@@ -1,4 +1,4 @@
-import { DataBase } from "../services/DataBase.js";
+import { DataBase } from "./DataBase.js";
 
 export class AppController {
     pages = {
@@ -128,7 +128,7 @@ export class AppController {
                         <input type="button" id="save" class="save-button button" value="Save">
                         <span id="saveMessage" class="save-message"></span>
                     </div>
-                    <input type="submit" id="next" class="next-button button" value="Finish">
+                    <input type="submit" id="finish" class="next-button button" value="Finish">
                 </div>
             </div>
     `,
@@ -145,7 +145,7 @@ export class AppController {
     #document;
     #container;
     #currentPage;
-    #researchItems = [];
+    #profileData = {};
 
     constructor(document) {
         this.#document = document;
@@ -173,24 +173,33 @@ export class AppController {
 
     async loadSavedData(page) {
         try {
+            // Load profile data once and store it in the class property
+            this.#profileData = await DataBase.get("storage", "profileData") || {
+                researchItems: []
+            };
+            
+            // Make sure researchItems exists
+            if (!this.#profileData.researchItems) {
+                this.#profileData.researchItems = [];
+            }
+            
             if (page === 'main') {
-                // Load profile data for main page display
-                const profileData = await DataBase.get("storage", "profileData");
-                if (profileData) {
+                // Display profile data for main page
+                if (this.#profileData) {
                     const fullNameElement = this.#document.getElementById("fullName");
                     if (fullNameElement) {
-                        fullNameElement.textContent = `${profileData.firstName || 'FirstName'} ${profileData.lastName || 'LastName'}`; // default values if name not found
+                        fullNameElement.textContent = `${this.#profileData.firstName || 'FirstName'} ${this.#profileData.lastName || 'LastName'}`; // default values if name not found
                     }
 
                     const departmentDisplay = this.#document.getElementById("departmentDisplay");
-                    if (departmentDisplay && profileData.department) {
-                        departmentDisplay.textContent = profileData.department;
+                    if (departmentDisplay && this.#profileData.department) {
+                        departmentDisplay.textContent = this.#profileData.department;
                     }
                     
                     const emailDisplay = this.#document.getElementById("emailDisplay");
                     if (emailDisplay) {
-                        if (profileData.displayEmail && profileData.email) {
-                            emailDisplay.textContent = profileData.email;
+                        if (this.#profileData.displayEmail && this.#profileData.email) {
+                            emailDisplay.textContent = this.#profileData.email;
                         } else {
                             // Don't display anything if email is not set to be displayed
                             emailDisplay.textContent = "";
@@ -198,32 +207,36 @@ export class AppController {
                     }
                     
                     const bioDisplay = this.#document.getElementById("bioDisplay");
-                    if (bioDisplay && profileData.bio) {
-                        bioDisplay.textContent = profileData.bio;
+                    if (bioDisplay && this.#profileData.bio) {
+                        bioDisplay.textContent = this.#profileData.bio;
                     }
                 }
 
-                // Load research items for main page
-                const researchData = await DataBase.get("storage", "researchData");
-                if (researchData && researchData.items && researchData.items.length > 0) {
-                    // Update research items in the main view
-                    for (let i = 0; i < researchData.items.length; i++) {
-                        const researchElement = this.#document.createElement("div");
-                        researchElement.id = `research${i+1}`;
-                        researchElement.className = "research-element";
-                        const item = researchData.items[i];
-                        researchElement.innerHTML = `
-                            <h1>${item.title || `Research ${i+1}`}</h1>
-                            <p>${item.description || ""}</p>
-                            ${item.link ? `<a href="${item.link}" target="_blank">View More</a>` : ""}
-                        `;
-                        this.#document.getElementById("mainBody").appendChild(researchElement);
+                // Display research items
+                if (this.#profileData.researchItems && this.#profileData.researchItems.length > 0) {
+                    const mainBody = this.#document.getElementById("mainBody");
+                    if (mainBody) {
+                        // Clear any existing research elements
+                        const existingResearch = mainBody.querySelectorAll(".research-element");
+                        existingResearch.forEach(element => element.remove());
+                        
+                        // Add research items
+                        this.#profileData.researchItems.forEach((item, i) => {
+                            const researchElement = this.#document.createElement("div");
+                            researchElement.id = `research${i+1}`;
+                            researchElement.className = "research-element";
+                            researchElement.innerHTML = `
+                                <h1>${item.title || `Research ${i+1}`}</h1>
+                                <p>${item.description || ""}</p>
+                                ${item.link ? `<a href="${item.link}" target="_blank">View More</a>` : ""}
+                            `;
+                            mainBody.appendChild(researchElement);
+                        });
                     }
                 }
             } else if (page === 'edit1') {
-                // Load profile data for edit form
-                const profileData = await DataBase.get("storage", "profileData");
-                if (profileData) {
+                // Fill form with profile data
+                if (this.#profileData) {
                     const firstNameInput = this.#document.getElementById("firstName");
                     const lastNameInput = this.#document.getElementById("lastName");
                     const emailInput = this.#document.getElementById("email");
@@ -231,37 +244,33 @@ export class AppController {
                     const departmentSelect = this.#document.getElementById("department");
                     const bioTextarea = this.#document.getElementById("bio");
                     
-                    if (firstNameInput && profileData.firstName) {
-                        firstNameInput.value = profileData.firstName;
+                    if (firstNameInput && this.#profileData.firstName) {
+                        firstNameInput.value = this.#profileData.firstName;
                     }
                     
-                    if (lastNameInput && profileData.lastName) {
-                        lastNameInput.value = profileData.lastName;
+                    if (lastNameInput && this.#profileData.lastName) {
+                        lastNameInput.value = this.#profileData.lastName;
                     }
                     
-                    if (emailInput && profileData.email) {
-                        emailInput.value = profileData.email;
+                    if (emailInput && this.#profileData.email) {
+                        emailInput.value = this.#profileData.email;
                     }
                     
-                    if (displayEmailCheckbox && profileData.displayEmail !== undefined) {
-                        displayEmailCheckbox.checked = profileData.displayEmail;
+                    if (displayEmailCheckbox && this.#profileData.displayEmail !== undefined) {
+                        displayEmailCheckbox.checked = this.#profileData.displayEmail;
                     }
                     
-                    if (departmentSelect && profileData.department) {
-                        departmentSelect.value = profileData.department;
+                    if (departmentSelect && this.#profileData.department) {
+                        departmentSelect.value = this.#profileData.department;
                     }
                     
-                    if (bioTextarea && profileData.bio) {
-                        bioTextarea.value = profileData.bio;
+                    if (bioTextarea && this.#profileData.bio) {
+                        bioTextarea.value = this.#profileData.bio;
                     }
                 }
             } else if (page === 'edit3') {
-                // Load research items for research form
-                const researchData = await DataBase.get("storage", "researchData");
-                if (researchData && researchData.items) {
-                    this.#researchItems = researchData.items;
-                    this.renderResearchItems();
-                }
+                // Render research items in the form
+                this.renderResearchItems();
             }
         } catch (error) {
             console.error("Error loading saved data:", error);
@@ -274,7 +283,11 @@ export class AppController {
         
         container.innerHTML = ''; // Clear existing items
         
-        this.#researchItems.forEach((item, index) => {
+        if (!this.#profileData.researchItems || this.#profileData.researchItems.length === 0) {
+            return; // No items to render
+        }
+        
+        this.#profileData.researchItems.forEach((item, index) => {
             const itemElement = this.#document.createElement("div");
             itemElement.className = "research-item";
             itemElement.innerHTML = `
@@ -310,7 +323,7 @@ export class AppController {
     }
 
     editResearchItem(index) {
-        const item = this.#researchItems[index];
+        const item = this.#profileData.researchItems[index];
         if (!item) return;
         
         // Populate form with item data
@@ -333,44 +346,41 @@ export class AppController {
     }
 
     deleteResearchItem(index) {
-        this.#researchItems.splice(index, 1);
+        this.#profileData.researchItems.splice(index, 1);
         this.renderResearchItems();
-        this.saveResearchItems();
+        this.saveProfileData();
         this.showSaveMessage("Research item deleted");
     }
 
     async saveProfileData() {
-        const firstName = this.#document.getElementById("firstName")?.value;
-        const lastName = this.#document.getElementById("lastName")?.value;
-        const email = this.#document.getElementById("email")?.value;
-        const displayEmail = this.#document.getElementById("displayEmail")?.checked;
-        const department = this.#document.getElementById("department")?.value;
-        const bio = this.#document.getElementById("bio")?.value;
+        // If we're on the edit1 page, update the basic profile info
+        if (this.#currentPage === 'edit1') {
+            const firstName = this.#document.getElementById("firstName")?.value;
+            const lastName = this.#document.getElementById("lastName")?.value;
+            const email = this.#document.getElementById("email")?.value;
+            const displayEmail = this.#document.getElementById("displayEmail")?.checked;
+            const department = this.#document.getElementById("department")?.value;
+            const bio = this.#document.getElementById("bio")?.value;
+            
+            // Update profile data with new values
+            this.#profileData = {
+                ...this.#profileData, // Keep existing data, including research items
+                firstName,
+                lastName,
+                email,
+                displayEmail,
+                department,
+                bio
+            };
+            
+            this.showSaveMessage("Profile information saved");
+        }
         
-        const profileData = {
-            firstName,
-            lastName,
-            email,
-            displayEmail,
-            department,
-            bio
-        };
-        
+        // Save the updated profile data to IndexedDB
         await DataBase.put("storage", { 
             type: "profileData", 
-            ...profileData 
+            ...this.#profileData
         });
-        
-        this.showSaveMessage("Profile information saved");
-    }
-
-    async saveResearchItems() {
-        await DataBase.put("storage", {
-            type: "researchData",
-            items: this.#researchItems
-        });
-        
-        this.showSaveMessage("Research information saved");
     }
 
     showSaveMessage(message) {
@@ -391,15 +401,42 @@ export class AppController {
         if (this.#currentPage === 'edit1') {
             await this.saveProfileData();
         } else if (this.#currentPage === 'edit3') {
-            await this.saveResearchItems();
+            // This is already handled by add/edit/delete research item functions
+            await this.saveProfileData();
         } else if (this.#currentPage === 'edit2') {
             // For edit2, we're not implementing file upload functionality
             this.showSaveMessage("Profile picture and resume settings saved");
         }
     }
 
-    async saveAllDataToServer() { // new for milestone 6, use fetch with 
+    async saveAllDataToServer() { // new for milestone 6, use fetch to POST user's profile data 
+        try {
+            // load from IndexedDB
+            this.#profileData = await DataBase.get("storage", "profileData") || {
+                researchItems: []
+            };
+            
+            // Make sure researchItems exists
+            if (!this.#profileData.researchItems) {
+                this.#profileData.researchItems = [];
+            }
 
+            console.log("saving all data to server");
+            console.log("here is the data:");
+            console.log(this.#profileData);
+
+            // upload to server
+            await fetch("/profile", {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json" 
+                },
+                body: JSON.stringify(this.#profileData)
+            });
+
+        } catch (error) {
+            console.error("Error uploading data:", error);
+        }
     }
 
     setupEventListeners() {
@@ -446,6 +483,23 @@ export class AppController {
             });
         }
 
+        // add event listener for finish button to also save to server
+        const finishButton = this.#document.getElementById("finish");
+        if (finishButton) {
+            finishButton.addEventListener("click", async (event) => {
+                event.preventDefault(); // Prevent form submission default behavior
+                
+                // Save the current page data first
+                await this.saveCurrentPageData();
+                await this.saveAllDataToServer();
+                
+                // Then navigate to the next page
+                const nextPage = this.pageSequence[this.#currentPage];
+                await DataBase.put("storage", { type: "currentPage", title: nextPage });
+                this.loadPage(nextPage);
+            });
+        }
+
         // Add event listener for the "Add" research button on edit3 page
         const addResearchButton = this.#document.getElementById("addResearch");
         if (addResearchButton) {
@@ -465,13 +519,16 @@ export class AppController {
                 if (editIndex !== null && editIndex !== undefined) {
                     // Update existing item
                     const index = parseInt(editIndex);
-                    this.#researchItems[index] = { title, link, type, description };
+                    this.#profileData.researchItems[index] = { title, link, type, description };
                     addResearchButton.value = "Add";
                     addResearchButton.removeAttribute("data-edit-index");
                     this.showSaveMessage("Research item updated");
                 } else {
                     // Add new item
-                    this.#researchItems.push({ title, link, type, description });
+                    if (!this.#profileData.researchItems) {
+                        this.#profileData.researchItems = [];
+                    }
+                    this.#profileData.researchItems.push({ title, link, type, description });
                     this.showSaveMessage("Research item added");
                 }
                 
@@ -484,8 +541,8 @@ export class AppController {
                 // Update the display
                 this.renderResearchItems();
                 
-                // Save the research items
-                await this.saveResearchItems();
+                // Save the profile data (which includes research items)
+                await this.saveProfileData();
             });
         }
     }
