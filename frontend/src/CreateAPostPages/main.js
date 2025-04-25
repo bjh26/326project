@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const backButtons = document.querySelectorAll('[id^="back"]');
     const form = document.getElementById('CreateAPostForm');
     const statusDiv = document.getElementById('status');
+    const deleteButton = document.getElementById('delete'); 
+    const modeInput = document.getElementById('mode');
+    const modeSelect = document.getElementById('mode-toggle');
+    const uniqueIdInput = document.getElementById('unique-id');
 
     let db;
     const DB_NAME = 'postFormDB';
@@ -94,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function collectFormData() {
         return {
+            // uniqueID: !document.getElementById('unique-id').value.trim() ? None : document.getElementById.value,
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
             responsibilities: document.getElementById('responsibilities').value,
@@ -234,6 +239,39 @@ document.addEventListener('DOMContentLoaded', function() {
             }, duration);
         }
     }
+
+    function updateUniqueIdState(mode) {
+        if (mode === 'create') {
+            uniqueIdInput.value = '';
+            uniqueIdInput.disabled = true;
+            fetch('/researchPost', {
+                method: `POST`,
+                body: JSON.stringify(collectFormData())
+            });
+        } else {
+            uniqueIdInput.disabled = false;
+            fetch(`/researchPost/${uniqueIdInput.value}`, {
+                method: `PUT`,
+                body: JSON.stringify(collectFormData())
+            });
+        }
+    }
+    
+    modeSelect.addEventListener('change', () => {
+        const selectedMode = modeSelect.value;
+        modeInput.value = selectedMode;
+        updateUniqueIdState(selectedMode);
+        showStatus(`Mode: ${selectedMode.toUpperCase()}`, 'info');
+    });
+    
+    // Initial state on page load
+    updateUniqueIdState(modeSelect.value);
+
+    deleteButton.addEventListener('click', function () {
+        fetch(`/researchPost/${uniqueIdInput.value}`), {
+            method: `DELETE`
+        }
+    })
     
     // event listeners for buttons
     nextButtons.forEach(button => {

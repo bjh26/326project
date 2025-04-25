@@ -1,0 +1,30 @@
+{
+  "name": "326project",
+  "version": "1.0.0",
+  "description": "[Milestone 5](https://docs.google.com/presentation/d/1OlBOJ9-sP_x-JOfePhgwUFvVw8XBChhxRksLWmSPO9Q/edit?usp=sharing)\\\r [Milestone 4](https://docs.google.com/presentation/d/16nZfw48o_uI1C_hrMXpN-gYvfu1tI0B_KnUVseFKxoU/edit?usp=sharing)",
+  "main": "index.js",
+  "type": "module",
+  "license": "AGPL-version-3.0",
+  "private": false,
+  "engines": {
+    "node": ">= 14.0.0",
+    "npm": ">= 6.0.0"
+  },
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": "",
+  "keywords": [],
+  "author": "",
+  "contributors": [],
+  "scripts": {
+    "dev": "",
+    "test": ""
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {}
+}

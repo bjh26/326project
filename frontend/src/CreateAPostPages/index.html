@@ -12,6 +12,19 @@
         <form id = "CreateAPostForm" action="/submit_form" method="POST">
             <div class="step active" id="step1">
 
+                <div class="mode-toggle">
+                    <label for="mode-toggle">Mode:</label>
+                    <select id="mode-toggle">
+                        <option value="create" selected>Create</option>
+                        <option value="edit">Edit</option>
+                    </select>
+                </div>
+
+                <div class="post-form">
+                    <label for="unique-id">Unique ID</label>
+                    <input type="text" name="unique-id" id="unique-id">
+                </div>
+
                 <div class="post-form">
                     <label for="title">Title</label>
                     <input type="text" name="title" id="title">
@@ -28,6 +41,7 @@
                 </div>
                 <div class="buttons">
                     <button type="button" id="next1">Next</button>
+                    <button type="button" id="delete">Delete</button>
                 </div>
 
             </div>
