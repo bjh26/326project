@@ -245,8 +245,15 @@ export class JobDetailsComponent extends BaseComponents {
   }
 
   handleApply(post) {
-    // In the future, this could open an application form or redirect to an application page
-    alert(`You are applying for: ${post.title}\nPlease contact ${post.contact_name || 'the research opportunity contact'} at ${post.contact_email || 'the provided contact email'} for more information.`);
+    // Get the contact email from the post
+    const contactEmail = post.contact_email || '';
+    
+    // Create a well-formatted email subject and body
+    const subject = `Application for ${post.title}`;
+    
+    // Create the mailto URL
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contactEmail)}&su=${encodeURIComponent(subject)}`;
+    window.open(gmailUrl, '_blank');
     
     // Log application event
     this.eventHub.publish('ApplicationSubmitted', {

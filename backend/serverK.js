@@ -257,8 +257,6 @@ app.get('/api/updates', (req, res) => {
     });
 });
 
-// Add this to your server.js file where the other route handlers are
-
 // POST new post
 app.post('/api/posts', (req, res) => {
     // Validate required fields

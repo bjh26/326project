@@ -37,6 +37,8 @@ export const Events = {
     ProgressSave: "ProgressSave",
     ProgressSaveSuccess: "ProgressSaveSuccess",
     ProgressSaveFailure: "ProgressSaveFailure",
+
+    ApplicationSubmitted: "ApplicationSubmitted",
     
     // Pages switching events
     NavigateTo: "NavigateTo",
