@@ -4,9 +4,24 @@ document.addEventListener("DOMContentLoaded", () => {
     dragAndDrop("uploadResume", "resume");
     change("uploadProfileImage", "profileImage");
     change("uploadResume", "resume");
+    document.getElementById("createAccount").addEventListener('click', addUser);
+    document.getElementById("deleteAccount").addEventListener('click', deleteUser);
 });
 
 function restorePage() {
+    const inputFields = ["firstName", "lastName", "email", "username", "department", "bio"];
+    
+    inputFields.forEach(id => {
+        const field = document.getElementById(id);
+        const storedValue = localStorage.getItem(id);
+        if (storedValue) {
+            field.value = storedValue;
+        } 
+        field.addEventListener('input', () => {
+            localStorage.setItem(id, field.value);
+        });
+    });
+
     try{
         const savedResume = (localStorage.getItem('uploadResume'));
         const savedProfile = localStorage.getItem('uploadProfileImage');
@@ -20,9 +35,14 @@ function restorePage() {
     } catch (err) {
         console.error("Error restoring uploads from localStorage:", err, "or nothing saved yet");
     }
-   
 }
 
+/**
+ * @param {string} element - The div where your input element resides in.
+ * @param {string} inputElementId - The id of the input field. 
+ * Allows for drag and drop operations on input fields.
+ * Call both change() and dragAndDrop() for seamless UX.
+ */
 function dragAndDrop(element, inputElementId) {
     const dropSpace = document.getElementById(element);
     const dropItem = document.getElementById(inputElementId);
@@ -64,6 +84,12 @@ function dragAndDrop(element, inputElementId) {
     });
 }
 
+/**
+ * @param {string} element - The div where your input element resides in.
+ * @param {string} inputElementId - The id of the input field. 
+ * Allows for users to interact with uploading files by clicking on the input field.
+ * Call both change() and dragAndDrop() for seamless UX.
+*/
 function change(element, inputElementId) {
     const dropSpace = document.getElementById(element);
     const dropItem = document.getElementById(inputElementId);
@@ -88,4 +114,70 @@ function change(element, inputElementId) {
         reader.readAsDataURL(file);
         e.target.value = '';
     });
+}
+
+
+/**
+ * Adds a new user to backend server.
+ */
+async function addUser() {
+    const profile = {
+        firstName: document.getElementById("firstName").value, 
+        lastName: document.getElementById("lastName").value, 
+        email: document.getElementById("email").value, 
+        displayEmail: false, 
+        bio: document.getElementById("bio").value, 
+        // will add when server is big enough
+        // profileImage: localStorage.getItem('uploadProfileImage'),
+        // resume: localStorage.getItem('uploadResume'),
+        researchItems: []
+    };
+
+    if(document.getElementById('email').value === '' || document.getElementById('email').value === null){
+        alert("Please enter in your email.")
+    }
+
+    try {
+        const res = await fetch('/profile', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(profile),
+        });
+
+        if(!res.ok) {
+            const errorMessage = await res.json(); // or response.json() if backend sends JSON
+            throw new Error(errorMessage.error);
+        } 
+    } catch(error) {
+        alert(`${error.message}`);
+    }
+}
+
+/**
+ * Removes a user from the backend server.
+ */
+async function deleteUser() {
+    const profile = {
+        firstName: document.getElementById("firstName").value, 
+        lastName: document.getElementById("lastName").value, 
+        email: document.getElementById("email").value, 
+        displayEmail: false, 
+        bio: document.getElementById("bio").value, 
+        // will add when server is big enough
+        // profileImage: localStorage.getItem('uploadProfileImage'),
+        // resume: localStorage.getItem('uploadResume'),
+        researchItems: []
+    };
+
+    await fetch('/profile/:id', {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profile),
+    }); 
+    
+    console.log('User deleted');
 }

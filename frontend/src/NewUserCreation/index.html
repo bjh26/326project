@@ -14,7 +14,7 @@
                 <div class = "upload-documents">
                     <div id = "uploadProfileImage" class="profile-image">
                         <label for="profileImage"> 
-                            <img src = "../assets/Sample_User_Icon.png" id="dummyProfileImage">
+                            <img src = "/Sample_User_Icon.png" id="dummyProfileImage">
                         </label>
                         <input type="file" id="profileImage" accept=".jpeg, .jpg, .png" style="display: none">
                     </div> 
@@ -25,8 +25,10 @@
                     </div>    
                 </div>
                 <form class="short-response">
-                    <label for = "name">Name<input type = "text" id = "name"></label>
-                    <label for="username">Username</label><input type="text" id="username" value="username" readonly>
+                    <label for = "firstName">First Name<input type = "text" id = "firstName"></label>
+                    <label for="lastName">Last Name<input type="text" id="lastName"></label>
+                    <label for ="email">Email<input type="text" id="email" required></label>
+                    <label for="username">Make a Username</label><input type="text" id="username" value="username" readonly>
                     <label for = "department">Department</label>
                     <select id = "department">
                         <option value = "biology">Biology</option>
@@ -40,9 +42,9 @@
                 </div>             
             </div>
             <div class="button-container">
-                <input class="create-button" type="submit" value="create new account">   
+                <input class="create-button" type="submit" value="create new account" id="createAccount">  
+                <input class="create-button" type="submit" value="delete account" id="deleteAccount">    
             </div>
         </div>
-        
     </body>
 </html>
