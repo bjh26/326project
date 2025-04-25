@@ -1,5 +1,6 @@
 ﻿# Team 25: Research Connect
 ## Slides
+[Milestone 6](https://docs.google.com/presentation/d/1tqRVpSDFX2-xCZx16q56RFbzCKba6W-plDpB2sB0p0U/edit?usp=sharing)\
 [Milestone 5](https://docs.google.com/presentation/d/1OlBOJ9-sP_x-JOfePhgwUFvVw8XBChhxRksLWmSPO9Q/edit?usp=sharing)\
 [Milestone 4](https://docs.google.com/presentation/d/16nZfw48o_uI1C_hrMXpN-gYvfu1tI0B_KnUVseFKxoU/edit?usp=sharing)
 
@@ -33,7 +34,8 @@ Issues: saved postings, create a post, login page, home page screen, multi-step 
 
 ### Nishil Adina
 Role: Meeting Coordinator\
-Issues: new user page, user profile page, user data structure, multi-step profile creation/update form
+Issues: new user page, user profile page, user data structure, multi-step profile creation/update form, profile data load from/save to server
+
 
 ### Khang Nguyen
 Role: Tasks Tracker\
