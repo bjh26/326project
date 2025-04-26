@@ -79,7 +79,6 @@ function dragAndDrop(element, inputElementId) {
                 }
                 reader.readAsDataURL(file);
             }
-            // eventually will upload the files and send it to the backend server
         }
     });
 }
@@ -148,7 +147,7 @@ async function addUser() {
         });
 
         if(!res.ok) {
-            const errorMessage = await res.json(); // or response.json() if backend sends JSON
+            const errorMessage = await res.json(); 
             throw new Error(errorMessage.error);
         } 
     } catch(error) {
