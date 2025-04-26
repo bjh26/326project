@@ -1,0 +1,118 @@
+/* /frontend/src/components/JobListings/style.css */
+.job-listings-column {
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+    background-color: white;
+}
+
+.job-listings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.job-listings-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.job-listings {
+    max-height: calc(100vh - 240px);
+    overflow-y: auto;
+}
+
+.job-listings-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid #e0e0e0;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination button {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 35px;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.job-post {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.job-post.active {
+    background-color: #f9f9f9;
+    border-left: 3px solid #881111;
+}
+
+.job-post:hover {
+    background-color: #f9f9f9;
+}
+
+.job-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.job-post-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.bookmark-icon {
+    color: #888;
+    cursor: pointer;
+}
+
+.bookmark-icon:hover {
+    color: #555;
+}
+
+.bookmark-icon.fas {
+    color: #881111; /* Highlight color when bookmarked */
+}
+
+.job-post-details p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Loading and error states */
+.loading, .error, .no-results {
+    padding: 30px;
+    text-align: center;
+    color: #666;
+}
+
+.error {
+    color: #d32f2f;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .job-listings-column {
+        max-height: 60vh;
+    }
+}

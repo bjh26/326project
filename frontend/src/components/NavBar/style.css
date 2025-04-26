@@ -1,0 +1,100 @@
+/* /frontend/src/components/NavBar/style.css */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    gap: 10px;
+}
+
+#logo img {
+    max-height: 60px;
+    max-width: 120px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+button {
+    background-color: #fff;
+    border-radius: 24px;
+    border-style: none;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0;
+    box-sizing: border-box;
+    color: #3c4043;
+    cursor: pointer;
+    font-family: "Google Sans",Roboto,Arial,sans-serif;
+    font-size: 14px;
+    height: 48px;
+    letter-spacing: .25px;
+    line-height: normal;
+    max-width: 100%;
+    padding: 2px 24px;
+}
+  
+button:hover {
+    background: #F6F9FE;
+    color: #881111;
+}
+  
+button:active {
+    box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
+    outline: none;
+}
+  
+button:focus {
+    outline: none;
+    border: 2px solid #881111;
+}
+
+/* Dropdown styling for profile */
+.profile-dropdown {
+    position: relative;
+}
+
+.profile-dropdown .dropdown-content {
+    margin-top: 8px;
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px, rgba(0, 0, 0, .14) 0 6px 10px 0;
+    border-radius: 8px;
+    z-index: 1000;
+    padding: 8px 0;
+    min-width: 180px;
+    font-family: "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.profile-dropdown .dropdown-content a {
+    color: #3c4043;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+}
+
+.profile-dropdown .dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.profile-dropdown .dropdown-content.show {
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .header-actions {
+        margin-bottom: 10px;
+    }
+}
