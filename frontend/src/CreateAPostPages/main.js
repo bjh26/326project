@@ -4,6 +4,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const backButtons = document.querySelectorAll('[id^="back"]');
     const form = document.getElementById('CreateAPostForm');
     const statusDiv = document.getElementById('status');
+    const deleteButton = document.getElementById('delete'); 
+    const modeInput = document.getElementById('mode');
+    const modeSelect = document.getElementById('mode-toggle');
+    const uniqueIdInput = document.getElementById('unique-id');
+
+    //IndexdDB used for continual data saving and loading
 
     let db;
     const DB_NAME = 'postFormDB';
@@ -94,6 +100,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function collectFormData() {
         return {
+            // uniqueID: !document.getElementById('unique-id').value.trim() ? None : document.getElementById.value,
+            // uniqueId: document.getElementById('unique-id').value.trim() || null,
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
             responsibilities: document.getElementById('responsibilities').value,
@@ -144,22 +152,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Fake server
-    async function submitToFakeServer(formData) {
-        return new Promise((resolve, reject) => {
-            showStatus('Submitting form...', 'info');
-            
-            // Delay
-            setTimeout(() => {
-                // 90% chance of success
-                if (Math.random() < 0.9) {
-                    resolve({ success: true, message: 'Form submitted successfully!' });
-                } else {
-                    reject(new Error('Server error: Could not process your submission'));
-                }
-            }, 1500);
-        });
-    }
     
     // Navigation function - shows the target view and hides others
     function navigate(viewId) {
@@ -182,7 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const inputs = document.querySelectorAll(`#${stepId} input:not([type="date"]), #${stepId} textarea`);
         let isValid = true;
         inputs.forEach(input => {
-            if (input.value.trim() === '') {
+            const isOptional = input.hasAttribute('data-optional')
+            if (!isOptional && input.value.trim() === '') {
                 isValid = false;
                 input.classList.add('error');
                 input.addEventListener('input', function() {
@@ -234,6 +227,86 @@ document.addEventListener('DOMContentLoaded', function() {
             }, duration);
         }
     }
+
+    // function updateUniqueIdState(mode) {
+    //     if (mode === 'create') {
+    //         uniqueIdInput.value = '';
+    //         uniqueIdInput.disabled = true;
+    //         fetch('/researchPost', {
+    //             method: `POST`,
+    //             body: JSON.stringify(collectFormData())
+    //         });
+    //     } else {
+    //         uniqueIdInput.disabled = false;
+    //         fetch(`/researchPost/${uniqueIdInput.value}`, {
+    //             method: `PUT`,
+    //             body: JSON.stringify(collectFormData())
+    //         });
+    //     }
+    // }
+
+    function updateUniqueIdState(mode) {
+        if (mode === 'create') {
+            uniqueIdInput.value = '';
+            uniqueIdInput.disabled = true;
+        } else {
+            uniqueIdInput.disabled = false;
+        }
+    }
+
+
+    async function submitPost(mode) {
+        const postInfo = collectFormData();
+        try {
+            let response;
+            if (mode === 'create') {
+                response = await fetch('/researchPost', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postInfo)
+                });
+            } else {
+                const id = document.getElementById('unique-id').value;
+                response = await fetch(`/researchPost/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postInfo)
+                });
+            }
+    
+            if (!response.ok) {
+                throw new Error('Failed to save post');
+            }
+    
+            const result = await response.json();
+            showStatus(result.message || 'Post saved!', 'success');
+    
+        } catch (err) {
+            console.error('Submit error:', err);
+            showStatus(err.message, 'error');
+        }
+    }
+    
+    
+    modeSelect.addEventListener('change', () => {
+        const selectedMode = modeSelect.value;
+        modeInput.value = selectedMode;
+        updateUniqueIdState(selectedMode);
+        showStatus(`Mode: ${selectedMode.toUpperCase()}`, 'info');
+    });
+    
+    // Initial state on page load
+    updateUniqueIdState(modeSelect.value);
+
+    deleteButton.addEventListener('click', function () {
+        fetch(`/researchPost/${uniqueIdInput.value}`, {
+            method: `DELETE`
+        })
+    })
     
     // event listeners for buttons
     nextButtons.forEach(button => {
@@ -259,20 +332,47 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Form submission
+    // // Form submission
+    // form.addEventListener('submit', async function(e) {
+    //     e.preventDefault();
+        
+    //     if (validateStep('step3')) {
+    //         const formData = collectFormData();
+    
+    //         try {
+            
+    //             await saveProgress();
+                
+    //             const result = await submitToFakeServer(formData);
+                
+    //             showStatus(result.message, 'success');
+                
+    //             setTimeout(async () => {
+    //                 const transaction = db.transaction([STORE_NAME], 'readwrite');
+    //                 const store = transaction.objectStore(STORE_NAME);
+    //                 await store.delete('postForm');
+                    
+    //                 form.reset();
+    //                 navigate('step1');
+    //             }, 2000);
+                
+    //         } catch (error) {
+    //             console.error('Submission error:', error);
+    //             showStatus(`Failed to submit: ${error.message}. Your progress is saved.`, 'error');
+    //         }
+    //     }
+    // });
+
+    //new form submission 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         if (validateStep('step3')) {
-            const formData = collectFormData();
-    
             try {
-            
                 await saveProgress();
                 
-                const result = await submitToFakeServer(formData);
-                
-                showStatus(result.message, 'success');
+                const mode = modeSelect.value;
+                await submitPost(mode);
                 
                 setTimeout(async () => {
                     const transaction = db.transaction([STORE_NAME], 'readwrite');
