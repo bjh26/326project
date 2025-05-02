@@ -1,5 +1,6 @@
 import express from "express";
-import { sequelize, userModel } from "./userModel.js";
+import { sequelizeUser, userModel } from "./userModel.js";
+import { sequelizePost, postModel } from "./postModel.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -23,9 +24,10 @@ app.use(express.static("../frontend/src/NewUserCreation"));
 app.use(express.static("../frontend/src/assets"));
 app.use(express.json());
 
+// test function with dummy data
 async function preloadData() {
     try {
-        await sequelize.sync({force:true});
+        await sequelizeUser.sync({force:true});
         console.log('importing data...')
         const test = await userModel.create({
             firstName: 'blair',
@@ -37,6 +39,18 @@ async function preloadData() {
         });
         console.log(test)
         console.log('data imported...')
+
+        await sequelizePost.sync({force:true});
+        await postModel.create({
+            title: 'example posting',
+            description: 'human experiment',
+            contactEmail: 'bjhuang@umass.edu',
+            responsibilities: 'show up',
+            qualifications: 'preferably majoring in accounting',
+            compensation: '$20/hr',
+            contactName: 'blair',
+        });
+
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
         });
@@ -47,6 +61,7 @@ async function preloadData() {
 
 preloadData();
 
+// USER 
 // Adds newly created user to database
 app.post("/profile", async (req, res) => { 
     const profile = req.body; 
@@ -102,3 +117,55 @@ app.put("/profile/:id", async (request, response) => {
     response.json({message: "Profile updated successfully"});
 });
 
+// POST 
+app.post('/researchPost', async (request, response) => {
+    const newPost = request.body;
+    // add a check here if you want to make sure there are no duplicate postings
+    await postModel.create({
+        title: newPost.title,
+        description: newPost.description,
+        contactEmail: newPost.contactEmail,
+        responsibilities: newPost.responsibilities,
+        qualifications: newPost.qualifications,
+        compensation: newPost.compensation,
+        hiringPeriod: newPost.hiringPeriod,
+        applicationInstructions: newPost.applicationInstructions,
+        deadline: newPost.deadline,
+        contactName: newPost.contactName,
+        contactEmail: newPost.contactEmail
+    }); 
+    response.json({message: "Profile updated successfully"});
+});
+
+app.put('/researchPost/:id', async (request, response) => {
+    const id = request.params.contactEmail;
+    const editedPost = request.body; 
+    // what's the unique id? def not email so double check @Elizabeth
+    const findPost = await postModel.findOne({where: {contactEmail: id}}); 
+    if (findPost !== null) { return response.status(404).json({message: "Post already exists"}); }
+    await findPost.update({
+        title: editedPost.title,
+        description: editedPost.description,
+        contactEmail: editedPost.contactEmail,
+        responsibilities: editedPost.responsibilities,
+        qualifications: editedPost.qualifications,
+        compensation: editedPost.compensation,
+        hiringPeriod: editedPost.hiringPeriod,
+        applicationInstructions: editedPost.applicationInstructions,
+        deadline: editedPost.deadline,
+        contactName: editedPost.contactName,
+        contactEmail: editedPost.contactEmail
+    }); 
+    response.json(editedPost);
+});
+
+app.delete('/researchPost/:id', async (request, response) => {
+    const id = request.params.contactEmail;
+    // what's the unique id? def not email so double check @Elizabeth
+    // if there is no unique id what are the set of attributes that will find the unique posting?
+    // important because we might be destroying more than we intend to in the current set up
+    const findPost = await postModel.findOne({where: {contactEmail: id}});
+    await findPost.destroy({where: {contactEmail: id}});
+});
+
+// @Khang please fill this out yourself 

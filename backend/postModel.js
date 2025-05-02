@@ -3,13 +3,13 @@ import { Sequelize, DataTypes } from "sequelize";
 // can also use sequelize object defined in the userModel file
 
 // initializes a new Sequelize instance with SQLite
-const sequelize = new Sequelize({
+const sequelizePost = new Sequelize({
     dialect: "sqlite",
-    storage: "database.sqlite"
+    storage: "Post.sqlite"
 });
 
 // Post Model
-const postModel = sequelize.define("Posts", {
+const postModel = sequelizePost.define("Posts", {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -47,7 +47,7 @@ const postModel = sequelize.define("Posts", {
         type: DataTypes.DATE,
         allowNull: true
     },
-    appInstructions: {
+    applicationInstructions: {
         type: DataTypes.STRING,
         allowNull: true
     }, 
@@ -62,4 +62,4 @@ const postModel = sequelize.define("Posts", {
 
 });
 
-export { sequelize, postModel }
+export { sequelizePost, postModel }

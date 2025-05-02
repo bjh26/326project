@@ -1,13 +1,13 @@
 import { Sequelize, DataTypes } from "sequelize";
 
 // initializes a new Sequelize instance with SQLite
-const sequelize = new Sequelize({
+const sequelizeUser = new Sequelize({
     dialect: "sqlite",
-    storage: "database.sqlite"
+    storage: "User.sqlite"
 });
 
 // User model
-const userModel = sequelize.define("Users", { 
+const userModel = sequelizeUser.define("Users", { 
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -51,4 +51,4 @@ const userModel = sequelize.define("Users", {
     }
 });
 
-export { sequelize, userModel };
+export { sequelizeUser, userModel };
