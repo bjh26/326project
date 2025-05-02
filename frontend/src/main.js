@@ -1,14 +1,18 @@
 import { AppControllerComponent } from "./components/AppControllerComponent/AppControllerComponent.js";
 import { TaskRepositoryRemoteService } from "./services/TaskRepositoryRemoteService.js";
+import { LocalDB } from "./services/LocalDB.js";
 
-// Create an instance of AppControllerComponent
+// open local DB (uses IndexedDB)
+LocalDB.open();
+
+// create an instance of AppControllerComponent
 const appController = new AppControllerComponent();
 
-// Render the component in the #app container
+// render the component in the #app container
 const appContainer = document.getElementById("app");
-appContainer.appendChild(appController.render());
+appContainer.appendChild(await appController.render());
 
-// Services
+// services
 const taskRepository = new TaskRepositoryRemoteService();
 
 

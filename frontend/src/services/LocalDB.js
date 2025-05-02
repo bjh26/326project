@@ -8,7 +8,7 @@ export class LocalDB {
     }
   
     /**
-     * Open or upgrade the IndexedDB database
+     * Opens or upgrades the IndexedDB database.
      * @returns {Promise<IDBDatabase>}
      */
     static open() {
@@ -48,18 +48,40 @@ export class LocalDB {
         return LocalDB.db.transaction(["storage"], mode).objectStore("storage");
     }
   
+    /**
+     * Add an object to the database with the given key.
+     * @param {string} key
+     * @param {object} value
+     * @returns {Promise<string>}
+     */
     static add(key, value) {
         return this._promisify(this._getStore("readwrite").add(value, key));
     }
   
+    /**
+     * Overwrites the object in the database associated with the given key.
+     * @param {string} key
+     * @param {object} value
+     * @returns {Promise<string>}
+     */
     static put(key, value) {
         return this._promisify(this._getStore("readwrite").put(value, key)); // https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/put
     }
   
+    /**
+     * Retrieves an object from the database associated with the given key.
+     * @param {string} key
+     * @returns {Promise<object>}
+     */
     static get(key) {
         return this._promisify(this._getStore().get(key)); // https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/get
     }
   
+    /**
+     * Deletes the object from the database associated with the given key.
+     * @param {string} key
+     * @returns {Promise<undefined>}
+     */
     static delete(key) {
         return this._promisify(this._getStore("readwrite").delete(key));
     }
