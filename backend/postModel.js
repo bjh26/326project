@@ -28,7 +28,7 @@ const postModel = sequelizePost.define("Posts", {
         allowNull: true
     }, 
     qualifications: {
-        type: DataTypes.STRING, // or array if can filter based on qualifications
+        type: DataTypes.STRING, // sqlite doesn't take in arrays
         allowNull: true
     }, 
     compensation: {
