@@ -169,3 +169,131 @@ app.delete('/researchPost/:id', async (request, response) => {
 });
 
 // @Khang please fill this out yourself 
+app.get('/api/posts', async (req, res) => {
+    try {
+        const posts = await postModel.findAll();
+        
+        // Format posts for frontend
+        const formattedPosts = posts.map(post => {
+            const postData = post.get({ plain: true });
+            const formattedPost = formatPostForFrontend(postData);
+            
+            // Convert dates to ISO strings for JSON transmission
+            return {
+                ...formattedPost,
+                postedDate: formattedPost.postedDate.toISOString(),
+                deadline: formattedPost.deadline.toISOString(),
+                hiring_period: {
+                    start: formattedPost.hiring_period.start.toISOString(),
+                    end: formattedPost.hiring_period.end.toISOString()
+                }
+            };
+        });
+        
+        res.json(formattedPosts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Error fetching posts', error: error.message });
+    }
+});
+
+// GET a specific research post by ID
+app.get('/api/posts/:id', async (req, res) => {
+    try {
+        const postId = parseInt(req.params.id);
+        const post = await postModel.findByPk(postId);
+        
+        if (!post) {
+            return res.status(404).json({ message: 'Research opportunity not found' });
+        }
+        
+        // Format post for frontend
+        const postData = post.get({ plain: true });
+        const formattedPost = formatPostForFrontend(postData);
+        
+        // Convert Date objects to ISO strings for JSON transmission
+        const postForJson = {
+            ...formattedPost,
+            postedDate: formattedPost.postedDate.toISOString(),
+            deadline: formattedPost.deadline.toISOString(),
+            hiring_period: {
+                start: formattedPost.hiring_period.start.toISOString(),
+                end: formattedPost.hiring_period.end.toISOString()
+            }
+        };
+        
+        res.json(postForJson);
+    } catch (error) {
+        console.error('Error fetching post:', error);
+        res.status(500).json({ message: 'Error fetching post', error: error.message });
+    }
+});
+
+// GET all unique majors with their post counts
+app.get('/api/majors', async (req, res) => {
+    try {
+        const posts = await postModel.findAll();
+        const majorCounts = {};
+
+        posts.forEach(post => {
+            const qualifications = post.qualification_requirement || [];
+            
+            qualifications.forEach(line => {
+                umassMajors.forEach(major => {
+                    if (line.includes(major)) {
+                        if (!majorCounts[major]) {
+                            majorCounts[major] = 0;
+                        }
+                        majorCounts[major]++;
+                    }
+                });
+                
+                Object.keys(umassMajorAbbreviations).forEach(abbr => {
+                    if (line.includes(abbr)) {
+                        const fullMajor = umassMajorAbbreviations[abbr];
+                        if (!majorCounts[fullMajor]) {
+                            majorCounts[fullMajor] = 0;
+                        }
+                        majorCounts[fullMajor]++;
+                    }
+                });
+            });
+        });
+
+        res.json(majorCounts);
+    } catch (error) {
+        console.error('Error fetching majors:', error);
+        res.status(500).json({ message: 'Error fetching majors', error: error.message });
+    }
+});
+
+// SSE endpoint for real-time updates
+app.get('/api/updates', (req, res) => {
+    // Set headers for SSE
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+    });
+    
+    // Send initial connection message
+    res.write(`data: ${JSON.stringify({ type: 'connection', message: 'Connected to updates stream' })}\n\n`);
+    
+    // Add client to connected clients
+    const clientId = Date.now();
+    const newClient = {
+        id: clientId,
+        response: res
+    };
+    
+    sseClients.push(newClient);
+    
+    // Handle client disconnect
+    req.on('close', () => {
+        const index = sseClients.findIndex(client => client.id === clientId);
+        if (index !== -1) {
+            sseClients.splice(index, 1);
+            console.log(`Client ${clientId} disconnected, ${sseClients.length} clients remaining`);
+        }
+    });
+});
