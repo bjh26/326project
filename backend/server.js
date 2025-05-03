@@ -1,6 +1,6 @@
 import express from "express";
 import { sequelizeUser, userModel } from "./userModel.js";
-import { sequelizePost, postModel } from "./postModel.js";
+import { sequelizePost, postModel, seedResearchPosts, formatPostForFrontend } from "./postModel.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -40,16 +40,7 @@ async function preloadData() {
         console.log(test)
         console.log('data imported...')
 
-        await sequelizePost.sync({force:true});
-        await postModel.create({
-            title: 'example posting',
-            description: 'human experiment',
-            contactEmail: 'bjhuang@umass.edu',
-            responsibilities: 'show up',
-            qualifications: 'preferably majoring in accounting',
-            compensation: '$20/hr',
-            contactName: 'blair',
-        });
+        seedResearchPosts(); // Add in mock data for research posts
 
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
@@ -183,10 +174,8 @@ app.get('/api/posts', async (req, res) => {
                 ...formattedPost,
                 postedDate: formattedPost.postedDate.toISOString(),
                 deadline: formattedPost.deadline.toISOString(),
-                hiring_period: {
-                    start: formattedPost.hiring_period.start.toISOString(),
-                    end: formattedPost.hiring_period.end.toISOString()
-                }
+                hiringPeriodStart: formattedPost.hiringPeriodStart.toISOString(),
+                hiringPeriodEnd: formattedPost.hiringPeriodEnd.toISOString(),
             };
         });
         
@@ -216,10 +205,8 @@ app.get('/api/posts/:id', async (req, res) => {
             ...formattedPost,
             postedDate: formattedPost.postedDate.toISOString(),
             deadline: formattedPost.deadline.toISOString(),
-            hiring_period: {
-                start: formattedPost.hiring_period.start.toISOString(),
-                end: formattedPost.hiring_period.end.toISOString()
-            }
+            hiringPeriodStart: formattedPost.hiringPeriodStart.toISOString(),
+            hiringPeriodEnd: formattedPost.hiringPeriodEnd.toISOString(),
         };
         
         res.json(postForJson);
@@ -236,7 +223,7 @@ app.get('/api/majors', async (req, res) => {
         const majorCounts = {};
 
         posts.forEach(post => {
-            const qualifications = post.qualification_requirement || [];
+            const qualifications = post.qualificationRequirement || [];
             
             qualifications.forEach(line => {
                 umassMajors.forEach(major => {

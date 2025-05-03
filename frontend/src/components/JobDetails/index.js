@@ -55,13 +55,13 @@ export class JobDetailsComponent extends BaseComponents {
     
     // Format hiring period
     let hiringPeriodText = 'Not specified';
-    if (post.hiring_period && post.hiring_period.start && post.hiring_period.end) {
-      const start = new Date(post.hiring_period.start).toLocaleDateString('en-US', {
+    if (post.hiringPeriodStart && post.hiringPeriodEnd) {
+      const start = new Date(post.hiringPeriodStart).toLocaleDateString('en-US', {
         month: '2-digit',
         day: '2-digit',
         year: 'numeric'
       });
-      const end = new Date(post.hiring_period.end).toLocaleDateString('en-US', {
+      const end = new Date(post.hiringPeriodEnd).toLocaleDateString('en-US', {
         month: '2-digit',
         day: '2-digit',
         year: 'numeric'
@@ -90,12 +90,12 @@ export class JobDetailsComponent extends BaseComponents {
         </ul>
         ` : ''}
         
-        ${post.qualification_requirement ? `
+        ${post.qualificationRequirement ? `
         <h3>Qualification Requirements</h3>
         <ul>
-          ${Array.isArray(post.qualification_requirement) 
-            ? post.qualification_requirement.map(q => `<li>${q}</li>`).join('') 
-            : `<li>${post.qualification_requirement}</li>`}
+          ${Array.isArray(post.qualificationRequirement) 
+            ? post.qualificationRequirement.map(q => `<li>${q}</li>`).join('') 
+            : `<li>${post.qualificationRequirement}</li>`}
         </ul>
         ` : ''}
         
@@ -105,15 +105,15 @@ export class JobDetailsComponent extends BaseComponents {
         <h3>Hiring Period</h3>
         <p>${hiringPeriodText}</p>
         
-        ${post.application_instructions ? `
+        ${post.applicationInstructions ? `
         <h3>Application Instructions</h3>
-        <p>${post.application_instructions}</p>
+        <p>${post.applicationInstructions}</p>
         ` : ''}
 
         <h3>Contact Information</h3>
         <div class="contact-info">
-          <p><strong>${post.contact_name || 'Not specified'}</strong></p>
-          ${post.contact_email ? `<p><strong>Email:</strong> <a href="mailto:${post.contact_email}">${post.contact_email}</a></p>` : ''}
+          <p><strong>${post.contactName || 'Not specified'}</strong></p>
+          ${post.contactEmail ? `<p><strong>Email:</strong> <a href="mailto:${post.contactEmail}">${post.contactEmail}</a></p>` : ''}
         </div>
         
         <div class="action-buttons">
@@ -157,13 +157,13 @@ export class JobDetailsComponent extends BaseComponents {
     
     // Format hiring period
     let hiringPeriodText = 'Not specified';
-    if (post.hiring_period && post.hiring_period.start && post.hiring_period.end) {
-      const start = new Date(post.hiring_period.start).toLocaleDateString('en-US', {
+    if (post.hiringPeriod && post.hiringPeriodStart && post.hiringPeriodEnd) {
+      const start = new Date(post.hiringPeriodStart).toLocaleDateString('en-US', {
         month: '2-digit',
         day: '2-digit',
         year: 'numeric'
       });
-      const end = new Date(post.hiring_period.end).toLocaleDateString('en-US', {
+      const end = new Date(post.hiringPeriodEnd).toLocaleDateString('en-US', {
         month: '2-digit',
         day: '2-digit',
         year: 'numeric'
@@ -195,12 +195,12 @@ export class JobDetailsComponent extends BaseComponents {
             </ul>
             ` : ''}
             
-            ${post.qualification_requirement ? `
+            ${post.qualificationRequirement ? `
             <h3>Qualification Requirements</h3>
             <ul>
-              ${Array.isArray(post.qualification_requirement) 
-                ? post.qualification_requirement.map(q => `<li>${q}</li>`).join('') 
-                : `<li>${post.qualification_requirement}</li>`}
+              ${Array.isArray(post.qualificationRequirement) 
+                ? post.qualificationRequirement.map(q => `<li>${q}</li>`).join('') 
+                : `<li>${post.qualificationRequirement}</li>`}
             </ul>
             ` : ''}
             
@@ -210,15 +210,15 @@ export class JobDetailsComponent extends BaseComponents {
             <h3>Hiring Period</h3>
             <p>${hiringPeriodText}</p>
             
-            ${post.application_instructions ? `
+            ${post.applicationInstructions ? `
             <h3>Application Instructions</h3>
-            <p>${post.application_instructions}</p>
+            <p>${post.applicationInstructions}</p>
             ` : ''}
 
             <h3>Contact Information</h3>
             <div class="contact-info">
-              <p><strong>${post.contact_name || 'Not specified'}</strong></p>
-              ${post.contact_email ? `<p><strong>Email:</strong> <a href="mailto:${post.contact_email}">${post.contact_email}</a></p>` : ''}
+              <p><strong>${post.contactName || 'Not specified'}</strong></p>
+              ${post.contactEmail ? `<p><strong>Email:</strong> <a href="mailto:${post.contactEmail}">${post.contactEmail}</a></p>` : ''}
             </div>
             
             <div class="action-buttons">
@@ -246,7 +246,7 @@ export class JobDetailsComponent extends BaseComponents {
 
   handleApply(post) {
     // Get the contact email from the post
-    const contactEmail = post.contact_email || '';
+    const contactEmail = post.contactEmail || '';
     
     // Create a well-formatted email subject and body
     const subject = `Application for ${post.title}`;

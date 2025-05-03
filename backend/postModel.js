@@ -34,15 +34,15 @@ const postModel = sequelizePost.define("Posts", {
             this.setDataValue('responsibilities', JSON.stringify(value));
         }
     },
-    qualification_requirement: {
+    qualificationRequirement: {
         type: DataTypes.TEXT, // Will store JSON string for array
         allowNull: true,
         get() {
-            const rawValue = this.getDataValue('qualification_requirement');
+            const rawValue = this.getDataValue('qualificationRequirement');
             return rawValue ? JSON.parse(rawValue) : [];
         },
         set(value) {
-            this.setDataValue('qualification_requirement', JSON.stringify(value));
+            this.setDataValue('qualificationRequirement', JSON.stringify(value));
         }
     }, 
     compensation: {
@@ -54,11 +54,11 @@ const postModel = sequelizePost.define("Posts", {
         allowNull: true,
         defaultValue: DataTypes.NOW,
     },
-    hiring_period_start: {
+    hiringPeriodStart: {
         type: DataTypes.DATE,
         allowNull: true
     },
-    hiring_period_end: {
+    hiringPeriodEnd: {
         type: DataTypes.DATE,
         allowNull: true
     },
@@ -87,16 +87,14 @@ const formatPostForFrontend = (post) => {
         title: post.title,
         description: post.description,
         responsibilities: post.responsibilities,
-        qualification_requirement: post.qualification_requirement,
+        qualificationRequirement: post.qualificationRequirement,
         compensation: post.compensation,
-        hiring_period: {
-            start: post.hiring_period_start,
-            end: post.hiring_period_end
-        },
-        application_instructions: post.application_instructions,
+        hiringPeriodStart: post.hiringPeriodStart,
+        hiringPeriodEnd: post.hiringPeriodEnd,
+        applicationInstructions: post.applicationInstructions,
         deadline: post.deadline,
-        contact_name: post.contact_name,
-        contact_email: post.contact_email,
+        contactName: post.contactName,
+        contactEmail: post.contactEmail,
         postedDate: post.postedDate
     };
 };
@@ -117,18 +115,18 @@ const seedResearchPosts = async () => {
                     "Collaborate with team members to analyze project requirements.",
                     "Document research findings and progress."
                 ],
-                qualification_requirement: [
+                qualificationRequirement: [
                     "Undergraduate student in Computer Science or Software Engineering.",
                     "Basic knowledge of programming languages like JavaScript or Python.",
                     "Strong analytical and problem-solving skills."
                 ],
                 compensation: "$15/hour",
-                hiring_period_start: new Date("2024-01-15"),
-                hiring_period_end: new Date("2024-05-30"),
-                application_instructions: "Submit your resume and a brief cover letter to Prof. Emily Rodriguez.",
+                hiringPeriodStart: new Date("2024-01-15"),
+                hiringPeriodEnd: new Date("2024-05-30"),
+                applicationInstructions: "Submit your resume and a brief cover letter to Prof. Emily Rodriguez.",
                 deadline: new Date("2024-02-15"),
-                contact_name: "Emily Rodriguez",
-                contact_email: "emily.rodriguez@university.edu",
+                contactName: "Emily Rodriguez",
+                contactEmail: "emily.rodriguez@university.edu",
                 postedDate: new Date("2023-11-01")
             },
             {
@@ -139,18 +137,18 @@ const seedResearchPosts = async () => {
                     "Analyze datasets to extract meaningful insights.",
                     "Collaborate with researchers to publish findings."
                 ],
-                qualification_requirement: [
+                qualificationRequirement: [
                     "Undergraduate or graduate student in Computer Science, Data Science, or AI.",
                     "Experience with Python and machine learning libraries.",
                     "Strong mathematical foundation in statistics and linear algebra."
                 ],
                 compensation: "$18/hour",
-                hiring_period_start: new Date("2024-02-01"),
-                hiring_period_end: new Date("2024-06-15"),
-                application_instructions: "Send your application to Prof. Michael Chang via email.",
+                hiringPeriodStart: new Date("2024-02-01"),
+                hiringPeriodEnd: new Date("2024-06-15"),
+                applicationInstructions: "Send your application to Prof. Michael Chang via email.",
                 deadline: new Date("2024-02-20"),
-                contact_name: "Michael Chang",
-                contact_email: "michael.chang@university.edu",
+                contactName: "Michael Chang",
+                contactEmail: "michael.chang@university.edu",
                 postedDate: new Date("2023-10-25")
             },
             {
@@ -161,18 +159,18 @@ const seedResearchPosts = async () => {
                     "Evaluate model performance and suggest improvements.",
                     "Prepare technical documentation and reports."
                 ],
-                qualification_requirement: [
+                qualificationRequirement: [
                     "Background in Artificial Intelligence or Computer Science.",
                     "Experience with NLP frameworks and tools.",
                     "Strong programming skills in Python."
                 ],
                 compensation: "$17/hour",
-                hiring_period_start: new Date("2024-01-20"),
-                hiring_period_end: new Date("2024-05-20"),
-                application_instructions: "Apply online through the university's research portal.",
+                hiringPeriodStart: new Date("2024-01-20"),
+                hiringPeriodEnd: new Date("2024-05-20"),
+                applicationInstructions: "Apply online through the university's research portal.",
                 deadline: new Date("2024-02-10"),
-                contact_name: "Sarah Johnson",
-                contact_email: "sarah.johnson@university.edu",
+                contactName: "Sarah Johnson",
+                contactEmail: "sarah.johnson@university.edu",
                 postedDate: new Date("2023-10-15")
             },
             {
@@ -183,18 +181,18 @@ const seedResearchPosts = async () => {
                     "Collaborate with the team to test and validate methodologies.",
                     "Document and present research outcomes."
                 ],
-                qualification_requirement: [
+                qualificationRequirement: [
                     "Student in Software Engineering or Computer Engineering.",
                     "Experience with software development tools and practices.",
                     "Strong teamwork and communication skills."
                 ],
                 compensation: "$16/hour",
-                hiring_period_start: new Date("2024-02-10"),
-                hiring_period_end: new Date("2024-06-01"),
-                application_instructions: "Submit your application to Prof. David Wilson via email.",
+                hiringPeriodStart: new Date("2024-02-10"),
+                hiringPeriodEnd: new Date("2024-06-01"),
+                applicationInstructions: "Submit your application to Prof. David Wilson via email.",
                 deadline: new Date("2024-02-25"),
-                contact_name: "David Wilson",
-                contact_email: "david.wilson@university.edu",
+                contactName: "David Wilson",
+                contactEmail: "david.wilson@university.edu",
                 postedDate: new Date("2023-09-30")
             },
             {
@@ -205,18 +203,18 @@ const seedResearchPosts = async () => {
                     "Develop prototypes for experimental software applications.",
                     "Collaborate with research teams to document findings."
                 ],
-                qualification_requirement: [
+                qualificationRequirement: [
                     "Bachelor's degree in Computer Science or related field.",
                     "Experience with JavaScript, Python, or C++.",
                     "Understanding of AI/ML fundamentals."
                 ],
                 compensation: "Competitive hourly wage or stipend.",
-                hiring_period_start: new Date("2025-05-01"),
-                hiring_period_end: new Date("2025-08-31"),
-                application_instructions: "Submit a resume and cover letter via our application portal.",
+                hiringPeriodStart: new Date("2025-05-01"),
+                hiringPeriodEnd: new Date("2025-08-31"),
+                applicationInstructions: "Submit a resume and cover letter via our application portal.",
                 deadline: new Date("2025-04-30"),
-                contact_name: "Jane Doe",
-                contact_email: "jane.doe@researchlab.edu",
+                contactName: "Jane Doe",
+                contactEmail: "jane.doe@researchlab.edu",
                 postedDate: new Date("2023-08-15")
             }
         ];
