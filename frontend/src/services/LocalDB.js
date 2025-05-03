@@ -71,7 +71,7 @@ export class LocalDB {
     /**
      * Retrieves an object from the database associated with the given key.
      * @param {string} key
-     * @returns {Promise<object>}
+     * @returns {Promise<any>}
      */
     static get(key) {
         return this._promisify(this._getStore().get(key)); // https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/get
