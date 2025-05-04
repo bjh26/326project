@@ -77,9 +77,11 @@ export class AppControllerComponent {
         this.#container.innerHTML = ''; // Clear existing content
 
         if (page === "login") {
-            this.#hub.publish("NavigateToLoginPage");
+            // this.#hub.publish("NavigateToLoginPage");
         } else if (page === "home") {
-            this.#hub.publish("NavigateToHomePage");
+            const homePageControllerComponent = document.createElement("div");
+            homePageControllerComponent.textContent = "Home Page";
+            this.#container.appendChild(homePageControllerComponent);
         } else if (page === "profile") {
             let email, canEdit;
             if (!info) { // rendering upon reloading, check for session info in DB
@@ -111,7 +113,7 @@ export class AppControllerComponent {
     }
 
     #setupEventListeners() {
-        this.#hub.subscribe(Events.NavigateTo, data => this.#renderPage(data.page, data.info));
+        this.#hub.subscribe(Events.NavigateTo, async (data) => await this.#renderPage(data.page, data.info));
     }
 
     // // Sets up the HTML structure for the container

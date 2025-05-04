@@ -15,9 +15,9 @@ export class EventHub {
     }
   
     // Publish an event
-    publish(event, data) {
+    async publish(event, data) {
       if (!this.events[event]) return;
-      this.events[event].forEach(listener => listener(data));
+      this.events[event].forEach(async (listener) => await listener(data));
     }
   
     // Unsubscribe from an event

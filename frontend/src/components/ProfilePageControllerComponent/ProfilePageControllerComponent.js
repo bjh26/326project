@@ -729,7 +729,8 @@ export class ProfilePageControllerComponent {
         const homeButton = this.#container.querySelector("#home");
         if (homeButton) {
             homeButton.addEventListener("click", async () => {
-                await this.loadPage("main");
+                console.log("home button clicked");
+                await this.#hub.publish(Events.NavigateTo, { page: "home" });
             });
         }
 
