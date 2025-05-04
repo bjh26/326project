@@ -2,9 +2,11 @@
 // import { SimpleTaskListViewComponent } from '../SimpleTaskListViewComponent/SimpleTaskListViewComponent.js';
 // import { TaskInputComponent } from '../TaskInputComponent/TaskInputComponent.js';
 import { EventHub } from '../../eventhub/EventHub.js';
+import { Events } from '../../eventhub/Events.js';
 import { LocalDB } from '../../services/LocalDB.js';
 
 import { ProfilePageControllerComponent } from '../ProfilePageControllerComponent/ProfilePageControllerComponent.js';
+import { LoginPageControllerComponent } from '../LoginPageControllerComponent/LoginPageControllerComponent.js';
 
 export class AppControllerComponent {
     #container = null; // private container for the component
@@ -42,13 +44,13 @@ export class AppControllerComponent {
         this.#currentPage = await LocalDB.get("currentPage");
         if (!this.#currentPage) {
             this.#currentPage = "login"; // default to login
-            LocalDB.put("currentPage", "login");
+            await LocalDB.put("currentPage", "login");
         }
 
-        this.#container.appendChild(await this.#renderPage(this.#currentPage));
-        
-        
+        // load current page into container
+        await this.#renderPage(this.#currentPage);
 
+        this.#setupEventListeners();
 
         // this.#setupContainerContent();
         // this.#attachEventListeners();
@@ -72,11 +74,10 @@ export class AppControllerComponent {
     async #renderPage(page, info) {
         if (page === "login") {
             this.#hub.publish("NavigateToLoginPage");
+            const loginPageComponent = Login
         } else if (page === "home") {
             this.#hub.publish("NavigateToHomePage");
         } else if (page === "profile") {
-            this.#hub.publish("NavigateToProfilePage", { email: xxx, canEdit: xxx });
-
             let email, canEdit;
             if (!info) { // rendering upon reloading, check for session info in DB
                 email = await LocalDB.get("viewingProfile");
@@ -94,7 +95,7 @@ export class AppControllerComponent {
 
             const profilePageControllerComponent = new ProfilePageControllerComponent(email, canEdit);
             
-            return await profilePageControllerComponent.render();
+            this.#container = profilePageControllerComponent.render();
         } else if (page === "createProfile") {
 
         } else if (page === "createPost") {
@@ -106,62 +107,66 @@ export class AppControllerComponent {
         }
     }
 
-    // Sets up the HTML structure for the container
-    #setupContainerContent() {
-        this.#container.innerHTML = `
-        <div id="viewContainer"></div>
-        <button id="switchViewBtn">Switch to Simple View</button>
-        `;
+    #setupEventListeners() {
+        this.#hub.subscribe(Events.NavigateTo, data => this.#renderPage(data.page, data.info));
     }
 
-    // Attaches the necessary event listeners
-    #attachEventListeners() {
-        const switchViewBtn = this.#container.querySelector('#switchViewBtn');
+    // // Sets up the HTML structure for the container
+    // #setupContainerContent() {
+    //     this.#container.innerHTML = `
+    //     <div id="viewContainer"></div>
+    //     <button id="switchViewBtn">Switch to Simple View</button>
+    //     `;
+    // }
 
-        // Event listener for switching views
-        switchViewBtn.addEventListener('click', () => {
-            this.#toggleView();
-        });
+    // // Attaches the necessary event listeners
+    // #attachEventListeners() {
+    //     const switchViewBtn = this.#container.querySelector('#switchViewBtn');
 
-        // Subscribe to events from the EventHub to manage switching
-        this.#hub.subscribe('SwitchToSimpleView', () => {
-            this.#currentView = 'simple';
-            this.#renderCurrentView();
-        });
+    //     // Event listener for switching views
+    //     switchViewBtn.addEventListener('click', () => {
+    //         this.#toggleView();
+    //     });
 
-        this.#hub.subscribe('SwitchToMainView', () => {
-            this.#currentView = 'main';
-            this.#renderCurrentView();
-        });
-    }
+    //     // Subscribe to events from the EventHub to manage switching
+    //     this.#hub.subscribe('SwitchToSimpleView', () => {
+    //         this.#currentView = 'simple';
+    //         this.#renderCurrentView();
+    //     });
 
-    // Toggles the view between main and simple
-    #toggleView() {
-        if (this.#currentView === 'main') {
-            this.#currentView = 'simple';
-            this.#hub.publish('SwitchToSimpleView', null);
-        } else {
-            this.#currentView = 'main';
-            this.#hub.publish('SwitchToMainView', null);
-        }
-    }
+    //     this.#hub.subscribe('SwitchToMainView', () => {
+    //         this.#currentView = 'main';
+    //         this.#renderCurrentView();
+    //     });
+    // }
 
-    // Renders the current view based on the #currentView state
-    #renderCurrentView() {
-        const viewContainer = this.#container.querySelector('#viewContainer');
-        viewContainer.innerHTML = ''; // Clear existing content
+    // // Toggles the view between main and simple
+    // #toggleView() {
+    //     if (this.#currentView === 'main') {
+    //         this.#currentView = 'simple';
+    //         this.#hub.publish('SwitchToSimpleView', null);
+    //     } else {
+    //         this.#currentView = 'main';
+    //         this.#hub.publish('SwitchToMainView', null);
+    //     }
+    // }
 
-        // Update the button text based on the current view
-        const switchViewBtn = this.#container.querySelector('#switchViewBtn');
-        switchViewBtn.textContent = this.#currentView === 'main' ? 'Switch to Simple View' : 'Switch to Main View';
+    // // Renders the current view based on the #currentView state
+    // #renderCurrentView() {
+    //     const viewContainer = this.#container.querySelector('#viewContainer');
+    //     viewContainer.innerHTML = ''; // Clear existing content
 
-        if (this.#currentView === 'main') {
-            // Render the main task list view
-            viewContainer.appendChild(this.#taskInputComponent.render());
-            viewContainer.appendChild(this.#taskListComponent.render());
-        } else {
-            // Render the simple task list view
-            viewContainer.appendChild(this.#simpleTaskListViewComponent.render());      
-        }
-    }
+    //     // Update the button text based on the current view
+    //     const switchViewBtn = this.#container.querySelector('#switchViewBtn');
+    //     switchViewBtn.textContent = this.#currentView === 'main' ? 'Switch to Simple View' : 'Switch to Main View';
+
+    //     if (this.#currentView === 'main') {
+    //         // Render the main task list view
+    //         viewContainer.appendChild(this.#taskInputComponent.render());
+    //         viewContainer.appendChild(this.#taskListComponent.render());
+    //     } else {
+    //         // Render the simple task list view
+    //         viewContainer.appendChild(this.#simpleTaskListViewComponent.render());      
+    //     }
+    // }
 }

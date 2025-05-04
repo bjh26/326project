@@ -40,7 +40,7 @@ export class ProfilePageControllerComponent {
         this.#currentProfilePage = await LocalDB.get("currentProfilePage");
         if (!this.#currentProfilePage) {
             this.#currentProfilePage = "profile"; // default to profile
-            LocalDB.put("currentProfilePage", "profile");
+            await LocalDB.put("currentProfilePage", "profile");
         }
 
         // load profile data from server into IndexedDB
@@ -56,6 +56,12 @@ export class ProfilePageControllerComponent {
         this.#addEventListeners(this.#currentProfilePage);
 
         return this.#container;
+    }
+
+    async loadPage(page) {
+        await LocalDB.put("currentProfilePage", page);
+        this.#currentProfilePage = page;
+        await this.render();
     }
 
     async #loadDataFromServer(email) {
@@ -74,7 +80,7 @@ export class ProfilePageControllerComponent {
 
     async #saveToServer() {
         // load from IndexedDB
-        this.#profileData = LocalDB.get("profileData");
+        this.#profileData = await LocalDB.get("profileData");
         
         // make sure researchItems exists
         if (!this.#profileData.researchItems) {
@@ -238,11 +244,7 @@ export class ProfilePageControllerComponent {
                 
                 // then navigate to the next page
                 const nextPage = this.#pageSequence[this.#currentProfilePage];
-                await LocalDB.put("currentProfilePage", nextPage);
-                this.#currentProfilePage = nextPage;
-
-
-                this.loadPage(nextPage); // ???
+                this.loadPage(nextPage);
             });
         }
 
@@ -250,9 +252,7 @@ export class ProfilePageControllerComponent {
         const editButton = document.getElementById("edit");
         if (editButton) {
             editButton.addEventListener("click", async () => {
-                await LocalDB.put("currentProfilePage", "edit1");
-                this.#currentProfilePage = "edit1";
-                this.loadPage("edit1"); // ???
+                this.loadPage("edit1");
             });
         }
 
@@ -260,9 +260,7 @@ export class ProfilePageControllerComponent {
         const homeButton = document.getElementById("home");
         if (homeButton) {
             homeButton.addEventListener("click", async () => {
-                await LocalDB.put("currentProfilePage", "main");
-                this.#currentProfilePage = "main";
-                this.loadPage("main"); // ???
+                this.loadPage("main");
             });
         }
 
@@ -286,13 +284,11 @@ export class ProfilePageControllerComponent {
                 await this.#saveToServer();
                 
                 // then navigate to the home page
-                await LocalDB.put("currentProfilePage", "main");
-                this.#currentProfilePage = "main";
-                this.loadPage("main"); // ???
+                this.loadPage("main");
             });
         }
 
-        // add event listener for the "Add" research button on edit3 page
+        // add event listener for the 'add' research button on edit3 page
         const addResearchButton = document.getElementById("addResearch");
         if (addResearchButton) {
             addResearchButton.addEventListener("click", async () => {
