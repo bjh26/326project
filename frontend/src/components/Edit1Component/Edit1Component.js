@@ -1,4 +1,4 @@
-import { BaseComponent } from "../BaseComponent/BaseComponent";
+import { BaseComponent } from "../BaseComponent/BaseComponent.js";
 
 export class Edit1Component extends BaseComponent {
     constructor() {

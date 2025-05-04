@@ -1,6 +1,5 @@
 import Service from "./Service.js";
 import { Events } from "../eventhub/Events.js";
-import Base64 from "../utility/base64.js";
 
 export class TaskRepositoryRemoteService extends Service {
   constructor() {

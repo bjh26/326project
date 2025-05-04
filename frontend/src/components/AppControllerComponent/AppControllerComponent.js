@@ -40,15 +40,17 @@ export class AppControllerComponent {
     async render() {
         this.#createContainer();
 
+        // this.#setupContainerContent();
+
         // check if current page is in IndexedDB, otherwise default to login page
         this.#currentPage = await LocalDB.get("currentPage");
         if (!this.#currentPage) {
-            this.#currentPage = "login"; // default to login
-            await LocalDB.put("currentPage", "login");
+            this.#currentPage = "profile"; // default to login
+            await LocalDB.put("currentPage", "profile");
         }
 
         // load current page into container
-        await this.#renderPage(this.#currentPage);
+        await this.#renderPage(this.#currentPage, { email:"nadina@umass.edu", canEdit:true });
 
         this.#setupEventListeners();
 
@@ -67,14 +69,15 @@ export class AppControllerComponent {
 
     // creates the main container element
     #createContainer() {
-        this.#container = document.createElement('div');
-        this.#container.classList.add('app-controller');
+        this.#container = document.createElement("div");
+        this.#container.id = "app-controller";
     }
 
     async #renderPage(page, info) {
+        this.#container.innerHTML = ''; // Clear existing content
+
         if (page === "login") {
             this.#hub.publish("NavigateToLoginPage");
-            const loginPageComponent = Login
         } else if (page === "home") {
             this.#hub.publish("NavigateToHomePage");
         } else if (page === "profile") {
@@ -86,8 +89,8 @@ export class AppControllerComponent {
                     throw new Error(`Invalid request to load profile page (email: ${email}, canEdit: ${canEdit})`);
                 }
             } else {
-                if (!(email in info) || !(canEdit in info)) {
-                    throw new Error(`Invalid request to load profile page (info: ${info})`);
+                if (!("email" in info) || !("canEdit" in info)) {
+                    throw new Error(`Invalid request to load profile page (info: ${JSON.stringify(info)}`);
                 }
                 email = info.email;
                 canEdit = info.canEdit;
@@ -95,7 +98,7 @@ export class AppControllerComponent {
 
             const profilePageControllerComponent = new ProfilePageControllerComponent(email, canEdit);
             
-            this.#container = profilePageControllerComponent.render();
+            this.#container.appendChild(await profilePageControllerComponent.render());
         } else if (page === "createProfile") {
 
         } else if (page === "createPost") {

@@ -3,7 +3,7 @@ import { TaskRepositoryRemoteService } from "./services/TaskRepositoryRemoteServ
 import { LocalDB } from "./services/LocalDB.js";
 
 // open local DB (uses IndexedDB)
-LocalDB.open();
+await LocalDB.open();
 
 // create an instance of AppControllerComponent
 const appController = new AppControllerComponent();
@@ -13,7 +13,7 @@ const appContainer = document.getElementById("app");
 appContainer.appendChild(await appController.render());
 
 // services
-const taskRepository = new TaskRepositoryRemoteService();
+// const taskRepository = new TaskRepositoryRemoteService();
 
 
 

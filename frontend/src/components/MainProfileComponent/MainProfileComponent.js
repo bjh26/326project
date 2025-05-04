@@ -1,4 +1,4 @@
-import { BaseComponent } from "../BaseComponent/BaseComponent";
+import { BaseComponent } from "../BaseComponent/BaseComponent.js";
 
 export class MainProfileComponent extends BaseComponent {
     constructor() {
