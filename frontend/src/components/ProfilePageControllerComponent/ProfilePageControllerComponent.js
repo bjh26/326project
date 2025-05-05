@@ -476,12 +476,13 @@
 import { EventHub } from '../../eventhub/EventHub.js';
 import { Events } from '../../eventhub/Events.js';
 import { LocalDB } from '../../services/LocalDB.js';
+import { BaseComponent } from '../BaseComponent/BaseComponent.js';
 import { Edit1Component } from '../Edit1Component/Edit1Component.js';
 import { Edit2Component } from '../Edit2Component/Edit2Component.js';
-import { Edit3Component } from '../Edit3Component/Edit2Component.js';
+import { Edit3Component } from '../Edit3Component/Edit3Component.js';
 import { MainProfileComponent } from '../MainProfileComponent/MainProfileComponent.js';
 
-export class ProfilePageControllerComponent {
+export class ProfilePageControllerComponent extends BaseComponent {
     #container = null; // private container for the component
     #currentProfilePage = null; // track the current page ("main", "edit1", "edit2", "edit3") 
     #hub; // EventHub instance for managing events
@@ -495,19 +496,21 @@ export class ProfilePageControllerComponent {
 
     #email; // email of person whose profile we're viewing
     #canEdit; // whether user has perms to edit this profile
+    #refreshed; // whether this page was triggered on a refresh
 
     #profileData;
 
     // constructor is called upon loading site for first time
-    constructor(email, canEdit) {
+    constructor(email, canEdit, refreshed) {
+        super();
         // store EventHub instance for convenience
         this.#hub = EventHub.getInstance();
         this.#email = email;
         this.#canEdit = canEdit;
+        this.#refreshed = refreshed;
     }
 
     async render() {
-        // Create a real DOM element for the container, not just a string
         this.#container = document.createElement("div");
         this.#container.id = "profile-page-container";
 
@@ -518,8 +521,13 @@ export class ProfilePageControllerComponent {
             await LocalDB.put("currentProfilePage", "main");
         }
 
-        // load profile data from server into IndexedDB
-        await this.#loadDataFromServer(this.#email);
+        if (this.#refreshed) { // page was refreshed
+            // load from IndexedDB
+            this.#profileData = await LocalDB.get("profileData");
+        } else {
+            // load profile data from server into IndexedDB
+            await this.#loadDataFromServer(this.#email);
+        }        
 
         // load skeleton for current page into container
         this.#loadSkeleton(this.#currentProfilePage);
@@ -753,7 +761,7 @@ export class ProfilePageControllerComponent {
                 await this.#saveCurrentPageData();
                 await this.#saveToServer();
                 
-                // then navigate to the home page
+                // then navigate to the main page
                 await this.loadPage("main");
             });
         }

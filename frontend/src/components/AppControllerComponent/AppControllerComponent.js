@@ -7,8 +7,10 @@ import { LocalDB } from '../../services/LocalDB.js';
 
 import { ProfilePageControllerComponent } from '../ProfilePageControllerComponent/ProfilePageControllerComponent.js';
 import { LoginPageControllerComponent } from '../LoginPageControllerComponent/LoginPageControllerComponent.js';
+import { BaseComponent } from '../BaseComponent/BaseComponent.js';
+import { CreateAccountControllerComponent } from '../CreateAccountController/CreateAccountController.js';
 
-export class AppControllerComponent {
+export class AppControllerComponent extends BaseComponent {
     #container = null; // private container for the component
     #currentPage = null; // track the current view 
     //   #taskListComponent = null; // Instance of the main task list component
@@ -18,6 +20,8 @@ export class AppControllerComponent {
 
     // constructor is called upon loading site for first time
     constructor() {
+        super();
+
         // store EventHub instance for convenience
         this.#hub = EventHub.getInstance();
 
@@ -45,12 +49,12 @@ export class AppControllerComponent {
         // check if current page is in IndexedDB, otherwise default to login page
         this.#currentPage = await LocalDB.get("currentPage");
         if (!this.#currentPage) {
-            this.#currentPage = "profile"; // default to login
-            await LocalDB.put("currentPage", "profile");
+            this.#currentPage = "createAccount"; // default to login
+            await LocalDB.put("currentPage", "createAccount");
         }
 
         // load current page into container
-        await this.#renderPage(this.#currentPage, { email:"nadina@umass.edu", canEdit:true });
+        await this.#renderPage(this.#currentPage);
 
         this.#setupEventListeners();
 
@@ -83,28 +87,33 @@ export class AppControllerComponent {
             homePageControllerComponent.textContent = "Home Page";
             this.#container.appendChild(homePageControllerComponent);
         } else if (page === "profile") {
-            let email, canEdit;
+            let email, canEdit, refreshed;
             if (!info) { // rendering upon reloading, check for session info in DB
-                email = await LocalDB.get("viewingProfile");
-                canEdit = await LocalDB.get("canEdit");
-                if (!email || !canEdit) {
+                const requestedProfile = await LocalDB.get("profileData");
+                email = requestedProfile.email;
+                const myEmail = await LocalDB.get("sessionEmail");
+                canEdit = email === myEmail;
+                if (!email) {
                     throw new Error(`Invalid request to load profile page (email: ${email}, canEdit: ${canEdit})`);
                 }
+                refreshed = true;
             } else {
                 if (!("email" in info) || !("canEdit" in info)) {
                     throw new Error(`Invalid request to load profile page (info: ${JSON.stringify(info)}`);
                 }
                 email = info.email;
                 canEdit = info.canEdit;
+                refreshed = false;
             }
 
-            const profilePageControllerComponent = new ProfilePageControllerComponent(email, canEdit);
+            const profilePageControllerComponent = new ProfilePageControllerComponent(email, canEdit, refreshed);
             
             this.#container.appendChild(await profilePageControllerComponent.render());
         } else if (page === "createProfile") {
 
-        } else if (page === "createPost") {
-
+        } else if (page === "createAccount") {
+            const createAccountControllerComponent = new CreateAccountControllerComponent();
+            this.#container.appendChild(await createAccountControllerComponent.render());
         } else if (page === "") {
 
         } else {

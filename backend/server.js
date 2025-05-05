@@ -61,3 +61,16 @@ app.put("/profile/:id", (request, response) => {
         response.status(404).json({message: "User not found"});
     }
 });
+
+app.post("/profile", (req, res) => { 
+    const profile = req.body; 
+    // check if email already exists
+    if(profiles.some(p => p.email === profile.email)){
+        return res.status(400).json({ error: "A profile with this email already exists." });
+    }
+    console.log(profile.profileImage)
+    const toAdd = Profile(profile.firstName, profile.lastName, profile.email, false, profile.bio, profile.profileImage, profile.resume);
+    profiles.push(toAdd);
+    console.log(profiles);
+    res.sendStatus(200);
+});
