@@ -1,2 +1,2 @@
-export { EventHub } from './EventHub.js';
-export { Events } from './Events.js';
+export { EventHub } from '../../eventhub/EventHub.js';
+export { Events } from '../../eventhub/Events.js';

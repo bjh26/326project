@@ -293,3 +293,29 @@ app.use('/profile', userRoutes);
 //         }
 //     });
 // });
+
+// const profiles = []; // array of objects where each object corresponds to a user's profile
+const profiles = 
+[
+    {
+      type: 'profileData',
+      researchItems: [],
+      firstName: 'Nishil',
+      lastName: 'Adina',
+      email: 'nadina@umass.edu',
+      displayEmail: true,
+      department: 'Computer Science',
+      bio: 'hi'
+    }
+]; // fake data to start with
+
+const Profile = (firstName, lastName, email, displayEmail, bio, researchItems) => ({
+    firstName,
+    lastName,
+    email,
+    displayEmail,
+    bio,
+    researchItems,
+}); // returns an object containing each field
+// this is just how the profile object is structured
+
