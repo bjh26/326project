@@ -162,6 +162,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
             // the conversion to fail.
             const base64 = reader.result.split(",")[1];
             this.#profileData[type] = base64;
+            this.#profileData.mime = file.type;
             await this.#saveAccountCreateData();
         }
         reader.readAsDataURL(file);
@@ -170,7 +171,8 @@ export class CreateAccountControllerComponent extends BaseComponent {
     async #saveToServer() {
         const profile = this.#profileData;
         profile.researchItems = [];
-    
+        console.log(profile);
+            
         if(document.getElementById('email').value === '' || document.getElementById('email').value === null){
             alert("Please enter in your email.");
             return;
@@ -184,10 +186,19 @@ export class CreateAccountControllerComponent extends BaseComponent {
             body: JSON.stringify(profile),
         });
 
-        if(!res.ok) {
-            const errorMessage = await res.json(); 
-            throw new Error(errorMessage.error);
+        if (!res.ok) {
+            const contentType = res.headers.get("content-type");
+        
+            if (contentType && contentType.includes("application/json")) {
+                const errorMessage = await res.json();
+                throw new Error(errorMessage.error || "Server returned an error.");
+            } else {
+                const text = await res.text(); // fallback to plain text
+                console.error("Unexpected response:", text);
+                throw new Error(`Server error: ${res.status}`);
+            }
         }
+        
     }
 
     async #saveAccountCreateData() {
