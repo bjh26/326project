@@ -137,7 +137,7 @@ export class JobListingsComponent extends BaseComponents {
 
   async getAllPosts() {
     try {
-      const response = await fetch('/api/posts');
+      const response = await fetch('/researchPost');
       if (!response.ok) {
         throw new Error(`Failed to fetch posts: ${response.statusText}`);
       }

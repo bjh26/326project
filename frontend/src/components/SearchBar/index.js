@@ -189,7 +189,7 @@ export class SearchBarComponent extends BaseComponents {
 
   async populateMajorsList(searchQuery = '') {
     try {
-      const response = await fetch('/api/majors');
+      const response = await fetch('/researchPost/majors/all');
       if (!response.ok) {
         throw new Error(`Failed to fetch majors: ${response.statusText}`);
       }
