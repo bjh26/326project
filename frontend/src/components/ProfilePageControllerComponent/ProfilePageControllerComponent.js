@@ -762,6 +762,10 @@ export class ProfilePageControllerComponent extends BaseComponent {
                 await this.#saveToServer();
                 
                 // then navigate to the main page
+                // setTimeout(async () => {
+                //     await this.loadPage("main");
+                    
+                // }, 1000);
                 await this.loadPage("main");
             });
         }
