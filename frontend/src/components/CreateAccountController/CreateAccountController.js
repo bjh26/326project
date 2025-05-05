@@ -19,7 +19,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
         this.#container = document.createElement("div");
         this.#container.id = "account-creation-container";
 
-        this.#profileData = await LocalDB.get("accountCreateData");
+        this.#profileData = await LocalDB.get("accountCreateData") || {};
 
         this.#loadSkeleton();
 
@@ -100,6 +100,71 @@ export class CreateAccountControllerComponent extends BaseComponent {
                 await this.#hub.publish(Events.NavigateTo, { page: "home" });
             });
         }
+
+        const pfpDiv = this.#container.querySelector("#uploadProfileImage");
+        const pfpInputElement = this.#container.querySelector("#profileImage");
+        this.#addDragAndDropAndManualUploadFunctionality(pfpDiv, pfpInputElement, "pfp");
+
+        const resumeDiv = this.#container.querySelector("#uploadResume");
+        const resumeInputElement = this.#container.querySelector("#resume");
+        this.#addDragAndDropAndManualUploadFunctionality(resumeDiv, resumeInputElement, "resume");
+    }
+
+    /**
+     * Allows for drag and drop and manual upload operations on input fields.
+     * @param {HTMLElement} div - The div where your input element resides in.
+     * @param {HTMLElement} inputElement - The file upload input field.
+     * @param {string} type - Either "pfp" or "resume".
+     */
+    #addDragAndDropAndManualUploadFunctionality(div, inputElement, type) {
+            
+        div.addEventListener("dragover", e => {
+            e.preventDefault(); 
+            div.style.backgroundColor = "#881111";
+        });
+
+        div.addEventListener("dragleave", () => {
+            div.style.backgroundColor = "lightgray";
+            div.style.color = "white";
+        });
+
+        // drag and drop
+        div.addEventListener("drop", async e => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0]; 
+            console.log("Dropped file:", file.name, file.type, file.size);
+
+            await this.#saveFileToLocalDB(file, type);
+        });
+
+
+        // manual upload
+        inputElement.addEventListener("change", async e => {
+            e.preventDefault();
+            const file = e.target.files[0];
+            console.log("Uploaded file:", file.name, file.type, file.size);
+
+            await this.#saveFileToLocalDB(file, type);
+        });
+    }
+
+    async #saveFileToLocalDB(file, type) {
+        const reader = new FileReader();
+        reader.onload = async e => {
+            // display image
+            if (file.type.startsWith("image/")) {
+                this.#container.querySelector("#dummyProfileImage").src = e.target.result;
+            }
+
+            // We need to remove the prefix from the resulting base64 string.
+            // The prefix is "data:application/octet-stream;base64," which is
+            // not needed when converting back to blob. In fact, it causes
+            // the conversion to fail.
+            const base64 = reader.result.split(",")[1];
+            this.#profileData[type] = base64;
+            await this.#saveAccountCreateData();
+        }
+        reader.readAsDataURL(file);
     }
 
     async #saveToServer() {
@@ -132,11 +197,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
         const displayEmail = this.#container.querySelector("#displayEmail")?.checked;
         const department = this.#container.querySelector("#department")?.value;
         const bio = this.#container.querySelector("#bio")?.value;
-        
-        if(!email || email.value === ''){
-            alert("Please enter in your email.");
-            return;
-        }
 
         // update profile data with new values
         this.#profileData = {
