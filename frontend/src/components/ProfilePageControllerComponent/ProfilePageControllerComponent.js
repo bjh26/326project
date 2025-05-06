@@ -7,6 +7,7 @@ import { Edit1Component } from '../Edit1Component/Edit1Component.js';
 import { Edit2Component } from '../Edit2Component/Edit2Component.js';
 import { Edit3Component } from '../Edit3Component/Edit3Component.js';
 import { MainProfileComponent } from '../MainProfileComponent/MainProfileComponent.js';
+import { umassMajors } from '../../assets/majors.js';
 
 export class ProfilePageControllerComponent extends BaseComponent {
     #container = null; // private container for the component
@@ -96,6 +97,13 @@ export class ProfilePageControllerComponent extends BaseComponent {
         } else {
             console.log(`loading data from server for ${email}`);
             this.#profileData = await response.json();
+
+            const jsonFormat = this.#profileData.researchItems;
+            const keys = Object.keys(jsonFormat);
+            const arrayFormat = new Array(keys.length);
+            keys.forEach(i => arrayFormat[i] = jsonFormat[i]);
+            this.#profileData.researchItems = arrayFormat;
+
             await this.#saveToLocalDB();
         }
     }
@@ -108,9 +116,16 @@ export class ProfilePageControllerComponent extends BaseComponent {
         // load from IndexedDB
         this.#profileData = await LocalDB.get("profileData");
         
+        let arrayFormat;
+
         // make sure researchItems exists
         if (!this.#profileData.researchItems) {
-            this.#profileData.researchItems = [];
+            this.#profileData.researchItems = {};
+        } else { // convert researchItems to JSON
+            arrayFormat = this.#profileData.researchItems;
+            const jsonFormat = {};
+            arrayFormat.researchItems.forEach((element, index) => jsonFormat[i] = element);
+            this.#profileData.researchItems = jsonFormat;
         }
 
         // upload to server
@@ -121,6 +136,12 @@ export class ProfilePageControllerComponent extends BaseComponent {
             },
             body: JSON.stringify(this.#profileData)
         });
+
+        // convert back to array
+        if (arrayFormat) {
+            this.#profileData.researchItems = arrayFormat;
+        }
+
     }
 
     #loadSkeleton(page) {    
@@ -302,6 +323,16 @@ export class ProfilePageControllerComponent extends BaseComponent {
                 if (bioTextarea && this.#profileData.bio) {
                     bioTextarea.value = this.#profileData.bio;
                 }
+            }
+            const departmentSelect = this.#container.querySelector("#department");
+            if (departmentSelect) {
+                umassMajors.sort();
+                umassMajors.forEach(major => {
+                    const option = document.createElement("option");
+                    option.value = major;
+                    option.text = major;
+                    departmentSelect.add(option);
+                });
             }
         } else if (page === 'edit3') {
             this.#renderResearchItems();
