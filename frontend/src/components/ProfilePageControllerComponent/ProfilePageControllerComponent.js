@@ -99,10 +99,12 @@ export class ProfilePageControllerComponent extends BaseComponent {
             this.#profileData = await response.json();
 
             const jsonFormat = this.#profileData.researchItems;
-            const keys = Object.keys(jsonFormat);
-            const arrayFormat = new Array(keys.length);
-            keys.forEach(i => arrayFormat[i] = jsonFormat[i]);
-            this.#profileData.researchItems = arrayFormat;
+            if (jsonFormat) {
+                const keys = Object.keys(jsonFormat);
+                const arrayFormat = new Array(keys.length);
+                keys.forEach(i => arrayFormat[i] = jsonFormat[i]);
+                this.#profileData.researchItems = arrayFormat;
+            }
 
             await this.#saveToLocalDB();
         }

@@ -15,7 +15,10 @@ export const createUser = async (req, res) => {
             lastName: profile.lastName,
             email: profile.email,
             bio: profile.bio,
-            img: profile.profileImage,
+            resume: profile.resume,
+            department: profile.department,
+            mime: profile.mime,
+            pfp: profile.pfp,
             resume: profile.resume
         });
         
