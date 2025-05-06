@@ -2,6 +2,7 @@ import { BaseComponent } from "../BaseComponent/BaseComponent.js";
 import { EventHub } from '../../eventhub/EventHub.js';
 import { Events } from '../../eventhub/Events.js';
 import { LocalDB } from '../../services/LocalDB.js';
+import { umassMajors } from "../../assets/majors.js";
 
 export class CreateAccountControllerComponent extends BaseComponent {
     #container;
@@ -62,6 +63,17 @@ export class CreateAccountControllerComponent extends BaseComponent {
             if (bioTextarea && this.#profileData.bio) {
                 bioTextarea.value = this.#profileData.bio;
             }
+        }
+
+        const departmentSelect = this.#container.querySelector("#department");
+        if (departmentSelect) {
+            umassMajors.sort();
+            umassMajors.forEach(major => {
+                const option = document.createElement("option");
+                option.value = major;
+                option.text = major;
+                departmentSelect.add(option);
+            });
         }
     }
 
@@ -251,9 +263,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
                                     <label for ="email">Email<input type="text" id="email" required></label>
                                     <label for = "department">Department</label>
                                     <select id = "department">
-                                        <option value = "Biology">Biology</option>
-                                        <option value = "Political Science">Political Science</option>
-                                        <option value = "Computer Science">Computer Science</option>
                                     </select>
                                 </form>
                                 <div class="long-response">

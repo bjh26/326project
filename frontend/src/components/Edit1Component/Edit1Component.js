@@ -25,9 +25,6 @@ export class Edit1Component extends BaseComponent {
                                     </div>
                                     <label for="department">Department</label>
                                     <select id = "department" class="user-input">
-                                        <option value = "Biology">Biology</option>
-                                        <option value = "Political Science">Political Science</option>
-                                        <option value = "Computer Science">Computer Science</option>
                                     </select>
                                     <label for="bio">Bio</label>
                                     <textarea id="bio" class="user-input"></textarea>
