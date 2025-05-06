@@ -182,6 +182,8 @@ export class ProfilePageControllerComponent extends BaseComponent {
                 if (pfpDiv && this.#profileData.pfp && this.#profileData.mime) {
                     pfpDiv.innerHTML = "";
                     const pfpDisplay = document.createElement("img");
+                    pfpDisplay.classList.add('pfp');
+                    pfpDisplay.classList.add('dot');
                     const imgFile = Base64.convertBase64ToFile(this.#profileData.pfp, this.#profileData.mime);
                     const imageURL = URL.createObjectURL(imgFile);
                     pfpDisplay.src = imageURL;
