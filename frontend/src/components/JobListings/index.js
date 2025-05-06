@@ -91,13 +91,14 @@ export class JobListingsComponent extends BaseComponents {
       title: rawPost.title || 'Untitled Opportunity',
       description: rawPost.description || 'No description available',
       responsibilities: this.ensureArray(rawPost.responsibilities),
-      qualification_requirement: this.ensureArray(rawPost.qualification_requirement),
+      qualificationRequirement: this.ensureArray(rawPost.qualificationRequirement),
       compensation: rawPost.compensation || 'Not specified',
-      hiring_period: this.normalizeHiringPeriod(rawPost.hiring_period),
-      application_instructions: rawPost.application_instructions || 'Contact for details',
+      hiringPeriodStart: this.normalizeHiringPeriod(rawPost.hiringPeriodStart),
+      hiringPeriodEnd: this.normalizeHiringPeriod(rawPost.hiringPeriodEnd),
+      applicationInstructions: rawPost.applicationInstructions || 'Contact for details',
       deadline: this.normalizeDate(rawPost.deadline),
-      contact_name: rawPost.contact_name || 'Not specified',
-      contact_email: rawPost.contact_email || 'No email provided',
+      contactName: rawPost.contactName || 'Not specified',
+      contactEmail: rawPost.contactEmail || 'No email provided',
       postedDate: this.normalizeDate(rawPost.postedDate)
     };
   }
@@ -118,41 +119,19 @@ export class JobListingsComponent extends BaseComponents {
     }
   }
 
-  normalizeHiringPeriod(hiringPeriod) {
-    if (!hiringPeriod) {
-      return { 
-        start: new Date(), 
-        end: new Date(new Date().setMonth(new Date().getMonth() + 3)) 
-      };
+  normalizeHiringPeriod(hiringPeriodStart, hiringPeriodEnd) {
+    const start = this.normalizeDate(hiringPeriodStart);
+    const end = this.normalizeDate(hiringPeriodEnd);
+
+    // If both start and end are valid, return them
+    if (start && end) {
+      return { start, end };
     }
-    
-    // Handle string format "MM/DD/YYYY - MM/DD/YYYY"
-    if (typeof hiringPeriod === 'string') {
-      try {
-        const dates = hiringPeriod.split(' - ');
-        if (dates.length === 2) {
-          return {
-            start: new Date(dates[0]),
-            end: new Date(dates[1])
-          };
-        }
-      } catch (e) {
-        // Fall through to default
-      }
-    }
-    
-    // Handle object format {start: Date, end: Date}
-    if (typeof hiringPeriod === 'object') {
-      return {
-        start: this.normalizeDate(hiringPeriod.start),
-        end: this.normalizeDate(hiringPeriod.end)
-      };
-    }
-    
-    // Default fallback
+
+    // Default fallback if either is missing
     return { 
-      start: new Date(), 
-      end: new Date(new Date().setMonth(new Date().getMonth() + 3)) 
+      start: start || new Date(), 
+      end: end || new Date(new Date().setMonth(new Date().getMonth() + 3)) 
     };
   }
 
@@ -188,7 +167,7 @@ export class JobListingsComponent extends BaseComponents {
         if (!searchState.query) return true;
         return post.title.toLowerCase().includes(searchState.query.toLowerCase()) || 
                post.description.toLowerCase().includes(searchState.query.toLowerCase()) ||
-               post.contact_name.toLowerCase().includes(searchState.query.toLowerCase());
+               post.contactName.toLowerCase().includes(searchState.query.toLowerCase());
       });
       
       // Major filtering, date range filtering, etc. (keep existing implementation)
@@ -245,14 +224,14 @@ export class JobListingsComponent extends BaseComponents {
       
       // Format hiring period for display
       let hiringPeriodText = 'Not specified';
-      if (post.hiring_period && post.hiring_period.start && post.hiring_period.end) {
+      if (post.hiringPeriodStart && post.hiringPeriodEnd) {
         try {
-          const start = post.hiring_period.start.toLocaleDateString('en-US', {
+          const start = post.hiringPeriodStart.toLocaleDateString('en-US', {
             month: '2-digit',
             day: '2-digit',
             year: 'numeric'
           });
-          const end = post.hiring_period.end.toLocaleDateString('en-US', {
+          const end = post.hiringPeriodEnd.toLocaleDateString('en-US', {
             month: '2-digit',
             day: '2-digit',
             year: 'numeric'
@@ -269,7 +248,7 @@ export class JobListingsComponent extends BaseComponents {
           <i class="far fa-bookmark bookmark-icon"></i>
         </div>
         <div class="job-post-details">
-          <p><strong>Contact:</strong> ${post.contact_name}</p>
+          <p><strong>Contact:</strong> ${post.contactName}</p>
           <p><strong>Compensation:</strong> ${post.compensation}</p>
           <p><strong>Period:</strong> ${hiringPeriodText}</p>
         </div>

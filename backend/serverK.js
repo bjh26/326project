@@ -14,9 +14,6 @@ const __dirname = dirname(__filename);
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-
-
-
 // Serve static files from the frontend directory
 app.use('/src', express.static(path.join(__dirname, '../frontend/src')));
 app.use('/src/pages/HomePage', express.static(path.join(__dirname, '../frontend/src/pages/HomePage')));
@@ -24,7 +21,6 @@ app.use('/src/components/JobListings', express.static(path.join(__dirname, '../f
 app.use('/src/components/JobDetails', express.static(path.join(__dirname, '../frontend/src/components/JobDetails')));
 app.use('/src/components/NavBar', express.static(path.join(__dirname, '../frontend/src/components/NavBar')));
 app.use('/src/components/SearchBar', express.static(path.join(__dirname, '../frontend/src/components/SearchBar')));
-
 
 // In-memory data store (will be replaced with SQLite in next milestone)
 let researchPosts = [
