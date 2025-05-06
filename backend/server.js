@@ -31,20 +31,20 @@ async function preloadData() {
             img: 'not yet defined',
             resume: 'not yet defined'
         });
-        console.log(test)
-        console.log('data imported...')
 
         seedResearchPosts(); // Add in mock data for research posts
 
-        app.listen(PORT, () => {
-            console.log(`Server is running on http://localhost:${PORT}`);
-        });
+        
     } catch (err) {
         console.error('Error during preloadData:', err);
     }
 }
 
 preloadData();
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 // API routes
 app.use('/researchPost', postRoutes);
