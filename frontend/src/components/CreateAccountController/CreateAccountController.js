@@ -237,11 +237,11 @@ export class CreateAccountControllerComponent extends BaseComponent {
                                         <label for="profileImage"> 
                                             <img src = "./Sample_User_Icon.png" id="dummyProfileImage">
                                         </label>
-                                        <input type="file" id="profileImage" accept=".jpeg, .jpg, .png" style="display: none">
+                                        <input type="file" id="profileImage" accept="image/*" style="display: none">
                                     </div> 
                                     <div id="uploadResume" class="resume-upload">
                                         <label for="resume" id="resumeLabel">upload your resume
-                                            <input type="file" id="resume" accept=".pdf, .doc, .docx" style="visibility:hidden">
+                                            <input type="file" id="resume" accept="application/pdf" style="visibility: hidden">
                                         </label>
                                     </div>    
                                 </div>

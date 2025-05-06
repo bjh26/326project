@@ -20,6 +20,11 @@ export class ProfilePageControllerComponent extends BaseComponent {
         "edit3": "main"
     };
 
+    #pageSequenceRev = {
+        "edit2": "edit1", 
+        "edit3": "edit2"
+    };
+
     #email; // email of person whose profile we're viewing
     #canEdit; // whether user has perms to edit this profile
     #refreshed; // whether this page was triggered on a refresh
@@ -186,12 +191,52 @@ export class ProfilePageControllerComponent extends BaseComponent {
                 // display resume
                 const resumeDiv = this.#container.querySelector("#resume");
                 if (resumeDiv && this.#profileData.resume) {
+                    // Create data URL
+                    const resumeDataUrl = `data:application/pdf;base64,${this.#profileData.resume}`;
+
+                    // // Create download link
+                    // const link = document.createElement("a");
+                    // link.href = resumeDataUrl;
+                    // link.download = "resume.pdf";
+                    // link.textContent = "Download Resume";
+                    // link.target = "_blank";
+
+                    // View in new tab
                     const link = document.createElement("a");
-                    link.href = `data:application/pdf;base64,${this.#profileData.resume}`;
-                    link.download = "resume.pdf";
-                    link.textContent = "Download Resume";
-                    link.target = "_blank";
+                    link.href = "#";
+                    link.textContent = "View Resume";
+
+                    // // Create iframe to display PDF
+                    // const iframe = document.createElement("iframe");
+                    // iframe.src = resumeDataUrl;
+                    // iframe.width = "100%";
+                    // iframe.height = "600px";
+                    // iframe.style.border = "1px solid #ccc";
+                    // iframe.style.marginTop = "10px";
+
+                    // Append both to the container
                     resumeDiv.appendChild(link);
+                    // resumeDiv.appendChild(iframe);
+
+                    link.addEventListener("click", e => {
+                        e.preventDefault();
+                    
+                        const newWindow = window.open("", "_blank");
+                        if (newWindow) {
+                            newWindow.document.write(`
+                                <html>
+                                    <head>
+                                        <title>${this.#profileData.firstName}'s Resume</title>
+                                    </head>
+                                    <body style="margin:0">
+                                        <iframe src="${resumeDataUrl}" 
+                                                style="width:100vw; height:100vh; border:none;"></iframe>
+                                    </body>
+                                </html>
+                            `);
+                            newWindow.document.close();
+                        }
+                    });
                 }
 
                 // resumeDiv.innerHTML = "";
@@ -263,8 +308,68 @@ export class ProfilePageControllerComponent extends BaseComponent {
         }
     }
 
+    /**
+     * Allows for drag and drop and manual upload operations on input fields.
+     * @param {HTMLElement} div - The div where your input element resides in.
+     * @param {HTMLElement} inputElement - The file upload input field.
+     * @param {string} type - Either "pfp" or "resume".
+     */
+    #addDragAndDropAndManualUploadFunctionality(div, inputElement, type) {
+            
+        div.addEventListener("dragover", e => {
+            e.preventDefault(); 
+            div.style.backgroundColor = "#881111";
+        });
+
+        div.addEventListener("dragleave", () => {
+            div.style.backgroundColor = "lightgray";
+            div.style.color = "white";
+        });
+
+        // drag and drop
+        div.addEventListener("drop", async e => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0]; 
+            console.log("Dropped file:", file.name, file.type, file.size);
+
+            await this.#saveFileToLocalDB(file, type);
+        });
+
+
+        // manual upload
+        inputElement.addEventListener("change", async e => {
+            e.preventDefault();
+            const file = e.target.files[0];
+            console.log("Uploaded file:", file.name, file.type, file.size);
+
+            await this.#saveFileToLocalDB(file, type);
+        });
+    }
+
+    async #saveFileToLocalDB(file, type) {
+        const reader = new FileReader();
+        reader.onload = async e => {
+            // display image
+            if (file.type.startsWith("image/") && this.#container.querySelector("#dummyProfileImage")) {
+                this.#container.querySelector("#dummyProfileImage").src = e.target.result;
+            }
+
+            // We need to remove the prefix from the resulting base64 string.
+            // The prefix is "data:application/octet-stream;base64," which is
+            // not needed when converting back to blob. In fact, it causes
+            // the conversion to fail.
+            const base64 = reader.result.split(",")[1];
+            this.#profileData[type] = base64;
+            if (file.type.startsWith("image/")) {
+                this.#profileData.mime = file.type;
+            }
+            await this.#saveToLocalDB();
+        }
+        reader.readAsDataURL(file);
+    }
+
     #addEventListeners() {
-        // add event listeners for the 'next' button
+        // add event listeners for the 'Next' button
         const nextButton = this.#container.querySelector("#next");
         if (nextButton) {
             nextButton.addEventListener("click", async (event) => {
@@ -279,7 +384,7 @@ export class ProfilePageControllerComponent extends BaseComponent {
             });
         }
 
-        // add event listener for the 'edit' button on the main page
+        // add event listener for the 'Edit' button on the main page
         const editButton = this.#container.querySelector("#edit");
         if (editButton) {
             editButton.addEventListener("click", async () => {
@@ -287,7 +392,7 @@ export class ProfilePageControllerComponent extends BaseComponent {
             });
         }
 
-        // add event listener for the 'home' button
+        // add event listener for the 'Home' button
         const homeButton = this.#container.querySelector("#home");
         if (homeButton) {
             homeButton.addEventListener("click", async () => {
@@ -296,7 +401,7 @@ export class ProfilePageControllerComponent extends BaseComponent {
             });
         }
 
-        // add event listeners for the 'save' buttons
+        // add event listeners for the 'Save' button
         const saveButton = this.#container.querySelector("#save");
         if (saveButton) {
             saveButton.addEventListener("click", async () => {
@@ -305,7 +410,17 @@ export class ProfilePageControllerComponent extends BaseComponent {
             });
         }
 
-        // add event listener for finish button to also save to server
+        // add event listener for the 'Back' button
+        const backButton = this.#container.querySelector("#back");
+        if (backButton) {
+            backButton.addEventListener("click", async () => {
+                // then navigate to the previous page
+                const nextPage = this.#pageSequenceRev[this.#currentProfilePage];
+                await this.loadPage(nextPage);
+            });
+        }
+
+        // add event listener for the 'Finish' button
         const finishButton = this.#container.querySelector("#finish");
         if (finishButton) {
             finishButton.addEventListener("click", async (event) => {
@@ -369,6 +484,23 @@ export class ProfilePageControllerComponent extends BaseComponent {
                 await this.#saveProfileData();
             });
         }
+
+        const pfpDiv = this.#container.querySelector("#profilePictureArea");
+        const pfpInputElement = this.#container.querySelector("#profilePictureInput");
+        const pfpText = this.#container.querySelector("#pfpFileSelect");
+        if (pfpDiv && pfpInputElement && pfpText) {
+            this.#addDragAndDropAndManualUploadFunctionality(pfpDiv, pfpInputElement, "pfp");
+            pfpText.addEventListener("click", () => pfpInputElement.click());
+        }
+
+        const resumeDiv = this.#container.querySelector("#resumeArea");
+        const resumeInputElement = this.#container.querySelector("#resumeInput");
+        const resumeText = this.#container.querySelector("#resumeFileSelect");
+        if (resumeDiv && resumeInputElement && resumeText) {
+            this.#addDragAndDropAndManualUploadFunctionality(resumeDiv, resumeInputElement, "resume");
+            resumeText.addEventListener("click", () => resumeInputElement.click());
+        }
+
     }
 
     #renderResearchItems() {

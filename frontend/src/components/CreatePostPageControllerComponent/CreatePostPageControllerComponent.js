@@ -191,7 +191,7 @@ export class CreatePostPageControllerComponent extends BaseComponent {
             });
         }
 
-        // add event listener for the 'back' button
+        // add event listener for the 'Back' button
         const backButton = this.#container.querySelector("#back");
         if (backButton) {
             backButton.addEventListener("click", async () => {
@@ -201,7 +201,6 @@ export class CreatePostPageControllerComponent extends BaseComponent {
             });
         }
 
-        
         // add event listener for the 'Cancel' button
         const cancelButton = this.#container.querySelector("#cancel");
         if (cancelButton) {
@@ -211,7 +210,7 @@ export class CreatePostPageControllerComponent extends BaseComponent {
             });
         }
 
-        // add event listeners for the 'Save' buttons
+        // add event listeners for the 'Save' button
         const saveButton = this.#container.querySelector("#save");
         if (saveButton) {
             saveButton.addEventListener("click", async () => {
