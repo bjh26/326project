@@ -43,7 +43,7 @@ export class HomePage extends BaseComponent {
         
         // Render appropriate content based on mode
         await this.#renderContent();
-        
+        console.log('HomePage rendered');
         return this.#container;
     }
 
