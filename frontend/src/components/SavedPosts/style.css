@@ -1,0 +1,151 @@
+/* Saved Posts Component Styles */
+.saved-posts-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+}
+
+.saved-posts-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: white;
+}
+
+.saved-posts-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+.saved-posts-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.saved-post-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.saved-post-card.removing {
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+.saved-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.saved-post-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #333;
+}
+
+.remove-bookmark {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.remove-bookmark:hover {
+    color: #881111;
+}
+
+.saved-post-info {
+    margin-bottom: 15px;
+}
+
+.saved-post-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.saved-post-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.view-details-btn {
+    background-color: #881111;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.view-details-btn:hover {
+    background-color: #6d0e0e;
+}
+
+.no-saved-posts {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.no-saved-posts p {
+    margin: 10px 0;
+    color: #666;
+}
+
+.no-saved-posts p:first-child {
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: bold;
+}
+
+/* Loading and error messages */
+.loading, .error {
+    padding: 30px;
+    text-align: center;
+    color: #666;
+}
+
+.error {
+    color: #d32f2f;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .saved-posts-container {
+        padding: 15px;
+    }
+    
+    .saved-post-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .remove-bookmark {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    
+    .saved-post-card {
+        position: relative;
+        padding-top: 30px;
+    }
+}
