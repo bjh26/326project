@@ -91,12 +91,13 @@ export class CreateAccountControllerComponent extends BaseComponent {
                 try {
                     await this.#saveToServer();
                 } catch (error) {
-                    alert(`${error.message}`);
+                    alert(error.message);
                     return;
                 }
                 
                 // then navigate to the home page
                 alert("Successfully created account!");
+                await LocalDB.put("sessionEmail", this.#profileData.email);
                 await this.#hub.publish(Events.NavigateTo, { page: "home" });
             });
         }

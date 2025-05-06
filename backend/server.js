@@ -75,3 +75,16 @@ app.post("/profile", (req, res) => {
     console.log(profiles);
     res.sendStatus(200);
 });
+
+const posts = [];
+
+app.post("/researchPost", (req, res) => { 
+    const post = req.body; 
+    // check if email already exists
+    if(profiles.some(p => p.email === post.email)){
+        return res.status(400).json({ error: "A profile with this email already exists." });
+    }
+    posts.push(post);
+    console.log(posts);
+    res.sendStatus(200);
+});

@@ -173,13 +173,23 @@ export class ProfilePageControllerComponent extends BaseComponent {
                 }
 
                 // display pfp
-                base64, mimetype, filename = "unknown-name"
                 const pfpDiv = this.#container.querySelector("#pfp");
                 if (pfpDiv && this.#profileData.pfp && this.#profileData.mime) {
                     pfpDiv.innerHTML = "";
                     const pfpDisplay = document.createElement("img");
                     const imgFile = Base64.convertBase64ToFile(this.#profileData.pfp, this.#profileData.mime);
-                    const imageURL = URL.createObjectURL(file);
+                    const imageURL = URL.createObjectURL(imgFile);
+                    pfpDisplay.src = imageURL;
+                    pfpDiv.appendChild(pfpDisplay);
+                }
+
+                // display resume
+                const resumeDiv = this.#container.querySelector("#resume");
+                if (resumeDiv && this.#profileData.resume && this.#profileData.mime) {
+                    pfpDiv.innerHTML = "";
+                    const pfpDisplay = document.createElement("???");
+                    const imgFile = Base64.convertBase64ToFile(this.#profileData.pfp, this.#profileData.mime);
+                    const imageURL = URL.createObjectURL(imgFile);
                     pfpDisplay.src = imageURL;
                     pfpDiv.appendChild(pfpDisplay);
                 }

@@ -20,8 +20,10 @@ export class CreatePost3Component extends BaseComponent {
                                 </div>
                         
                                 <div class="buttons">
-                                    <button type="button" id="back2">Back</button>
-                                    <button type="submit">Post</button>
+                                    <input type="button" class="form-button" id="cancel" value="Cancel">
+                                    <input type="button" class="form-button" id="save" value="Save">
+                                    <input type="button" class="form-button" id="back" value="Back">
+                                    <input type="submit" class="form-button" id="post" value="Post">
                                 </div>
                             `;
         return container;
