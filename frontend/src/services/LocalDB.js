@@ -100,4 +100,72 @@ export class LocalDB {
             request.onerror = () => reject(request.error);
         });
     }
+
+    /**
+     * Toggle bookmark status for a post
+     * @param {string} postId - The ID of the post to toggle bookmark status
+     * @returns {Promise<boolean>} - Success state of toggle operation
+     */
+    static async toggleBookmark(postId) {
+        try {
+            // Get the current user's email
+            const sessionEmail = await this.get("sessionEmail");
+            if (!sessionEmail) {
+                console.error("No user session found. Cannot bookmark post.");
+                return false;
+            }
+            
+            // Get or create bookmarks list for this user
+            const bookmarkKey = `bookmarks_${sessionEmail}`;
+            let bookmarks = await this.get(bookmarkKey) || [];
+            
+            // Toggle bookmark status
+            if (bookmarks.includes(postId)) {
+                // Remove bookmark
+                bookmarks = bookmarks.filter(id => id !== postId);
+            } else {
+                // Add bookmark
+                bookmarks.push(postId);
+            }
+            
+            // Save updated bookmarks
+            await this.put(bookmarkKey, bookmarks);
+            return true;
+        } catch (error) {
+            console.error("Error toggling bookmark:", error);
+            return false;
+        }
+    }
+
+    /**
+     * Get all bookmarked posts for current user
+     * @returns {Promise<Array<string>>} - Array of bookmarked post IDs
+     */
+    static async getBookmarks() {
+        try {
+            const sessionEmail = await this.get("sessionEmail");
+            if (!sessionEmail) return [];
+            
+            const bookmarkKey = `bookmarks_${sessionEmail}`;
+            return await this.get(bookmarkKey) || [];
+        } catch (error) {
+            console.error("Error getting bookmarks:", error);
+            return [];
+        }
+    }
+
+    /**
+     * Check if a post is bookmarked by the current user
+     * @param {string} postId - The ID of the post to check
+     * @returns {Promise<boolean>} - Whether the post is bookmarked
+     */
+    static async isBookmarked(postId) {
+        try {
+            const bookmarks = await this.getBookmarks();
+            return bookmarks.includes(postId);
+        } catch (error) {
+            console.error("Error checking bookmark status:", error);
+            return false;
+        }
+    }
 }

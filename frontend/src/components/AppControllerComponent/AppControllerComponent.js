@@ -10,6 +10,7 @@ import { LoginPageControllerComponent } from '../LoginPageControllerComponent/Lo
 import { BaseComponent } from '../BaseComponent/BaseComponent.js';
 import { CreateAccountControllerComponent } from '../CreateAccountController/CreateAccountController.js';
 import { CreatePostPageControllerComponent } from '../CreatePostPageControllerComponent/CreatePostPageControllerComponent.js';
+import { HomePage } from '../../pages/HomePage/HomePage.js'
 
 export class AppControllerComponent extends BaseComponent {
     #container = null; // private container for the component
@@ -85,9 +86,8 @@ export class AppControllerComponent extends BaseComponent {
         if (page === "login") {
 
         } else if (page === "home") {
-            const homePageControllerComponent = document.createElement("div");
-            homePageControllerComponent.textContent = "Home Page";
-            this.#container.appendChild(homePageControllerComponent);
+            const HomePageControllerComponent = new HomePage();
+            this.#container.appendChild(await HomePageControllerComponent.render());
         } else if (page === "profile") {
             let email, canEdit, refreshed;
             if (!info) { // rendering upon reloading, check for session info in DB

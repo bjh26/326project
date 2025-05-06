@@ -1,88 +1,79 @@
-// /frontend/src/pages/HomePage/index.js
-import { BaseComponents } from '../../components/BaseComponents.js';
-import { EventHub, Events } from '../../lib/EventHub/index.js';
-import { NavBarComponent } from '../../components/NavBar/index.js';
+import { BaseComponent } from '../../components/BaseComponent/BaseComponent.js';
+import { EventHub } from '../../eventhub/EventHub.js';
+import { Events } from '../../eventhub/Events.js';
 import { SearchBarComponent } from '../../components/SearchBar/index.js';
 import { JobListingsComponent } from '../../components/JobListings/index.js';
 import { JobDetailsComponent } from '../../components/JobDetails/index.js';
-import { postService } from '../../services/PostService.js';
+import { SavedPostsComponent } from '../../components/SavedPosts/index.js';
+import { LocalDB } from '../../services/LocalDB.js';
 
-export class HomePageScreen extends BaseComponents {
-  constructor() {
-    super();
-    this.parent = document.createElement('div');
-    this.parent.className = 'page-container';
-    this.eventHub = EventHub.getInstance();
-    
-    // Initialize components
-    this.navBar = new NavBarComponent();
-    this.searchBar = new SearchBarComponent();
-    this.jobListings = new JobListingsComponent();
-    this.jobDetails = new JobDetailsComponent();
-    
-    // Initialize services
-    this.postService = postService;
-    
-    // Set up SSE for real-time updates
-    this.setupUpdatesListener();
-    
-    // Setup navigation events
-    this.setupNavigationHandlers();
-  }
+export class HomePage extends BaseComponent {
+    #container = null;
+    #jobPostingsContainer = null;
+    #hub = null;
+    #searchBar = null;
+    #jobListings = null;
+    #jobDetails = null;
+    #savedPosts = null;
+    #isHomePage;
 
-  render() {
-    // Add the CSS for this page
-    this.loadCSS('src/pages/HomePage', 'HomePage');
-    
-    // Clear previous content
-    this.parent.innerHTML = '';
-    
-    // Render the navbar and append to parent
-    this.parent.appendChild(this.navBar.render());
-    
-    // Render search bar component and append (assuming SearchBarComponent is modified to be synchronous)
-    this.parent.appendChild(this.searchBar.render());
-    
-    // Create job postings container
-    const jobPostingsContainer = document.createElement('div');
-    jobPostingsContainer.className = 'job-postings-container';
-    
-    // Append job listings (left) and job details (right) components
-    // Assuming both components are modified to have synchronous render methods
-    jobPostingsContainer.appendChild(this.jobListings.render());
-    jobPostingsContainer.appendChild(this.jobDetails.render());
-    
-    this.parent.appendChild(jobPostingsContainer);
-    
-    return this.parent;
-  }
-
-  setupNavigationHandlers() {
-    // Handle navigation events
-    this.eventHub.subscribe(Events.NavigateTo, (destination) => {
-      if (destination === 'savedPosts') {
-        this.showSavedPosts();
-      }
-    });
-  }
-  
-  async showSavedPosts() {
-    // Get saved posts
-    const savedPosts = this.postService.getSavedPosts();
-    
-    if (savedPosts.length === 0) {
-      this.showNotification('You have no saved research opportunities.');
-      return;
+    constructor() {
+        super();
+        this.#hub = EventHub.getInstance();
+        
+        // Initialize components
+        this.#searchBar = new SearchBarComponent();
+        this.#jobListings = new JobListingsComponent();
+        this.#jobDetails = new JobDetailsComponent();
+        this.#savedPosts = new SavedPostsComponent();
     }
-    
-    // Publish the saved posts to update the UI
-    this.eventHub.publish(Events.LoadPostsSuccess, savedPosts);
-    
-    // Show a notification
-    this.showNotification(`Showing ${savedPosts.length} saved research opportunities.`);
-  }
 
-  // Other methods remain the same...
-  setupUpdatesListener() { /* same implementation */ }
-  showNotification(message) { /* same implementation */ }
+    async render() {
+        this.loadCSS('src/pages/HomePage', 'style');
+        this.#container = document.createElement('div');
+        this.#container.id = 'home-page';
+        
+        // Render search bar component (always visible)
+        this.#container.appendChild(this.#searchBar.render());
+        
+        // Create job postings container
+        this.#jobPostingsContainer = document.createElement('div');
+        this.#jobPostingsContainer.className = 'job-postings-container';
+        this.#container.appendChild(this.#jobPostingsContainer);
+        
+        // Render appropriate content based on mode
+        await this.#renderContent();
+        
+        return this.#container;
+    }
+
+    async #renderContent() {
+        // Clear container first
+        this.#jobPostingsContainer.innerHTML = '';
+        this.#isHomePage = await LocalDB.get('isHomePage');
+        if (this.#isHomePage == undefined) {
+            await LocalDB.put('isHomePage', true);
+            this.#isHomePage = true;
+        }
+        else if (!this.#isHomePage) {
+            // Render saved posts component
+            this.#jobPostingsContainer.appendChild(this.#savedPosts.render());
+            
+            // Initialize saved posts data
+            setTimeout(() => {
+                this.#savedPosts.loadSavedPosts();
+            }, 100);
+        } else {
+            // Append job listings (left) and job details (right) components
+            this.#jobPostingsContainer.appendChild(this.#jobListings.render());
+            this.#jobPostingsContainer.appendChild(this.#jobDetails.render());
+            
+            // Initialize job listings
+            setTimeout(() => {
+                this.#hub.publish(Events.LoadPosts);
+            }, 100);
+        }
+    }
+
+    
 }

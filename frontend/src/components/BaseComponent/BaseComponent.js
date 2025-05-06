@@ -13,16 +13,18 @@ export class BaseComponent {
     throw new Error('render method not implemented');
   }
 
-  loadCSS(fileName) {
-    if (this.cssLoaded) return;
+  loadCSS(path, filename) {
+    if (this.cssLoaded) {
+        return;
+    }
 
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    // Dynamically load CSS from the same directory as the JS file
-    link.href = `./components/${fileName}/${fileName}.css`;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `${path}/${filename}.css`;
+    link.type = "text/css";
     document.head.appendChild(link);
     this.cssLoaded = true;
-  }
+}
 
   dispatchCustomEvent(eventName, detail = {}) {
     const event = new CustomEvent(eventName, { detail });
