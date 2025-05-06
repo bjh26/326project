@@ -42,9 +42,12 @@ async function preloadData() {
 
 preloadData();
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+setTimeout(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}, 500);
+
 
 // API routes
 app.use('/researchPost', postRoutes);
