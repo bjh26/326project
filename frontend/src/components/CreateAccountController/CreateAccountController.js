@@ -91,13 +91,15 @@ export class CreateAccountControllerComponent extends BaseComponent {
                 try {
                     await this.#saveToServer();
                 } catch (error) {
-                    alert(`${error.message}`);
+                    alert(error.message);
                     return;
                 }
                 
                 // then navigate to the home page
                 alert("Successfully created account!");
-                await this.#hub.publish(Events.NavigateTo, { page: "home" });
+                await LocalDB.put("sessionEmail", this.#profileData.email);
+                await LocalDB.delete("accountCreateData");
+                await this.#hub.publish(Events.NavigateTo, { page: "profile", info: {email:this.#profileData.email, canEdit:true} });
             });
         }
 
@@ -162,6 +164,9 @@ export class CreateAccountControllerComponent extends BaseComponent {
             // the conversion to fail.
             const base64 = reader.result.split(",")[1];
             this.#profileData[type] = base64;
+            if (file.type.startsWith("image/")) {
+                this.#profileData.mime = file.type;
+            }
             await this.#saveAccountCreateData();
         }
         reader.readAsDataURL(file);
@@ -170,7 +175,8 @@ export class CreateAccountControllerComponent extends BaseComponent {
     async #saveToServer() {
         const profile = this.#profileData;
         profile.researchItems = [];
-    
+        console.log(profile);
+            
         if(document.getElementById('email').value === '' || document.getElementById('email').value === null){
             alert("Please enter in your email.");
             return;
@@ -184,10 +190,19 @@ export class CreateAccountControllerComponent extends BaseComponent {
             body: JSON.stringify(profile),
         });
 
-        if(!res.ok) {
-            const errorMessage = await res.json(); 
-            throw new Error(errorMessage.error);
+        if (!res.ok) {
+            const contentType = res.headers.get("content-type");
+        
+            if (contentType && contentType.includes("application/json")) {
+                const errorMessage = await res.json();
+                throw new Error(errorMessage.error || "Server returned an error.");
+            } else {
+                const text = await res.text(); // fallback to plain text
+                console.error("Unexpected response:", text);
+                throw new Error(`Server error: ${res.status}`);
+            }
         }
+        
     }
 
     async #saveAccountCreateData() {
@@ -220,19 +235,19 @@ export class CreateAccountControllerComponent extends BaseComponent {
                                 <div class = "upload-documents">
                                     <div id = "uploadProfileImage" class="profile-image">
                                         <label for="profileImage"> 
-                                            <img src = "/Sample_User_Icon.png" id="dummyProfileImage">
+                                            <img src = "./Sample_User_Icon.png" id="dummyProfileImage">
                                         </label>
-                                        <input type="file" id="profileImage" accept=".jpeg, .jpg, .png" style="display: none">
+                                        <input type="file" id="profileImage" accept="image/*" style="display: none">
                                     </div> 
                                     <div id="uploadResume" class="resume-upload">
                                         <label for="resume" id="resumeLabel">upload your resume
-                                            <input type="file" id="resume" accept=".pdf, .doc, .docx" style="visibility:hidden">
+                                            <input type="file" id="resume" accept="application/pdf" style="visibility: hidden">
                                         </label>
                                     </div>    
                                 </div>
                                 <form class="short-response">
                                     <label for = "firstName">First Name<input type = "text" id = "firstName"></label>
-                                    <label for="lastName">Last Name<input type="text" id="lastName"></label>
+                                    <label for = "lastName">Last Name<input type="text" id="lastName"></label>
                                     <label for ="email">Email<input type="text" id="email" required></label>
                                     <label for = "department">Department</label>
                                     <select id = "department">
@@ -248,8 +263,8 @@ export class CreateAccountControllerComponent extends BaseComponent {
                             </div>
                             <div class="button-container">
                                 <input class="button" type="button" value="Save" id="save">  
-                                <input class="create-button" type="submit" value="create new account" id="createAccount">  
-                                <input class="create-button" type="submit" value="delete account" id="deleteAccount">    
+                                <input class="button" type="submit" value="Create Account" id="createAccount">  
+                                <input class="button" type="submit" value="Delete Account" id="deleteAccount">    
                             </div>
                         `;
         this.#container.appendChild(wrapper);

@@ -9,6 +9,7 @@ import { ProfilePageControllerComponent } from '../ProfilePageControllerComponen
 import { LoginPageControllerComponent } from '../LoginPageControllerComponent/LoginPageControllerComponent.js';
 import { BaseComponent } from '../BaseComponent/BaseComponent.js';
 import { CreateAccountControllerComponent } from '../CreateAccountController/CreateAccountController.js';
+import { CreatePostPageControllerComponent } from '../CreatePostPageControllerComponent/CreatePostPageControllerComponent.js';
 
 export class AppControllerComponent extends BaseComponent {
     #container = null; // private container for the component
@@ -55,6 +56,7 @@ export class AppControllerComponent extends BaseComponent {
 
         // load current page into container
         await this.#renderPage(this.#currentPage);
+        // await this.#renderPage(this.#currentPage, {email:"nadina@umass.edu", canEdit:true});
 
         this.#setupEventListeners();
 
@@ -81,7 +83,7 @@ export class AppControllerComponent extends BaseComponent {
         this.#container.innerHTML = ''; // Clear existing content
 
         if (page === "login") {
-            // this.#hub.publish("NavigateToLoginPage");
+
         } else if (page === "home") {
             const homePageControllerComponent = document.createElement("div");
             homePageControllerComponent.textContent = "Home Page";
@@ -109,20 +111,25 @@ export class AppControllerComponent extends BaseComponent {
             const profilePageControllerComponent = new ProfilePageControllerComponent(email, canEdit, refreshed);
             
             this.#container.appendChild(await profilePageControllerComponent.render());
-        } else if (page === "createProfile") {
-
         } else if (page === "createAccount") {
             const createAccountControllerComponent = new CreateAccountControllerComponent();
             this.#container.appendChild(await createAccountControllerComponent.render());
-        } else if (page === "") {
-
+        } else if (page === "createPost") {
+            const createPostPageControllerComponent = new CreatePostPageControllerComponent();
+            this.#container.appendChild(await createPostPageControllerComponent.render());
         } else {
             throw new Error(`Invalid page: ${page}`);
         }
     }
 
     #setupEventListeners() {
-        this.#hub.subscribe(Events.NavigateTo, async (data) => await this.#renderPage(data.page, data.info));
+        this.#hub.subscribe(Events.NavigateTo, async (data) => {
+            if (!data.page) {
+                throw new Error(`Error: invalid navigate request, page is missing from data`);
+            }
+            await LocalDB.put("currentPage", data.page)
+            await this.#renderPage(data.page, data.info);
+        });
     }
 
     // // Sets up the HTML structure for the container

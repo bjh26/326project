@@ -761,3 +761,29 @@ label:first-of-type {
 .research-item-actions button:hover {
     background-color: #881111; /* slightly darker maroon */
 }
+
+.drop-box {
+    border: 2px dashed #aaa;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    color: #555;
+    font-family: sans-serif;
+    cursor: pointer;
+    transition: border-color 0.3s, background 0.3s;
+}
+
+.drop-box.dragover {
+    border-color: #4a90e2;
+    background-color: #f0f8ff;
+}
+
+.drop-box p {
+    margin: 0;
+}
+
+#file-select {
+    color: #4a90e2;
+    text-decoration: underline;
+    cursor: pointer;
+}

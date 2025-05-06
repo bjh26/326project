@@ -39,12 +39,11 @@ export class Edit3Component extends BaseComponent {
                                     <!-- Research items will be added here dynamically -->
                                 </div>
                                 <div class="form-actions">
-                                    <div class="button-group">
-                                        <input type="button" id="save" class="save-button button" value="Save">
-                                        <span id="saveMessage" class="save-message"></span>
-                                    </div>
+                                    <input type="button" id="save" class="save-button button" value="Save">
+                                    <input type="submit" id="back" class="next-button button" value="Back">
                                     <input type="submit" id="finish" class="next-button button" value="Finish">
                                 </div>
+                                <span id="saveMessage" class="save-message"></span>
                             `;
         return container;
     }
