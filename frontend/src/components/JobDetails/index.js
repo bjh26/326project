@@ -13,7 +13,7 @@ export class JobDetailsComponent extends BaseComponents {
 
   render() {
     // Load component CSS
-    this.loadCSS('src/components/JobDetails', 'style');
+    this.loadCSS('components/JobDetails', 'style');
     
     this.parent.innerHTML = `
       <div class="job-details-container">

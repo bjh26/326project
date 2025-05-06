@@ -11,6 +11,7 @@ import { BaseComponent } from '../BaseComponent/BaseComponent.js';
 import { CreateAccountControllerComponent } from '../CreateAccountController/CreateAccountController.js';
 import { CreatePostPageControllerComponent } from '../CreatePostPageControllerComponent/CreatePostPageControllerComponent.js';
 import { HomePage } from '../../pages/HomePage/HomePage.js'
+import { SavedPostsComponent } from '../SavedPosts/index.js';
 
 export class AppControllerComponent extends BaseComponent {
     #container = null; // private container for the component
@@ -84,8 +85,9 @@ export class AppControllerComponent extends BaseComponent {
         this.#container.innerHTML = ''; // Clear existing content
 
         if (page === "login") {
-
-        } else if (page === "home") {
+            const loginPageControllerComponent = new LoginPageControllerComponent();
+            this.#container.appendChild(await loginPageControllerComponent.render());
+        } else if (page === "home" || page === "savedPosts") {
             const HomePageControllerComponent = new HomePage();
             this.#container.appendChild(await HomePageControllerComponent.render());
         } else if (page === "profile") {
@@ -117,7 +119,8 @@ export class AppControllerComponent extends BaseComponent {
         } else if (page === "createPost") {
             const createPostPageControllerComponent = new CreatePostPageControllerComponent();
             this.#container.appendChild(await createPostPageControllerComponent.render());
-        } else {
+        }
+        else {
             throw new Error(`Invalid page: ${page}`);
         }
     }
