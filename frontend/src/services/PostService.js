@@ -1,10 +1,11 @@
 // /frontend/src/services/PostService.js
+// UNNECESSARY ANYMORE DONT USE THIS FILE
 import { Post } from '../lib/models/Post.js';
 import { EventHub, Events } from '../lib/EventHub/index.js';
 
 export class PostService {
     constructor() {
-        this.API_BASE_URL = '/api';
+        this.API_BASE_URL = '/researchPost'; // Base URL for API requests
         this.eventHub = EventHub.getInstance();
         this.cachedPosts = [];
         
@@ -18,7 +19,7 @@ export class PostService {
     // Load all posts from API
     async loadAllPosts() {
         try {
-            const response = await fetch(`${this.API_BASE_URL}/posts`);
+            const response = await fetch(`${this.API_BASE_URL}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch posts: ${response.statusText}`);
             }
@@ -67,7 +68,7 @@ export class PostService {
             }
             
             // Otherwise, fetch from API
-            const response = await fetch(`${this.API_BASE_URL}/posts/${postId}`);
+            const response = await fetch(`${this.API_BASE_URL}/${postId}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch post: ${response.statusText}`);
             }

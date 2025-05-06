@@ -25,7 +25,7 @@ export class SearchBarComponent extends BaseComponents {
 
   render() {
     // Load component CSS
-    this.loadCSS('src/components/SearchBar', 'style');
+    this.loadCSS('components/SearchBar', 'style');
     
     this.parent.innerHTML = `
       <div class="search-wrapper">

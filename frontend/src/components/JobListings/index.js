@@ -1,6 +1,6 @@
-// Updated JobListings/index.js
 import { BaseComponents } from '../BaseComponents.js';
 import { EventHub, Events } from '../../lib/EventHub/index.js';
+import { LocalDB } from '../../services/LocalDB.js';
 
 export class JobListingsComponent extends BaseComponents {
   constructor() {
@@ -10,12 +10,13 @@ export class JobListingsComponent extends BaseComponents {
     this.eventHub = EventHub.getInstance();
     this.posts = [];
     this.currentPage = 1;
-    this.postsPerPage = 10;
+    this.postsPerPage = 30;
+    this.totalPosts = 0;
   }
 
   render() {
     // Load component CSS
-    this.loadCSS('src/components/JobListings', 'style');
+    this.loadCSS('components/JobListings', 'style');
     
     this.parent.innerHTML = `
       <div class="job-listings-header">
@@ -26,55 +27,39 @@ export class JobListingsComponent extends BaseComponents {
       </div>
       <div class="job-listings-footer">
         <div class="pagination">
-          <button type="button" class="prev-page"><</button>
-          <span class="page-number">Page 1 of 1</span>
-          <button type="button" class="next-page">></button>
+          <button type="button" class="prev-page" disabled><i class="fas fa-chevron-left"></i></button>
+          <div class="page-navigation">
+            <span class="current-page">1</span>
+            <span class="page-separator">of</span>
+            <span class="total-pages">1</span>
+            <div class="page-jump">
+              <input type="number" min="1" max="1" value="1" class="page-input">
+              <button type="button" class="go-btn">Go</button>
+            </div>
+          </div>
+          <button type="button" class="next-page" disabled><i class="fas fa-chevron-right"></i></button>
         </div>
       </div>
     `;
 
+    // Set up pagination handlers
+    this.setupPaginationControls();
+
     // Subscribe to events
-    // This is a key event - it's published after data is fetched
-    this.eventHub.subscribe(Events.LoadPostsSuccess, (posts) => {
-      // Always normalize the data when receiving it
-      this.posts = posts.map(post => this.normalizePostData(post));
-      this.renderJobPosts();
+    this.eventHub.subscribe(Events.LoadPosts, () => {
+      this.loadPageData(this.currentPage);
     });
 
-    // Handle search results (also normalize the data)
+    // Handle search results
     this.eventHub.subscribe(Events.SearchPostsSuccess, (posts) => {
-      this.posts = posts.map(post => this.normalizePostData(post));
+      this.posts = posts;
       this.renderJobPosts();
     });
 
     this.eventHub.subscribe(Events.SearchPosts, (searchState) => {
       this.performSearch(searchState);
     });
-
-    // Load posts immediately on component initialization
-    this.eventHub.subscribe(Events.LoadPosts, () => {
-      this.getAllPosts();
-    });
-
-    // Set up pagination handlers
-    const prevPageButton = this.parent.querySelector('.prev-page');
-    const nextPageButton = this.parent.querySelector('.next-page');
-
-    prevPageButton.addEventListener('click', () => {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-        this.renderJobPosts();
-      }
-    });
-
-    nextPageButton.addEventListener('click', () => {
-      const totalPages = Math.ceil(this.posts.length / this.postsPerPage);
-      if (this.currentPage < totalPages) {
-        this.currentPage++;
-        this.renderJobPosts();
-      }
-    });
-
+    
     // Initial data load with a slight delay to ensure components are ready
     setTimeout(() => {
       this.eventHub.publish(Events.LoadPosts);
@@ -83,127 +68,231 @@ export class JobListingsComponent extends BaseComponents {
     return this.parent;
   }
 
-  // This method normalizes post data to ensure consistency
-  normalizePostData(rawPost) {
-    // Create a consistent post structure regardless of source
-    return {
-      id: rawPost.id || 0,
-      title: rawPost.title || 'Untitled Opportunity',
-      description: rawPost.description || 'No description available',
-      responsibilities: this.ensureArray(rawPost.responsibilities),
-      qualificationRequirement: this.ensureArray(rawPost.qualificationRequirement),
-      compensation: rawPost.compensation || 'Not specified',
-      hiringPeriodStart: this.normalizeHiringPeriod(rawPost.hiringPeriodStart),
-      hiringPeriodEnd: this.normalizeHiringPeriod(rawPost.hiringPeriodEnd),
-      applicationInstructions: rawPost.applicationInstructions || 'Contact for details',
-      deadline: this.normalizeDate(rawPost.deadline),
-      contactName: rawPost.contactName || 'Not specified',
-      contactEmail: rawPost.contactEmail || 'No email provided',
-      postedDate: this.normalizeDate(rawPost.postedDate)
-    };
+  setupPaginationControls() {
+    const prevButton = this.parent.querySelector('.prev-page');
+    const nextButton = this.parent.querySelector('.next-page');
+    const pageInput = this.parent.querySelector('.page-input');
+    const goButton = this.parent.querySelector('.go-btn');
+    
+    prevButton.addEventListener('click', () => {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+        this.loadPageData(this.currentPage);
+      }
+    });
+    
+    nextButton.addEventListener('click', () => {
+      const totalPages = Math.ceil(this.totalPosts / this.postsPerPage);
+      if (this.currentPage < totalPages) {
+        this.currentPage++;
+        this.loadPageData(this.currentPage);
+      }
+    });
+    
+    goButton.addEventListener('click', () => {
+      const requestedPage = parseInt(pageInput.value);
+      const totalPages = Math.ceil(this.totalPosts / this.postsPerPage);
+      if (!isNaN(requestedPage) && requestedPage >= 1 && requestedPage <= totalPages) {
+        this.currentPage = requestedPage;
+        this.loadPageData(this.currentPage);
+      } else {
+        // Invalid page number
+        pageInput.value = this.currentPage;
+        // Visual indication of error
+        pageInput.classList.add('error');
+        setTimeout(() => {
+          pageInput.classList.remove('error');
+        }, 500);
+      }
+    });
+    
+    // Allow Enter key to trigger Go button
+    pageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        goButton.click();
+      }
+    });
   }
 
-  // Helper methods for data normalization
-  ensureArray(value) {
-    if (!value) return [];
-    return Array.isArray(value) ? value : [value];
-  }
-
-  normalizeDate(dateValue) {
-    if (!dateValue) return new Date();
+  async loadPageData(page) {
+    // Show loading indicator
+    const jobListingsElement = this.parent.querySelector('.job-listings');
+    jobListingsElement.innerHTML = '<div class="loading">Loading research opportunities...</div>';
     
     try {
-      return new Date(dateValue);
-    } catch (e) {
-      return new Date();
-    }
-  }
-
-  normalizeHiringPeriod(hiringPeriodStart, hiringPeriodEnd) {
-    const start = this.normalizeDate(hiringPeriodStart);
-    const end = this.normalizeDate(hiringPeriodEnd);
-
-    // If both start and end are valid, return them
-    if (start && end) {
-      return { start, end };
-    }
-
-    // Default fallback if either is missing
-    return { 
-      start: start || new Date(), 
-      end: end || new Date(new Date().setMonth(new Date().getMonth() + 3)) 
-    };
-  }
-
-  async getAllPosts() {
-    try {
-      const response = await fetch('/researchPost');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch posts: ${response.statusText}`);
+      // Calculate page start/end indices
+      const startIndex = (page - 1) * this.postsPerPage;
+      // Fetch posts for this page
+      for(let i = 1; i <= Math.min(this.postsPerPage, this.totalPosts); i++) {
+        const response = await fetch(`/researchPost/${startIndex + i}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch posts: ${response.statusText}`);
+        }
+        const res = await response.json();
+        if (res) {
+          this.posts.push(res);
+          this.totalPosts++;
+        }
       }
       
-      const posts = await response.json();
       
-      // Important: Normalize all posts before publishing the event
-      const normalizedPosts = posts.map(post => this.normalizePostData(post));
+      // Render the posts
+      await this.renderJobPosts();
       
-      // Publish success event
-      this.eventHub.publish(Events.LoadPostsSuccess, normalizedPosts);
+      // Update pagination UI
+      this.updatePagination();
       
-      return normalizedPosts;
     } catch (error) {
-      console.error('Error fetching posts:', error);
-      this.eventHub.publish(Events.LoadPostsFailure, error);
-      return [];
+      console.error('Error loading page data:', error);
+      const jobListingsElement = this.parent.querySelector('.job-listings');
+      jobListingsElement.innerHTML = '<div class="error">Failed to load research opportunities. Please try again.</div>';
+    }
+  }
+
+  updatePagination() {
+    const totalPages = Math.ceil(this.totalPosts / this.postsPerPage);
+    
+    // Update page display and controls
+    const currentPageEl = this.parent.querySelector('.current-page');
+    const totalPagesEl = this.parent.querySelector('.total-pages');
+    const pageInput = this.parent.querySelector('.page-input');
+    const prevButton = this.parent.querySelector('.prev-page');
+    const nextButton = this.parent.querySelector('.next-page');
+    
+    // Update text and input values
+    currentPageEl.textContent = this.currentPage;
+    totalPagesEl.textContent = totalPages || 1;
+    pageInput.value = this.currentPage;
+    pageInput.max = totalPages || 1;
+    
+    // Enable/disable navigation buttons
+    prevButton.disabled = this.currentPage <= 1;
+    nextButton.disabled = this.currentPage >= totalPages;
+    
+    // Add visual indication for the buttons
+    if (prevButton.disabled) {
+      prevButton.classList.add('disabled');
+    } else {
+      prevButton.classList.remove('disabled');
+    }
+    
+    if (nextButton.disabled) {
+      nextButton.classList.add('disabled');
+    } else {
+      nextButton.classList.remove('disabled');
     }
   }
 
   async performSearch(searchState) {
     try {
-      const allPosts = await this.getAllPosts();
+      // Show loading state
+      const jobListingsElement = this.parent.querySelector('.job-listings');
+      jobListingsElement.innerHTML = '<div class="loading">Searching opportunities...</div>';
+      
+      // Reset to page 1 for new searches
+      this.currentPage = 1;
+      
+      // We'll make the search request to the backend
+      // For now, we'll implement this client-side, but ideally this would be a server endpoint
+      const response = await fetch('/researchPost');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.statusText}`);
+      }
+      
+      const allPosts = await response.json();
       
       // Filter by search query
       let filteredPosts = allPosts.filter(post => {
         if (!searchState.query) return true;
-        return post.title.toLowerCase().includes(searchState.query.toLowerCase()) || 
-               post.description.toLowerCase().includes(searchState.query.toLowerCase()) ||
-               post.contactName.toLowerCase().includes(searchState.query.toLowerCase());
+        
+        const query = searchState.query.toLowerCase();
+        return (
+          post.title?.toLowerCase().includes(query) || 
+          post.description?.toLowerCase().includes(query) ||
+          post.contactName?.toLowerCase().includes(query) ||
+          post.contactEmail?.toLowerCase().includes(query)
+        );
       });
       
-      // Major filtering, date range filtering, etc. (keep existing implementation)
-      // ...
+      // Additional filtering (majors, date ranges, etc.)
+      if (searchState.filters?.majors?.length > 0) {
+        filteredPosts = filteredPosts.filter(post => {
+          if (!post.qualificationRequirement) return false;
+          
+          // Check if any of the selected majors appear in qualifications
+          return searchState.filters.majors.some(major => {
+            if (Array.isArray(post.qualificationRequirement)) {
+              return post.qualificationRequirement.some(qual => 
+                qual.toLowerCase().includes(major.toLowerCase())
+              );
+            } else {
+              return post.qualificationRequirement.toLowerCase().includes(major.toLowerCase());
+            }
+          });
+        });
+      }
       
-      // Sort results
+      // Date range filtering
+      if (searchState.filters?.dateRange?.from || searchState.filters?.dateRange?.to) {
+        filteredPosts = filteredPosts.filter(post => {
+          if (!post.deadline) return true;
+          
+          const deadlineDate = new Date(post.deadline);
+          let isValid = true;
+          
+          if (searchState.filters.dateRange.from) {
+            const fromDate = new Date(searchState.filters.dateRange.from);
+            isValid = isValid && deadlineDate >= fromDate;
+          }
+          
+          if (searchState.filters.dateRange.to) {
+            const toDate = new Date(searchState.filters.dateRange.to);
+            isValid = isValid && deadlineDate <= toDate;
+          }
+          
+          return isValid;
+        });
+      }
+      
+      // Sorting logic
       if (searchState.sortOption === 'latest') {
         filteredPosts.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
       } else if (searchState.sortOption === 'deadline') {
         const today = new Date();
         filteredPosts.sort((a, b) => {
-          const timeToDeadlineA = new Date(a.deadline) - today;
-          const timeToDeadlineB = new Date(b.deadline) - today;
-          return timeToDeadlineA - timeToDeadlineB;
+          const deadlineA = new Date(a.deadline || '9999-12-31');
+          const deadlineB = new Date(b.deadline || '9999-12-31');
+          return deadlineA - deadlineB;
         });
       }
       
-      // Ensure data is normalized before publishing
-      const normalizedFilteredPosts = filteredPosts.map(post => this.normalizePostData(post));
+      // Store total count and update pagination
+      this.totalPosts = filteredPosts.length;
       
-      // Reset to first page on new search
-      this.currentPage = 1;
+      // Get posts for the current page only
+      const startIdx = (this.currentPage - 1) * this.postsPerPage;
+      const endIdx = Math.min(startIdx + this.postsPerPage, this.totalPosts);
+      this.posts = filteredPosts.slice(startIdx, endIdx);
       
-      // Update the posts and render
-      this.posts = normalizedFilteredPosts;
-      this.renderJobPosts();
+      // Render the filtered posts
+      await this.renderJobPosts();
       
-      // Publish search results success
-      this.eventHub.publish(Events.SearchPostsSuccess, normalizedFilteredPosts);
+      // Update pagination
+      this.updatePagination();
+      
+      // Publish search results
+      this.eventHub.publish(Events.SearchPostsSuccess, this.posts);
+      
     } catch (error) {
       console.error('Error searching posts:', error);
       this.eventHub.publish(Events.SearchPostsFailure, error);
+      
+      const jobListingsElement = this.parent.querySelector('.job-listings');
+      jobListingsElement.innerHTML = '<div class="error">Search failed. Please try again.</div>';
     }
   }
 
-  renderJobPosts() {
+  async renderJobPosts() {
     const jobListingsElement = this.parent.querySelector('.job-listings');
     jobListingsElement.innerHTML = '';
     
@@ -212,12 +301,7 @@ export class JobListingsComponent extends BaseComponents {
       return;
     }
     
-    // Pagination logic
-    const startIndex = (this.currentPage - 1) * this.postsPerPage;
-    const endIndex = Math.min(startIndex + this.postsPerPage, this.posts.length);
-    const postsToShow = this.posts.slice(startIndex, endIndex);
-    
-    postsToShow.forEach(post => {
+    for (const post of this.posts) {
       const jobPostElement = document.createElement('div');
       jobPostElement.className = 'job-post';
       jobPostElement.dataset.postId = post.id;
@@ -226,12 +310,12 @@ export class JobListingsComponent extends BaseComponents {
       let hiringPeriodText = 'Not specified';
       if (post.hiringPeriodStart && post.hiringPeriodEnd) {
         try {
-          const start = post.hiringPeriodStart.toLocaleDateString('en-US', {
+          const start = new Date(post.hiringPeriodStart).toLocaleDateString('en-US', {
             month: '2-digit',
             day: '2-digit',
             year: 'numeric'
           });
-          const end = post.hiringPeriodEnd.toLocaleDateString('en-US', {
+          const end = new Date(post.hiringPeriodEnd).toLocaleDateString('en-US', {
             month: '2-digit',
             day: '2-digit',
             year: 'numeric'
@@ -242,10 +326,14 @@ export class JobListingsComponent extends BaseComponents {
         }
       }
       
+      // Check if this post is bookmarked
+      const isBookmarked = await LocalDB.isBookmarked(post.id);
+      const bookmarkClass = isBookmarked ? 'fas' : 'far';
+      
       jobPostElement.innerHTML = `
         <div class="job-post-header">
           <h3>${post.title}</h3>
-          <i class="far fa-bookmark bookmark-icon"></i>
+          <i class="${bookmarkClass} fa-bookmark bookmark-icon"></i>
         </div>
         <div class="job-post-details">
           <p><strong>Contact:</strong> ${post.contactName}</p>
@@ -257,7 +345,7 @@ export class JobListingsComponent extends BaseComponents {
       // Add click event listener to select this post
       jobPostElement.addEventListener('click', (e) => {
         // Don't trigger if clicking bookmark icon
-        if (e.target.classList.contains('bookmark-icon')) {
+        if (e.target.classList.contains('bookmark-icon') || e.target.closest('.bookmark-icon')) {
           return;
         }
         
@@ -279,47 +367,60 @@ export class JobListingsComponent extends BaseComponents {
       
       // Add bookmark functionality
       const bookmarkIcon = jobPostElement.querySelector('.bookmark-icon');
-      bookmarkIcon.addEventListener('click', (e) => {
+      bookmarkIcon.addEventListener('click', async (e) => {
         e.stopPropagation();
-        bookmarkIcon.classList.toggle('fas');
-        bookmarkIcon.classList.toggle('far');
         
-        if (bookmarkIcon.classList.contains('fas')) {
-          // Save post
-          this.eventHub.publish(Events.StorePost, post);
-        } else {
-          // Remove from saved
-          this.eventHub.publish(Events.UnStorePosts, post.id);
+        // Toggle bookmark in database
+        const success = await LocalDB.toggleBookmark(post.id);
+        
+        if (success) {
+          // Toggle visual indicator
+          bookmarkIcon.classList.toggle('fas');
+          bookmarkIcon.classList.toggle('far');
+          
+          // Show a brief notification
+          const notificationText = bookmarkIcon.classList.contains('fas') 
+            ? 'Research opportunity saved!' 
+            : 'Research opportunity removed from saved items';
+          
+          this.showNotification(notificationText);
         }
       });
       
       jobListingsElement.appendChild(jobPostElement);
-    });
-    
-    // Update pagination
-    this.updatePagination();
+    }
     
     // If this is the first load, select the first post
-    if (postsToShow.length > 0) {
+    if (this.posts.length > 0) {
       const firstPost = this.parent.querySelector('.job-post');
       if (firstPost) {
         firstPost.classList.add('active');
-        this.eventHub.publish(Events.PostSelected, postsToShow[0]);
+        this.eventHub.publish(Events.PostSelected, this.posts[0]);
       }
     }
   }
 
-  updatePagination() {
-    const paginationElement = this.parent.querySelector('.page-number');
-    const totalPages = Math.ceil(this.posts.length / this.postsPerPage);
+  // Add notification method
+  showNotification(message) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'bookmark-notification';
+    notification.textContent = message;
     
-    paginationElement.textContent = `Page ${this.currentPage} of ${totalPages || 1}`;
+    // Add to document
+    document.body.appendChild(notification);
     
-    // Enable/disable pagination buttons
-    const prevButton = this.parent.querySelector('.prev-page');
-    const nextButton = this.parent.querySelector('.next-page');
+    // Show notification
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
     
-    prevButton.disabled = this.currentPage <= 1;
-    nextButton.disabled = this.currentPage >= totalPages;
+    // Remove after delay
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
   }
 }

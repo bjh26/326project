@@ -6,11 +6,13 @@ import { JobListingsComponent } from '../../components/JobListings/index.js';
 import { JobDetailsComponent } from '../../components/JobDetails/index.js';
 import { SavedPostsComponent } from '../../components/SavedPosts/index.js';
 import { LocalDB } from '../../services/LocalDB.js';
+import {NavBarComponent} from '../../components/NavBar/index.js';
 
 export class HomePage extends BaseComponent {
     #container = null;
     #jobPostingsContainer = null;
     #hub = null;
+    #navBar = null;
     #searchBar = null;
     #jobListings = null;
     #jobDetails = null;
@@ -22,6 +24,7 @@ export class HomePage extends BaseComponent {
         this.#hub = EventHub.getInstance();
         
         // Initialize components
+        this.#navBar = new NavBarComponent();
         this.#searchBar = new SearchBarComponent();
         this.#jobListings = new JobListingsComponent();
         this.#jobDetails = new JobDetailsComponent();
@@ -29,11 +32,12 @@ export class HomePage extends BaseComponent {
     }
 
     async render() {
-        this.loadCSS('src/pages/HomePage', 'style');
+        this.loadCSS('pages/HomePage', 'HomePage');
         this.#container = document.createElement('div');
         this.#container.id = 'home-page';
         
         // Render search bar component (always visible)
+        this.#container.appendChild(this.#navBar.render());
         this.#container.appendChild(this.#searchBar.render());
         
         // Create job postings container

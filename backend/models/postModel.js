@@ -108,6 +108,7 @@ const seedResearchPosts = async () => {
         // Mock data for research posts
         const mockPosts = [
             {
+                id: 1,
                 title: "Software Engineering Research Assistant",
                 description: "We are seeking a motivated undergraduate student to assist in a cutting-edge software engineering research project.",
                 responsibilities: [
@@ -130,6 +131,7 @@ const seedResearchPosts = async () => {
                 postedDate: new Date("2023-11-01")
             },
             {
+                id: 2,
                 title: "Machine Learning Research Position",
                 description: "Join our team to work on cutting-edge machine learning algorithms.",
                 responsibilities: [
@@ -152,6 +154,7 @@ const seedResearchPosts = async () => {
                 postedDate: new Date("2023-10-25")
             },
             {
+                id: 3,
                 title: "AI Research Opportunity",
                 description: "Help develop AI models for natural language processing.",
                 responsibilities: [
@@ -174,6 +177,7 @@ const seedResearchPosts = async () => {
                 postedDate: new Date("2023-10-15")
             },
             {
+                id: 4,
                 title: "Software Development Research",
                 description: "Work on innovative software development methodologies.",
                 responsibilities: [
@@ -196,6 +200,7 @@ const seedResearchPosts = async () => {
                 postedDate: new Date("2023-09-30")
             },
             {
+                id: 5,
                 title: "Software Engineering Research Assistant",
                 description: "Assist in cutting-edge software development research with a focus on AI-driven solutions.",
                 responsibilities: [
