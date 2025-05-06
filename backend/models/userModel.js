@@ -33,9 +33,13 @@ const userModel = sequelizeUser.define("Users", {
         type: DataTypes.STRING,
         allowNull: true
     },
-    img: { 
+    pfp: { 
       type: DataTypes.STRING,
       allowNull: true
+    },
+    mime: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     resume: {
         type: DataTypes.STRING,
