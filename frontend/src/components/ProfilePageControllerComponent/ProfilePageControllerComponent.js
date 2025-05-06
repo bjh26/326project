@@ -185,14 +185,21 @@ export class ProfilePageControllerComponent extends BaseComponent {
 
                 // display resume
                 const resumeDiv = this.#container.querySelector("#resume");
-                if (resumeDiv && this.#profileData.resume && this.#profileData.mime) {
-                    pfpDiv.innerHTML = "";
-                    const pfpDisplay = document.createElement("???");
-                    const imgFile = Base64.convertBase64ToFile(this.#profileData.pfp, this.#profileData.mime);
-                    const imageURL = URL.createObjectURL(imgFile);
-                    pfpDisplay.src = imageURL;
-                    pfpDiv.appendChild(pfpDisplay);
+                if (resumeDiv && this.#profileData.resume) {
+                    const link = document.createElement("a");
+                    link.href = `data:application/pdf;base64,${this.#profileData.resume}`;
+                    link.download = "resume.pdf";
+                    link.textContent = "Download Resume";
+                    link.target = "_blank";
+                    resumeDiv.appendChild(link);
                 }
+
+                // resumeDiv.innerHTML = "";
+                    // const resumeDisplay = document.createElement("???");
+                    // const resumeFile = Base64.convertBase64ToFile(this.#profileData.pfp, "application/pdf");
+                    // const imageURL = URL.createObjectURL(imgFile);
+                    // pfpDisplay.src = imageURL;
+                    // pfpDiv.appendChild(pfpDisplay);
             }
 
             // display research items
@@ -444,15 +451,15 @@ export class ProfilePageControllerComponent extends BaseComponent {
         if (this.#currentProfilePage === 'edit1') {
             // update this.#profileData and save to IndexedDB
             await this.#saveProfileData();
+        } else if (this.#currentProfilePage === 'edit2') {
+            // TODO: implement uploading files to IndexedDB
+            this.#showSaveMessage("Profile picture and resume settings saved");
         } else if (this.#currentProfilePage === 'edit3') {
             // this is already handled by add/edit/delete research item functions
             // so this.#profileData will have already been updated
             // all that's left is to save to IndexedDB
             await this.#saveToLocalDB();
-        } else if (this.#currentProfilePage === 'edit2') {
-            // TODO: implement uploading files to IndexedDB
-            this.#showSaveMessage("Profile picture and resume settings saved");
-        }
+        } 
     }
 
     async #saveProfileData() {

@@ -69,9 +69,7 @@ app.post("/profile", (req, res) => {
     if(profiles.some(p => p.email === profile.email)){
         return res.status(400).json({ error: "A profile with this email already exists." });
     }
-    console.log(profile.profileImage)
-    const toAdd = Profile(profile.firstName, profile.lastName, profile.email, false, profile.bio, profile.profileImage, profile.resume);
-    profiles.push(toAdd);
+    profiles.push(profile);
     console.log(profiles);
     res.sendStatus(200);
 });

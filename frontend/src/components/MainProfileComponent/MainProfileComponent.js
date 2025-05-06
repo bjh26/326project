@@ -35,6 +35,8 @@ export class MainProfileComponent extends BaseComponent {
                                     <div id="bio" class="side-column-text">
                                         <p id="bioDisplay"></p>
                                     </div>
+                                    <div id="resume">
+                                    </div>
                                 </div>
                                 <div id="mainBody" class="right-column">
                                 </div>

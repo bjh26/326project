@@ -98,7 +98,8 @@ export class CreateAccountControllerComponent extends BaseComponent {
                 // then navigate to the home page
                 alert("Successfully created account!");
                 await LocalDB.put("sessionEmail", this.#profileData.email);
-                await this.#hub.publish(Events.NavigateTo, { page: "home" });
+                await LocalDB.delete("accountCreateData");
+                await this.#hub.publish(Events.NavigateTo, { page: "profile", info: {email:this.#profileData.email, canEdit:true} });
             });
         }
 
@@ -163,7 +164,9 @@ export class CreateAccountControllerComponent extends BaseComponent {
             // the conversion to fail.
             const base64 = reader.result.split(",")[1];
             this.#profileData[type] = base64;
-            this.#profileData.mime = file.type;
+            if (file.type.startsWith("image/")) {
+                this.#profileData.mime = file.type;
+            }
             await this.#saveAccountCreateData();
         }
         reader.readAsDataURL(file);
@@ -232,7 +235,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
                                 <div class = "upload-documents">
                                     <div id = "uploadProfileImage" class="profile-image">
                                         <label for="profileImage"> 
-                                            <img src = "/Sample_User_Icon.png" id="dummyProfileImage">
+                                            <img src = "./Sample_User_Icon.png" id="dummyProfileImage">
                                         </label>
                                         <input type="file" id="profileImage" accept=".jpeg, .jpg, .png" style="display: none">
                                     </div> 
@@ -244,7 +247,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
                                 </div>
                                 <form class="short-response">
                                     <label for = "firstName">First Name<input type = "text" id = "firstName"></label>
-                                    <label for="lastName">Last Name<input type="text" id="lastName"></label>
+                                    <label for = "lastName">Last Name<input type="text" id="lastName"></label>
                                     <label for ="email">Email<input type="text" id="email" required></label>
                                     <label for = "department">Department</label>
                                     <select id = "department">
@@ -260,8 +263,8 @@ export class CreateAccountControllerComponent extends BaseComponent {
                             </div>
                             <div class="button-container">
                                 <input class="button" type="button" value="Save" id="save">  
-                                <input class="create-button" type="submit" value="create new account" id="createAccount">  
-                                <input class="create-button" type="submit" value="delete account" id="deleteAccount">    
+                                <input class="button" type="submit" value="Create Account" id="createAccount">  
+                                <input class="button" type="submit" value="Delete Account" id="deleteAccount">    
                             </div>
                         `;
         this.#container.appendChild(wrapper);
