@@ -13,7 +13,7 @@ export class SavedPostsComponent extends BaseComponent {
 
     render() {
         // Load component CSS
-        this.loadCSS('src/components/SavedPosts', 'style');
+        this.loadCSS('components/SavedPosts', 'style');
         
         this.parent.innerHTML = `
             <div class="saved-posts-header">
