@@ -1,5 +1,5 @@
 import express from "express";
-import { sequelizeUser, userModel } from "./userModel.js";
+import { sequelizeUser, userModel } from "./models/userModel.js";
 import { sequelizePost, seedResearchPosts} from "./models/postModel.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -14,19 +14,9 @@ const __dirname = dirname(__filename);
 // instantiate Express
 const app = express();
 const PORT = 3000;
-
-app.use('/src', express.static(path.join(__dirname, '../frontend/src')));
-app.use('/src/pages/HomePage', express.static(path.join(__dirname, '../frontend/src/pages/HomePage')));
-app.use('/src/components/JobListings', express.static(path.join(__dirname, '../frontend/src/components/JobListings')));
-app.use('/src/components/JobDetails', express.static(path.join(__dirname, '../frontend/src/components/JobDetails')));
-app.use('/src/components/NavBar', express.static(path.join(__dirname, '../frontend/src/components/NavBar')));
-app.use('/src/components/SearchBar', express.static(path.join(__dirname, '../frontend/src/components/SearchBar')));
-app.use(express.static("../frontend/src/EditPages"));
-app.use(express.static("../frontend/src/CreateAPostPages"));
-app.use(express.static("../frontend/src/NewUserCreation"));
-app.use(express.static("../frontend/src/assets"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.static("../frontend/src"));
 
 // test function with dummy data
 async function preloadData() {
