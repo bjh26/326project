@@ -104,6 +104,10 @@
     border-radius: 4px;
     text-align: center;
     width: 100%;
+    box-sizing: border-box; /* This ensures padding is included in the width */
+    max-width: 100%; /* Ensure it doesn't exceed container width */
+    overflow-wrap: break-word; /* Allow text to wrap */
+    word-wrap: break-word;
   }
   
   .message.error {

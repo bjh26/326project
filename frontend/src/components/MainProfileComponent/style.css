@@ -71,6 +71,9 @@ body {
 
 .right-column {
     padding: 20px 40px 40px 40px;
+    width: 100%; /* Ensure it takes full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+    overflow: hidden; /* Prevent overflow */
 }
 
 .research-element {
@@ -79,12 +82,17 @@ body {
     opacity: 50%;
     margin: 20px 10px;
     text-align: center;
-    min-width: 500px;
+    width: 100%; /* Change from min-width to width */
+    max-width: 100%; /* Add max-width to prevent overflow */
     min-height: 200px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
     transition: opacity 0.3s ease;
+    box-sizing: border-box; /* Add to include padding in width calculation */
+    overflow-wrap: break-word; /* Allow text to wrap */
+    word-break: break-word; /* Handle long words */
 }
+
 
 .research-element h1 {
     margin-top: 10px;
@@ -148,12 +156,25 @@ body {
         flex-direction: column;
     }
     
-    .right-column {
+    .left-column, .right-column {
+        width: 100%;
         padding: 20px;
+        box-sizing: border-box;
     }
     
     .research-element {
-        min-width: auto;
+        min-width: auto; /* Override min-width on mobile */
         width: 100%;
+        margin: 20px 0; /* Reduce horizontal margin */
+        padding: 15px; /* Reduce padding */
+    }
+
+    .research-element h1 {
+        font-size: 20px; /* Smaller font size on mobile */
+        word-break: break-word;
+    }
+    
+    .research-element p {
+        word-break: break-word;
     }
 }
