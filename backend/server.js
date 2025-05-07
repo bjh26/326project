@@ -40,7 +40,7 @@ async function preloadData() {
     }
 }
 
-preloadData();
+// preloadData();
 
 setTimeout(() => {
     app.listen(PORT, () => {
