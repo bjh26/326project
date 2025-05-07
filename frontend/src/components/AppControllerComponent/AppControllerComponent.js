@@ -52,8 +52,8 @@ export class AppControllerComponent extends BaseComponent {
         // check if current page is in IndexedDB, otherwise default to login page
         this.#currentPage = await LocalDB.get("currentPage");
         if (!this.#currentPage) {
-            this.#currentPage = "createAccount"; // default to login
-            await LocalDB.put("currentPage", "createAccount");
+            this.#currentPage = "login"; // default to login
+            await LocalDB.put("currentPage", "login");
         }
 
         // load current page into container
