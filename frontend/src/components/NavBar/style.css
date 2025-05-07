@@ -75,12 +75,14 @@ header {
     justify-content: center;
   }
   
-  .profile-picture {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
+  #profile-picture {
+    width: 48px; /* Match the button size */
+    height: 48px; /* Match the button size */
+    border-radius: 50%; /* Ensure it stays circular */
+    object-fit: cover; /* Ensure the image scales and crops to fit */
+    object-position: center; /* Center the image within the circle */
+    display: block; /* Ensure proper rendering */
+}
   
   /* Standard profile button (when no image) */
   #profile-button {
