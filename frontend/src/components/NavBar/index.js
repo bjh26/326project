@@ -78,18 +78,15 @@ export class NavBarComponent extends BaseComponents {
 
     // Make logo clickable to return to home page
     logoContainer.addEventListener('click', async () => {
-      const currentIsHomePage = await LocalDB.get("isHomePage") || false;
+      // IMPORTANT: Always update both keys in LocalDB
+      await LocalDB.put("isHomePage", true); // Set isHomePage to true
+      await LocalDB.put("currentPage", "home"); // Set currentPage to home
       
-      // Only take action if we're not already on the home page
-      if (!currentIsHomePage) {
-        await LocalDB.put("isHomePage", true); // Set isHomePage to true
-        
-        // Notify search components about the mode change
-        this.eventHub.publish('SearchModeChanged', 'home');
-        
-        // Then navigate
-        this.eventHub.publish(Events.NavigateTo, { page: "home" });
-      }
+      // Notify search components about the mode change
+      this.eventHub.publish('SearchModeChanged', 'home');
+      
+      // Then navigate
+      this.eventHub.publish(Events.NavigateTo, { page: "home" });
     });
     logoContainer.style.cursor = 'pointer'; // Add pointer cursor to indicate clickability
 
@@ -112,7 +109,9 @@ export class NavBarComponent extends BaseComponents {
       
       // Only take action if we're not already on the saved posts page
       if (currentIsHomePage) {
+        // IMPORTANT: Update both keys in LocalDB
         await LocalDB.put("isHomePage", false); // Set isHomePage to false
+        await LocalDB.put("currentPage", "savedPosts"); // Update currentPage as well
         
         // Notify search components about the mode change
         this.eventHub.publish('SearchModeChanged', 'saved');
@@ -134,6 +133,9 @@ export class NavBarComponent extends BaseComponents {
         // Get current user's email
         const sessionEmail = await LocalDB.get("sessionEmail");
         if (sessionEmail) {
+          // Update currentPage to profile
+          await LocalDB.put("currentPage", "profile");
+          
           // Navigate to profile page with edit permissions
           this.eventHub.publish(Events.NavigateTo, { 
             page: "profile", 
