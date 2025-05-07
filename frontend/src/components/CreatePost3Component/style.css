@@ -1,0 +1,212 @@
+/* Remove the extra background block */
+body::before,
+body::after,
+#create-a-post-container::before,
+#create-a-post-container::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Center the container properly */
+#create-a-post-container {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Style for the active step - ensure it's centered */
+.step {
+    display: block;
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 10;
+    box-sizing: border-box;
+}
+
+/* Hide inactive steps */
+.step:not(.active) {
+    display: none;
+}
+
+.post-form {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.post-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+}
+
+.post-form input[type="text"],
+.post-form input[type="email"] {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    color: #333;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.post-form input[type="text"]:focus,
+.post-form input[type="email"]:focus {
+    border-color: #A24857;
+    box-shadow: 0 0 0 3px rgba(162, 72, 87, 0.2);
+    outline: none;
+}
+
+/* Button container - single row layout */
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+
+/* Base button style */
+.form-button,
+#cancel,
+#save,
+#back,
+#post {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    white-space: nowrap;
+    height: 48px;
+    min-width: 0; /* Allow buttons to shrink */
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Cancel button */
+#cancel {
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+#cancel:hover {
+    background-color: #e9e9e9;
+}
+
+/* Save button */
+#save {
+    background-color: #6c757d;
+    color: white;
+}
+
+#save:hover {
+    background-color: #5a6268;
+}
+
+/* Back button */
+#back {
+    background-color: #6c757d;
+    color: white;
+}
+
+#back:hover {
+    background-color: #5a6268;
+}
+
+/* Post button - primary action */
+#post {
+    background-color: #A24857;
+    color: white;
+}
+
+#post:hover {
+    background-color: #933D4A;
+}
+
+/* Active state for all buttons */
+.form-button:active,
+#cancel:active,
+#save:active,
+#back:active,
+#post:active {
+    transform: translateY(1px);
+}
+
+/* Save message styling */
+#saveMessage {
+    margin-top: 10px;
+    padding: 12px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    display: none;
+}
+
+#saveMessage.show {
+    display: block;
+    animation: fadeOut 3s forwards;
+    animation-delay: 2s;
+}
+
+#saveMessage.error {
+    background-color: #f44336;
+}
+
+@keyframes fadeOut {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+/* Mobile adjustments - ensure buttons stay on a single row */
+@media (max-width: 768px) {
+    .buttons {
+        flex-wrap: nowrap;
+    }
+    
+    .form-button,
+    #cancel,
+    #save,
+    #back,
+    #post {
+        font-size: 14px;
+        padding: 12px 10px;
+    }
+}
+
+/* For very small screens, allow a bit more breathing room */
+@media (max-width: 480px) {
+    .form-button,
+    #cancel,
+    #save,
+    #back,
+    #post {
+        font-size: 12px;
+        padding: 12px 8px;
+    }
+}

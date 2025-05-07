@@ -6,8 +6,10 @@ export class CreatePost3Component extends BaseComponent {
     }
 
     render() {
+        this.loadCSS("components/CreatePost3Component", "style");
         const container = document.createElement("div");
         container.classList.add("step");
+        container.classList.add("active");
         container.id = "step3";
         container.innerHTML = ` <div class="post-form">
                                     <label for="contactName">Contact Name</label>

@@ -6,8 +6,10 @@ export class CreatePost2Component extends BaseComponent {
     }
 
     render() {
+        this.loadCSS("components/CreatePost2Component", "style");
         const container = document.createElement("div");
         container.classList.add("step");
+        container.classList.add("active");
         container.id = "step2";
         container.innerHTML = ` <div class="post-form">
                                     <label for="qualificationRequirement">Qualifications and Requirements</label>

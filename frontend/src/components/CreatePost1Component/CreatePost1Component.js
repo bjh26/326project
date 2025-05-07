@@ -6,8 +6,10 @@ export class CreatePost1Component extends BaseComponent {
     }
 
     render() {
+        this.loadCSS("components/CreatePost1Component", "style");
         const container = document.createElement("div");
         container.classList.add("step");
+        container.classList.add("active");
         container.id = "step1";
         container.innerHTML = ` <div class="post-form">
                                     <label for="title">Title</label>
