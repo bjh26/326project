@@ -91,8 +91,18 @@ export class NavBarComponent extends BaseComponents {
 
     // Make logo clickable to return to home page
     logoContainer.addEventListener('click', async () => {
-      LocalDB.put("isHomePage", true); // Set isHomePage to true
-      this.eventHub.publish(Events.NavigateTo, { page: "home" });
+      const currentIsHomePage = await LocalDB.get("isHomePage") || false;
+      
+      // Only take action if we're not already on the home page
+      if (!currentIsHomePage) {
+        await LocalDB.put("isHomePage", true); // Set isHomePage to true
+        
+        // Notify search components about the mode change
+        this.eventHub.publish('SearchModeChanged', 'home');
+        
+        // Then navigate
+        this.eventHub.publish(Events.NavigateTo, { page: "home" });
+      }
     });
     logoContainer.style.cursor = 'pointer'; // Add pointer cursor to indicate clickability
 
@@ -111,8 +121,18 @@ export class NavBarComponent extends BaseComponents {
 
     // Handle saved posts button click
     savedButton.addEventListener('click', async () => {
-      await LocalDB.put("isHomePage", false); // Set isHomePage to false
-      this.eventHub.publish(Events.NavigateTo, { page: "savedPosts" });
+      const currentIsHomePage = await LocalDB.get("isHomePage") || true;
+      
+      // Only take action if we're not already on the saved posts page
+      if (currentIsHomePage) {
+        await LocalDB.put("isHomePage", false); // Set isHomePage to false
+        
+        // Notify search components about the mode change
+        this.eventHub.publish('SearchModeChanged', 'saved');
+        
+        // Then navigate
+        this.eventHub.publish(Events.NavigateTo, { page: "savedPosts" });
+      }
     });
 
     // Setup dropdown menu buttons

@@ -9,78 +9,80 @@ import { LocalDB } from '../../services/LocalDB.js';
 import { NavBarComponent } from '../../components/NavBar/index.js';
 
 export class HomePage extends BaseComponent {
-    #container = null;
-    #jobPostingsContainer = null;
-    #hub = null;
-    #navBar = null;
-    #searchBar = null;
-    #jobListings = null;
-    #jobDetails = null;
-    #savedPosts = null;
-    #isHomePage;
-
     constructor() {
         super();
-        this.#hub = EventHub.getInstance();
+        this.container = document.createElement('div');
+        this.container.id = 'home-page';
+        this.jobPostingsContainer = null;
+        this.hub = EventHub.getInstance();
+        this.isHomePage = true;
         
         // Initialize components
-        this.#navBar = new NavBarComponent();
-        this.#searchBar = new SearchBarComponent();
-        this.#jobListings = new JobListingsComponent();
-        this.#jobDetails = new JobDetailsComponent();
-        this.#savedPosts = new SavedPostsComponent();
+        this.navBar = new NavBarComponent();
+        this.searchBar = new SearchBarComponent();
+        this.jobListings = new JobListingsComponent();
+        this.jobDetails = new JobDetailsComponent();
+        this.savedPosts = new SavedPostsComponent();
     }
 
     async render() {
         this.loadCSS('pages/HomePage', 'HomePage');
-        this.#container = document.createElement('div');
-        this.#container.id = 'home-page';
+        
+        // Clear the container
+        this.container.innerHTML = '';
+        
+        // Render navbar component (always visible)
+        this.container.appendChild(await this.navBar.render());
         
         // Render search bar component (always visible)
-        this.#container.appendChild(this.#navBar.render());
-        this.#container.appendChild(this.#searchBar.render());
+        this.container.appendChild(await this.searchBar.render());
         
         // Create job postings container
-        this.#jobPostingsContainer = document.createElement('div');
-        this.#jobPostingsContainer.className = 'job-postings-container';
-        this.#container.appendChild(this.#jobPostingsContainer);
+        this.jobPostingsContainer = document.createElement('div');
+        this.jobPostingsContainer.className = 'job-postings-container';
+        this.container.appendChild(this.jobPostingsContainer);
         
-        // Initialize home page state if not set
-        try {
-            this.#isHomePage = await LocalDB.get('isHomePage');
-            if (this.#isHomePage === undefined) {
-                await LocalDB.put('isHomePage', true);
-                this.#isHomePage = true;
-            }
-        } catch (error) {
-            console.error('Error loading home page state:', error);
-            this.#isHomePage = true; // Default to true on error
+        // Initialize home page state
+        this.isHomePage = await LocalDB.get('isHomePage');
+        if (this.isHomePage === undefined) {
             await LocalDB.put('isHomePage', true);
+            this.isHomePage = true;
         }
         
         // Render appropriate content
-        await this.#renderContent();
+        await this.renderContent();
         
-        return this.#container;
+        // Listen for NavigateTo events
+        this.hub.subscribe(Events.NavigateTo, async (data) => {
+            if (data.page === "home") {
+                this.isHomePage = true;
+                await this.renderContent();
+            } else if (data.page === "savedPosts") {
+                this.isHomePage = false;
+                await this.renderContent();
+            }
+        });
+        
+        return this.container;
     }
 
-    async #renderContent() {
+    async renderContent() {
         // Clear container first
-        this.#jobPostingsContainer.innerHTML = '';
+        this.jobPostingsContainer.innerHTML = '';
         
-        if (!this.#isHomePage) {
+        if (!this.isHomePage) {
             // Render saved posts component
-            this.#jobPostingsContainer.appendChild(this.#savedPosts.render());
+            this.jobPostingsContainer.appendChild(await this.savedPosts.render());
             
             // Initialize saved posts data immediately
-            this.#savedPosts.loadSavedPosts();
+            await this.savedPosts.loadSavedPosts();
         } else {
             // Append job listings and job details components
-            this.#jobPostingsContainer.appendChild(this.#jobListings.render());
-            this.#jobPostingsContainer.appendChild(this.#jobDetails.render());
+            this.jobPostingsContainer.appendChild(await this.jobListings.render());
+            this.jobPostingsContainer.appendChild(await this.jobDetails.render());
             
-            // Initialize job listings immediately (no setTimeout)
-            this.#hub.publish(Events.LoadPosts);
+            // Initialize job listings immediately
+            this.hub.publish(Events.LoadPosts);
         }
     }
 }

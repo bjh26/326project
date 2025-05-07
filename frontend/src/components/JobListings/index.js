@@ -16,6 +16,7 @@ export class JobListingsComponent extends BaseComponents {
     this.totalPosts = 0;
     this.isInitialLoad = true;
     this.isLoadingComplete = false;
+    this.isLoading = false; // Add a flag to prevent duplicate loads
     
     // Create a mapping from abbreviations to full major names for faster lookups
     this.abbrevToMajorMap = new Map();
@@ -60,7 +61,10 @@ export class JobListingsComponent extends BaseComponents {
 
     // Subscribe to events
     this.eventHub.subscribe(Events.LoadPosts, () => {
-      this.loadInitialData();
+      // Only load posts if we're not already loading
+      if (!this.isLoading) {
+        this.loadInitialData();
+      }
     });
 
     // Handle search results
@@ -71,6 +75,24 @@ export class JobListingsComponent extends BaseComponents {
 
     this.eventHub.subscribe(Events.SearchPosts, (searchState) => {
       this.performSearch(searchState);
+    });
+    
+    // Listen for bookmark status changes from SavedPosts component
+    this.eventHub.subscribe('BookmarkStatusChanged', (data) => {
+      // Update the UI for the affected post
+      const postElements = this.parent.querySelectorAll(`.job-post[data-post-id="${data.postId}"]`);
+      postElements.forEach(postElement => {
+        const bookmarkIcon = postElement.querySelector('.bookmark-icon');
+        if (bookmarkIcon) {
+          if (data.isBookmarked) {
+            bookmarkIcon.classList.add('fas');
+            bookmarkIcon.classList.remove('far');
+          } else {
+            bookmarkIcon.classList.remove('fas');
+            bookmarkIcon.classList.add('far');
+          }
+        }
+      });
     });
     
     // Initial data load - no delay needed
@@ -130,6 +152,10 @@ export class JobListingsComponent extends BaseComponents {
 
   async loadInitialData() {
     try {
+      // Set loading flag to prevent duplicate loads
+      if (this.isLoading) return;
+      this.isLoading = true;
+      
       // Show loading indicator
       const jobListingsElement = this.parent.querySelector('.job-listings');
       jobListingsElement.innerHTML = '<div class="loading">Loading research opportunities</div>';
@@ -149,9 +175,23 @@ export class JobListingsComponent extends BaseComponents {
       // Store total posts count
       this.totalPosts = allData.length;
       
+      // Make sure we don't have duplicates in posts
+      const uniquePostsMap = new Map();
+      allData.forEach(post => {
+        if (!uniquePostsMap.has(post.id)) {
+          // Ensure id is a string to prevent comparison issues
+          post.id = String(post.id);
+          uniquePostsMap.set(post.id, post);
+        }
+      });
+      
+      // Convert map back to array and sort by posted date (most recent first)
+      const uniquePosts = Array.from(uniquePostsMap.values())
+        .sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
+      
       // Get just the first page of posts to show
-      const firstPageEnd = Math.min(this.postsPerPage, this.totalPosts);
-      this.posts = allData.slice(0, firstPageEnd);
+      const firstPageEnd = Math.min(this.postsPerPage, uniquePosts.length);
+      this.posts = uniquePosts.slice(0, firstPageEnd);
       
       // Render the first page immediately
       await this.renderJobPosts();
@@ -168,20 +208,8 @@ export class JobListingsComponent extends BaseComponents {
         }
       }
       
-      // 2. Start loading full dataset in background for search/filtering
-      this.fetchAllPostsForFiltering(allData);
-      
-    } catch (error) {
-      console.error('Error loading initial data:', error);
-      const jobListingsElement = this.parent.querySelector('.job-listings');
-      jobListingsElement.innerHTML = '<div class="error">Failed to load research opportunities. Please try again.</div>';
-    }
-  }
-  
-  async fetchAllPostsForFiltering(initialData) {
-    try {
-      // We already have all the data from the initial fetch, so just store it
-      this.allPosts = initialData;
+      // 2. Start loading full dataset for filtering
+      this.allPosts = uniquePosts;
       this.isLoadingComplete = true;
       
       // Update search placeholder to indicate all data is ready
@@ -191,28 +219,34 @@ export class JobListingsComponent extends BaseComponents {
       }
       
     } catch (error) {
-      console.error('Error loading complete dataset:', error);
-      // This is a background task, so we don't show an error to the user,
-      // but we mark that complete data isn't available
-      this.isLoadingComplete = false;
+      console.error('Error loading initial data:', error);
+      const jobListingsElement = this.parent.querySelector('.job-listings');
+      jobListingsElement.innerHTML = '<div class="error">Failed to load research opportunities. Please try again.</div>';
+    } finally {
+      // Reset loading flag
+      this.isLoading = false;
     }
   }
 
   async loadPageData(page) {
-    // Calculate page start/end indices
-    const startIndex = (page - 1) * this.postsPerPage;
-    const endIndex = Math.min(startIndex + this.postsPerPage, this.totalPosts);
-    
-    // If we have all posts loaded, just slice from them
-    if (this.allPosts && this.allPosts.length > 0) {
-      this.posts = this.allPosts.slice(startIndex, endIndex);
-      await this.renderJobPosts();
-      this.updatePagination();
-      return;
-    }
-    
-    // Otherwise, we need to fetch from server (this is a fallback)
     try {
+      // Set loading flag to prevent duplicate loads
+      if (this.isLoading) return;
+      this.isLoading = true;
+      
+      // Calculate page start/end indices
+      const startIndex = (page - 1) * this.postsPerPage;
+      const endIndex = Math.min(startIndex + this.postsPerPage, this.totalPosts);
+      
+      // If we have all posts loaded, just slice from them
+      if (this.allPosts && this.allPosts.length > 0) {
+        this.posts = this.allPosts.slice(startIndex, endIndex);
+        await this.renderJobPosts();
+        this.updatePagination();
+        return;
+      }
+      
+      // Otherwise, we need to fetch from server (this is a fallback)
       // Show loading indicator
       const jobListingsElement = this.parent.querySelector('.job-listings');
       jobListingsElement.innerHTML = '<div class="loading">Loading page data</div>';
@@ -224,13 +258,27 @@ export class JobListingsComponent extends BaseComponents {
       
       const allData = await response.json();
       
+      // Make sure we don't have duplicates in posts
+      const uniquePostsMap = new Map();
+      allData.forEach(post => {
+        if (!uniquePostsMap.has(post.id)) {
+          // Ensure id is a string to prevent comparison issues
+          post.id = String(post.id);
+          uniquePostsMap.set(post.id, post);
+        }
+      });
+      
+      // Convert map back to array and sort by posted date (most recent first)
+      const uniquePosts = Array.from(uniquePostsMap.values())
+        .sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
+      
       // Store total posts count and all posts
-      this.totalPosts = allData.length;
-      this.allPosts = allData;
+      this.totalPosts = uniquePosts.length;
+      this.allPosts = uniquePosts;
       this.isLoadingComplete = true;
       
       // Get the current page of posts
-      this.posts = allData.slice(startIndex, endIndex);
+      this.posts = uniquePosts.slice(startIndex, endIndex);
       
       // Render the current page
       await this.renderJobPosts();
@@ -242,6 +290,9 @@ export class JobListingsComponent extends BaseComponents {
       console.error('Error loading page data:', error);
       const jobListingsElement = this.parent.querySelector('.job-listings');
       jobListingsElement.innerHTML = '<div class="error">Failed to load page data. Please try again.</div>';
+    } finally {
+      // Reset loading flag
+      this.isLoading = false;
     }
   }
 
@@ -320,6 +371,10 @@ export class JobListingsComponent extends BaseComponents {
 
   async performSearch(searchState) {
     try {
+      // Set loading flag to prevent duplicate loads
+      if (this.isLoading) return;
+      this.isLoading = true;
+      
       // Show loading state
       const jobListingsElement = this.parent.querySelector('.job-listings');
       jobListingsElement.innerHTML = '<div class="loading">Searching opportunities</div>';
@@ -336,7 +391,18 @@ export class JobListingsComponent extends BaseComponents {
         }
         
         const allData = await response.json();
-        this.allPosts = allData;
+        
+        // Make sure we don't have duplicates
+        const uniquePostsMap = new Map();
+        allData.forEach(post => {
+          if (!uniquePostsMap.has(post.id)) {
+            // Ensure id is a string to prevent comparison issues
+            post.id = String(post.id);
+            uniquePostsMap.set(post.id, post);
+          }
+        });
+        
+        this.allPosts = Array.from(uniquePostsMap.values());
         this.isLoadingComplete = true;
       }
       
@@ -420,6 +486,9 @@ export class JobListingsComponent extends BaseComponents {
       
       const jobListingsElement = this.parent.querySelector('.job-listings');
       jobListingsElement.innerHTML = '<div class="error">Search failed. Please try again.</div>';
+    } finally {
+      // Reset loading flag
+      this.isLoading = false;
     }
   }
 
@@ -431,6 +500,9 @@ export class JobListingsComponent extends BaseComponents {
       jobListingsElement.innerHTML = '<div class="no-results">No research opportunities found matching your criteria.</div>';
       return;
     }
+    
+    // Pre-fetch all bookmark statuses at once for better performance
+    const bookmarks = await LocalDB.getBookmarks();
     
     for (const post of this.posts) {
       const jobPostElement = document.createElement('div');
@@ -457,14 +529,14 @@ export class JobListingsComponent extends BaseComponents {
         }
       }
       
-      // Check if this post is bookmarked
-      const isBookmarked = await LocalDB.isBookmarked(post.id);
+      // Check if this post is bookmarked using the pre-fetched bookmarks
+      const isBookmarked = bookmarks.includes(String(post.id));
       const bookmarkClass = isBookmarked ? 'fas' : 'far';
       
       jobPostElement.innerHTML = `
         <div class="job-post-header">
           <h3>${post.title}</h3>
-          <i class="${bookmarkClass} fa-bookmark bookmark-icon"></i>
+          <i class="${bookmarkClass} fa-bookmark bookmark-icon" data-id="${post.id}"></i>
         </div>
         <div class="job-post-details">
           <p><strong>Contact:</strong> ${post.contactName || 'Not specified'}</p>
@@ -502,12 +574,29 @@ export class JobListingsComponent extends BaseComponents {
         e.stopPropagation();
         
         // Toggle bookmark in database
-        const success = await LocalDB.toggleBookmark(post.id);
+        const postId = bookmarkIcon.dataset.id;
+        const success = await LocalDB.toggleBookmark(postId);
         
         if (success) {
           // Toggle visual indicator
-          bookmarkIcon.classList.toggle('fas');
-          bookmarkIcon.classList.toggle('far');
+          const wasBookmarked = bookmarkIcon.classList.contains('fas');
+          
+          if (wasBookmarked) {
+            bookmarkIcon.classList.remove('fas');
+            bookmarkIcon.classList.add('far');
+          } else {
+            bookmarkIcon.classList.add('fas');
+            bookmarkIcon.classList.remove('far');
+          }
+          
+          // Log bookmark status for debugging
+          console.log(`Post ${postId} bookmark status: ${!wasBookmarked}`);
+          
+          // Notify other components about the bookmark change
+          this.eventHub.publish('BookmarkStatusChanged', { 
+            postId, 
+            isBookmarked: !wasBookmarked 
+          });
         }
       });
       

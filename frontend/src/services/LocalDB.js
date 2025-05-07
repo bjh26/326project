@@ -108,6 +108,10 @@ export class LocalDB {
      */
     static async toggleBookmark(postId) {
         try {
+            // Ensure postId is a string
+            const postIdStr = String(postId);
+            console.log(`Toggling bookmark for post ID: ${postIdStr}`);
+            
             // Get the current user's email
             const sessionEmail = await this.get("sessionEmail");
             if (!sessionEmail) {
@@ -119,14 +123,30 @@ export class LocalDB {
             const bookmarkKey = `bookmarks_${sessionEmail}`;
             let bookmarks = await this.get(bookmarkKey) || [];
             
-            // Toggle bookmark status
-            if (bookmarks.includes(postId)) {
-                // Remove bookmark
-                bookmarks = bookmarks.filter(id => id !== postId);
-            } else {
-                // Add bookmark
-                bookmarks.push(postId);
+            // Ensure bookmarks is an array (defensive programming)
+            if (!Array.isArray(bookmarks)) {
+                bookmarks = [];
             }
+            
+            // Log existing bookmarks
+            console.log(`Current bookmarks: ${JSON.stringify(bookmarks)}`);
+            
+            // Check if postId is already in bookmarks
+            const index = bookmarks.findIndex(id => String(id) === postIdStr);
+            
+            // Toggle bookmark status
+            if (index !== -1) {
+                // Remove bookmark
+                bookmarks.splice(index, 1);
+                console.log(`Removed bookmark for post ${postIdStr}`);
+            } else {
+                // Add bookmark (only if it doesn't already exist)
+                bookmarks.push(postIdStr);
+                console.log(`Added bookmark for post ${postIdStr}`);
+            }
+            
+            // Log updated bookmarks
+            console.log(`Updated bookmarks: ${JSON.stringify(bookmarks)}`);
             
             // Save updated bookmarks
             await this.put(bookmarkKey, bookmarks);
@@ -147,7 +167,21 @@ export class LocalDB {
             if (!sessionEmail) return [];
             
             const bookmarkKey = `bookmarks_${sessionEmail}`;
-            return await this.get(bookmarkKey) || [];
+            const bookmarks = await this.get(bookmarkKey);
+            
+            // Ensure we always return an array
+            if (!bookmarks || !Array.isArray(bookmarks)) {
+                console.log("No bookmarks found or invalid bookmarks format, returning empty array");
+                return [];
+            }
+            
+            // Convert all bookmark IDs to strings for consistent comparison
+            const stringBookmarks = bookmarks.map(id => String(id));
+            
+            // Return unique bookmark IDs to avoid duplicates
+            const uniqueBookmarks = [...new Set(stringBookmarks)];
+            console.log(`Retrieved bookmarks: ${JSON.stringify(uniqueBookmarks)}`);
+            return uniqueBookmarks;
         } catch (error) {
             console.error("Error getting bookmarks:", error);
             return [];
@@ -161,8 +195,16 @@ export class LocalDB {
      */
     static async isBookmarked(postId) {
         try {
+            // Ensure postId is a string
+            const postIdStr = String(postId);
+            
             const bookmarks = await this.getBookmarks();
-            return bookmarks.includes(postId);
+            const isBookmarked = bookmarks.includes(postIdStr);
+            
+            // Debug log
+            console.log(`Checking bookmark status for post ${postIdStr}: ${isBookmarked}`);
+            
+            return isBookmarked;
         } catch (error) {
             console.error("Error checking bookmark status:", error);
             return false;

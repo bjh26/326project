@@ -1,6 +1,7 @@
 import { BaseComponents } from '../BaseComponents.js';
 import { EventHub, Events } from '../../lib/EventHub/index.js';
 import { umassMajors, umassMajorAbbreviations } from "../../assets/majors.js";
+import { LocalDB } from '../../services/LocalDB.js';
 
 export class SearchBarComponent extends BaseComponents {
   constructor() {
@@ -8,6 +9,7 @@ export class SearchBarComponent extends BaseComponents {
     this.parent = document.createElement('div');
     this.parent.className = 'search-container sticky';
     this.eventHub = EventHub.getInstance();
+    this.isInSavedPostsMode = false;
     
     // Search state to track current filters and sort option
     this.searchState = {
@@ -38,7 +40,7 @@ export class SearchBarComponent extends BaseComponents {
     }
   }
 
-  render() {
+  async render() {
     // Load component CSS
     this.loadCSS('components/SearchBar', 'style');
     
@@ -95,6 +97,45 @@ export class SearchBarComponent extends BaseComponents {
     this.setupSearchHandlers();
     this.setupFilterHandlers();
     this.setupSortHandlers();
+
+    // Check current page mode without triggering new navigations
+    const isHomePage = await LocalDB.get('isHomePage');
+    if (isHomePage === false) {
+      this.isInSavedPostsMode = true;
+      const searchInput = this.parent.querySelector('#search-input');
+      if (searchInput) {
+        searchInput.placeholder = "Search saved posts...";
+      }
+    } else {
+      this.isInSavedPostsMode = false;
+      const searchInput = this.parent.querySelector('#search-input');
+      if (searchInput) {
+        searchInput.placeholder = "Search all research opportunities...";
+      }
+    }
+
+    // Listen for real mode changes
+    this.eventHub.subscribe('SearchModeChanged', (mode) => {
+      if (mode === 'saved') {
+        this.isInSavedPostsMode = true;
+        const searchInput = this.parent.querySelector('#search-input');
+        if (searchInput) {
+          searchInput.placeholder = "Search saved posts...";
+          // Clear previous search
+          searchInput.value = "";
+          this.searchState.query = "";
+        }
+      } else if (mode === 'home') {
+        this.isInSavedPostsMode = false;
+        const searchInput = this.parent.querySelector('#search-input');
+        if (searchInput) {
+          searchInput.placeholder = "Search all research opportunities...";
+          // Clear previous search
+          searchInput.value = "";
+          this.searchState.query = "";
+        }
+      }
+    });
     
     return this.parent;
   }
@@ -104,7 +145,14 @@ export class SearchBarComponent extends BaseComponents {
     
     searchInput.addEventListener('input', (event) => {
       this.searchState.query = event.target.value.trim();
-      this.eventHub.publish(Events.SearchPosts, this.searchState);
+      
+      if (this.isInSavedPostsMode) {
+        // Publish event for saved posts search
+        this.eventHub.publish('SearchSavedPosts', this.searchState);
+      } else {
+        // Regular search for all posts
+        this.eventHub.publish(Events.SearchPosts, this.searchState);
+      }
     });
   }
 
@@ -138,12 +186,22 @@ export class SearchBarComponent extends BaseComponents {
     
     dateFromInput.addEventListener('change', () => {
       this.searchState.filters.dateRange.from = dateFromInput.value || null;
-      this.eventHub.publish(Events.SearchPosts, this.searchState);
+      
+      if (this.isInSavedPostsMode) {
+        this.eventHub.publish('SearchSavedPosts', this.searchState);
+      } else {
+        this.eventHub.publish(Events.SearchPosts, this.searchState);
+      }
     });
     
     dateToInput.addEventListener('change', () => {
       this.searchState.filters.dateRange.to = dateToInput.value || null;
-      this.eventHub.publish(Events.SearchPosts, this.searchState);
+      
+      if (this.isInSavedPostsMode) {
+        this.eventHub.publish('SearchSavedPosts', this.searchState);
+      } else {
+        this.eventHub.publish(Events.SearchPosts, this.searchState);
+      }
     });
 
     // Prevent dropdown from closing when clicking inside it
@@ -178,7 +236,13 @@ export class SearchBarComponent extends BaseComponents {
       radio.addEventListener('change', () => {
         if (radio.checked) {
           this.searchState.sortOption = radio.value;
-          this.eventHub.publish(Events.SearchPosts, this.searchState);
+          
+          if (this.isInSavedPostsMode) {
+            this.eventHub.publish('SearchSavedPosts', this.searchState);
+          } else {
+            this.eventHub.publish(Events.SearchPosts, this.searchState);
+          }
+          
           sortDropdown.classList.remove('show');
         }
       });
@@ -315,7 +379,12 @@ export class SearchBarComponent extends BaseComponents {
         this.searchState.filters.majors = this.searchState.filters.majors.filter(m => m !== major);
       }
       
-      this.eventHub.publish(Events.SearchPosts, this.searchState);
+      if (this.isInSavedPostsMode) {
+        this.eventHub.publish('SearchSavedPosts', this.searchState);
+      } else {
+        this.eventHub.publish(Events.SearchPosts, this.searchState);
+      }
+      
       this.populateMajorsList(''); // Refresh to show selected items
     });
       
