@@ -35,6 +35,9 @@ export class JobListingsComponent extends BaseComponents {
     this.parent.innerHTML = `
     <div class="job-listings-header">
       <h2>Research Opportunities</h2>
+      <button type="button" id="create-post-btn" class="create-post-btn">
+        <i class="fas fa-plus"></i> Create Post
+      </button>
     </div>
     <div class="job-listings">
       <div class="loading">Loading research opportunities</div>
@@ -55,6 +58,12 @@ export class JobListingsComponent extends BaseComponents {
       </div>
     </div>
   `;
+
+    const createPostBtn = this.parent.querySelector('#create-post-btn');
+    createPostBtn.addEventListener('click', () => {
+      this.eventHub.publish(Events.NavigateTo, { page: "createPost" });
+    });
+
 
     // Set up pagination handlers
     this.setupPaginationControls();
