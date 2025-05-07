@@ -81,7 +81,20 @@ export class AppControllerComponent extends BaseComponent {
         this.#container.id = "app-controller";
     }
 
+    #cleanupStylesheets() {
+        // Get all link elements that were added by BaseComponent.loadCSS
+        const componentStylesheets = document.querySelectorAll('link[rel="stylesheet"][data-component-style="true"]');
+        
+        // Remove each stylesheet
+        componentStylesheets.forEach(stylesheet => {
+            document.head.removeChild(stylesheet);
+        });
+        
+        console.log(`Cleaned up ${componentStylesheets.length} component stylesheets`);
+    }
+
     async #renderPage(page, info) {
+        this.#cleanupStylesheets();
         this.#container.innerHTML = ''; // Clear existing content
 
         if (page === "login") {

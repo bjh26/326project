@@ -22,6 +22,7 @@ export class BaseComponent {
     link.rel = "stylesheet";
     link.href = `${path}/${filename}.css`;
     link.type = "text/css";
+    link.setAttribute('data-component-style', 'true');
     document.head.appendChild(link);
     this.cssLoaded = true;
 }

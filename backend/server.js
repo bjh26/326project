@@ -23,14 +23,14 @@ async function preloadData() {
     try {
         await sequelizeUser.sync({force:true});
         console.log('importing data...')
-        const test = await userModel.create({
-            firstName: 'blair',
-            lastName: 'huang',
-            email: 'bjhuang@umass.edu',
-            bio: 'umass 25',
-            img: 'not yet defined',
-            resume: 'not yet defined'
-        });
+        // const test = await userModel.create({
+        //     firstName: 'blair',
+        //     lastName: 'huang',
+        //     email: 'bjhuang@umass.edu',
+        //     bio: 'umass 25',
+        //     img: 'not yet defined',
+        //     resume: 'not yet defined'
+        // });
 
         seedResearchPosts(); // Add in mock data for research posts
 
