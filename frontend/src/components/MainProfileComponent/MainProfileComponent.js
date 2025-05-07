@@ -6,6 +6,7 @@ export class MainProfileComponent extends BaseComponent {
     }
 
     render(canEdit) {
+        this.loadCSS("components/MainProfileComponent", "style");
         const container = document.createElement("div");
         container.classList.add("main-grid");
         container.innerHTML = canEdit ?

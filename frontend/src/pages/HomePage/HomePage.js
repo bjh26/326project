@@ -32,7 +32,7 @@ export class HomePage extends BaseComponent {
         this.container.innerHTML = '';
         
         // Render navbar component (always visible)
-        this.container.appendChild(await this.navBar.render());
+        this.container.appendChild(this.navBar.render());
         
         // Render search bar component (always visible)
         this.container.appendChild(await this.searchBar.render());

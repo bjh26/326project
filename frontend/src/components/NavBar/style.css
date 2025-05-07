@@ -81,7 +81,6 @@ header {
     border-radius: 50%; /* Ensure it stays circular */
     object-fit: cover; /* Ensure the image scales and crops to fit */
     object-position: center; /* Center the image within the circle */
-    display: block; /* Ensure proper rendering */
 }
   
   /* Standard profile button (when no image) */

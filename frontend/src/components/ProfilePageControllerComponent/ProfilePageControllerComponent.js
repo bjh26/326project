@@ -117,7 +117,7 @@ export class ProfilePageControllerComponent extends BaseComponent {
     async #saveToServer() {
         // load from IndexedDB
         this.#profileData = await LocalDB.get("profileData");
-        
+        console.log("saving to server", this.#profileData);
         let arrayFormat;
 
         // make sure researchItems exists
@@ -126,7 +126,7 @@ export class ProfilePageControllerComponent extends BaseComponent {
         } else { // convert researchItems to JSON
             arrayFormat = this.#profileData.researchItems;
             const jsonFormat = {};
-            arrayFormat.researchItems.forEach((element, index) => jsonFormat[i] = element);
+            arrayFormat.forEach((element, index) => jsonFormat[index] = element);
             this.#profileData.researchItems = jsonFormat;
         }
 

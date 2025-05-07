@@ -1,0 +1,116 @@
+#login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f9;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.login-wrapper h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #A24857;
+    box-shadow: 0 0 0 2px rgba(162, 72, 87, 0.2);
+}
+
+.form-actions {
+    margin-top: 30px;
+}
+
+.button {
+    width: 100%;
+    background-color: #A24857;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #881111;
+}
+
+.create-account-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    color: #A24857;
+    font-weight: bold;
+    text-decoration: underline;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.link-button:hover {
+    color: #881111;
+    text-decoration: underline;
+}
+
+.message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.message.error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.message.info {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+@media (max-width: 480px) {
+    .login-wrapper {
+        padding: 30px 20px;
+        margin: 0 15px;
+    }
+}

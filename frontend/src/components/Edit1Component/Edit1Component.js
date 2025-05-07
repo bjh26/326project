@@ -6,6 +6,7 @@ export class Edit1Component extends BaseComponent {
     }
 
     render() {
+        this.loadCSS("components/Edit1Component", "style");
         const container = document.createElement("div");
         container.classList.add("form");
         container.id = "info-form";

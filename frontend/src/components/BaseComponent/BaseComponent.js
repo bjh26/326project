@@ -26,6 +26,7 @@ export class BaseComponent {
     this.cssLoaded = true;
 }
 
+
   dispatchCustomEvent(eventName, detail = {}) {
     const event = new CustomEvent(eventName, { detail });
     this.parent.dispatchEvent(event);

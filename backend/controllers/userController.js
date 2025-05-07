@@ -15,11 +15,7 @@ export const createUser = async (req, res) => {
             lastName: profile.lastName,
             email: profile.email,
             bio: profile.bio,
-            resume: profile.resume,
             department: profile.department,
-            mime: profile.mime,
-            pfp: profile.pfp,
-            resume: profile.resume
         });
         
         res.status(201).json({ message: "User created successfully" });
@@ -62,8 +58,13 @@ export const updateUser = async (req, res) => {
             lastName: updatedProfile.lastName,
             email: updatedProfile.email,
             bio: updatedProfile.bio,
-            img: updatedProfile.profileImage,
-            resume: updatedProfile.resume
+            resume: updatedProfile.resume,
+            department: updatedProfile.department,
+            mime: updatedProfile.mime,
+            pfp: updatedProfile.pfp,
+            researchItems: updatedProfile.researchItems,
+            displayEmail: updatedProfile.displayEmail,
+            updateAt: updatedProfile.updateAt,
         });
         
         res.json({ message: "Profile updated successfully" });

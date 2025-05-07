@@ -8,11 +8,6 @@ const sequelizeUser = new Sequelize({
 
 // User model
 const userModel = sequelizeUser.define("Users", { 
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
-    },
     firstName: {
       type: DataTypes.STRING,
       allowNull: false
@@ -23,7 +18,8 @@ const userModel = sequelizeUser.define("Users", {
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        primaryKey: true
     },
     department: {
         type: DataTypes.STRING,
@@ -50,7 +46,7 @@ const userModel = sequelizeUser.define("Users", {
         allowNull: true
     },
     researchItems: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: true
     }
 });

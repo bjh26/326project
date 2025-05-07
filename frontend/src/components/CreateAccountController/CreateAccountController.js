@@ -17,6 +17,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
     }
 
     async render() {
+        this.loadCSS("components/CreateAccountController", "style");
         this.#container = document.createElement("div");
         this.#container.id = "account-creation-container";
 

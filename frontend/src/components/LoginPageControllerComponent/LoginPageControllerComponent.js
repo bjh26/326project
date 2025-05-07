@@ -13,7 +13,7 @@ export class LoginPageControllerComponent extends BaseComponent {
     }
 
     async render() {
-        // this.loadCSS();
+        this.loadCSS("components/LoginPageControllerComponent", "style");
         this.#container = document.createElement("div");
         this.#container.id = "login-container";
 

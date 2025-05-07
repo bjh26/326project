@@ -47,23 +47,10 @@ export class NavBarComponent extends BaseComponents {
   
   async #loadProfilePicture() {
     try {
-      let pfp = await LocalDB.get('pfp');
-      let mime = await LocalDB.get('mime');
-      if ((pfp === undefined || mime === undefined)) {
-        const sessionEmail = await LocalDB.get("sessionEmail");
-      
-        const response = await fetch(`/profile/${sessionEmail}`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const profileData = await response.json();
-        pfp = profileData.pfp;
-        mime = profileData.mime;
-        await LocalDB.put('pfp', pfp);
-        await LocalDB.put('mime', mime);
-      }
-      
-
+      const res = await fetch(`/profile/${await LocalDB.get("sessionEmail")}`)
+      const profileData = await res.json();
+      const pfp = profileData.pfp;
+      const mime = profileData.mime;
       const profilePicture = this.parent.querySelector('#profile-picture');
       const defaultIcon = this.parent.querySelector('#default-profile-icon');
       
@@ -194,7 +181,7 @@ export class NavBarComponent extends BaseComponents {
         this.#showNotification("Logging out...");
         
         // Clear session information from LocalDB
-        await LocalDB.delete("sessionEmail");
+        await LocalDB.clear();
         
         // Navigate to login page after short delay
         setTimeout(() => {
