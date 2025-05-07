@@ -118,7 +118,6 @@ export const createPost = async (req, res) => {
         await postModel.create({
             title: newPost.title,
             description: newPost.description,
-            contactEmail: newPost.contactEmail,
             responsibilities: newPost.responsibilities,
             qualificationRequirement: newPost.qualificationRequirement,
             compensation: newPost.compensation,
@@ -154,7 +153,6 @@ export const updatePost = async (req, res) => {
         await findPost.update({
             title: editedPost.title,
             description: editedPost.description,
-            contactEmail: editedPost.contactEmail,
             responsibilities: editedPost.responsibilities,
             qualificationRequirement: editedPost.qualificationRequirement,
             compensation: editedPost.compensation,
