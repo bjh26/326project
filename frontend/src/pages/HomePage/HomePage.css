@@ -16,8 +16,6 @@
     width: 60%;
     overflow: hidden;
   }
-  
-  /* Make sure your responsive styles also target these class names */
 
 @media (max-width: 768px) {
     .job-postings-container {

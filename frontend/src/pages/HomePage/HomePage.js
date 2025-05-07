@@ -6,7 +6,7 @@ import { JobListingsComponent } from '../../components/JobListings/index.js';
 import { JobDetailsComponent } from '../../components/JobDetails/index.js';
 import { SavedPostsComponent } from '../../components/SavedPosts/index.js';
 import { LocalDB } from '../../services/LocalDB.js';
-import {NavBarComponent} from '../../components/NavBar/index.js';
+import { NavBarComponent } from '../../components/NavBar/index.js';
 
 export class HomePage extends BaseComponent {
     #container = null;
@@ -45,39 +45,42 @@ export class HomePage extends BaseComponent {
         this.#jobPostingsContainer.className = 'job-postings-container';
         this.#container.appendChild(this.#jobPostingsContainer);
         
-        // Render appropriate content based on mode
+        // Initialize home page state if not set
+        try {
+            this.#isHomePage = await LocalDB.get('isHomePage');
+            if (this.#isHomePage === undefined) {
+                await LocalDB.put('isHomePage', true);
+                this.#isHomePage = true;
+            }
+        } catch (error) {
+            console.error('Error loading home page state:', error);
+            this.#isHomePage = true; // Default to true on error
+            await LocalDB.put('isHomePage', true);
+        }
+        
+        // Render appropriate content
         await this.#renderContent();
-        console.log('HomePage rendered');
+        
         return this.#container;
     }
 
     async #renderContent() {
         // Clear container first
         this.#jobPostingsContainer.innerHTML = '';
-        this.#isHomePage = await LocalDB.get('isHomePage');
-        if (this.#isHomePage == undefined) {
-            await LocalDB.put('isHomePage', true);
-            this.#isHomePage = true;
-        }
-        else if (!this.#isHomePage) {
+        
+        if (!this.#isHomePage) {
             // Render saved posts component
             this.#jobPostingsContainer.appendChild(this.#savedPosts.render());
             
-            // Initialize saved posts data
-            setTimeout(() => {
-                this.#savedPosts.loadSavedPosts();
-            }, 100);
+            // Initialize saved posts data immediately
+            this.#savedPosts.loadSavedPosts();
         } else {
-            // Append job listings (left) and job details (right) components
+            // Append job listings and job details components
             this.#jobPostingsContainer.appendChild(this.#jobListings.render());
             this.#jobPostingsContainer.appendChild(this.#jobDetails.render());
             
-            // Initialize job listings
-            setTimeout(() => {
-                this.#hub.publish(Events.LoadPosts);
-            }, 100);
+            // Initialize job listings immediately (no setTimeout)
+            this.#hub.publish(Events.LoadPosts);
         }
     }
-
-    
 }
