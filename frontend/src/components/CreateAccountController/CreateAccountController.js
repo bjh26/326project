@@ -115,6 +115,14 @@ export class CreateAccountControllerComponent extends BaseComponent {
             });
         }
 
+        // add event listener for login link
+        const loginLink = this.#container.querySelector("#loginLink");
+        if (loginLink) {
+            loginLink.addEventListener("click", async () => {
+                await this.#hub.publish(Events.NavigateTo, { page: "login" });
+            });
+        }
+
         const pfpDiv = this.#container.querySelector("#uploadProfileImage");
         const pfpInputElement = this.#container.querySelector("#profileImage");
         this.#addDragAndDropAndManualUploadFunctionality(pfpDiv, pfpInputElement, "pfp");
@@ -271,9 +279,13 @@ export class CreateAccountControllerComponent extends BaseComponent {
                                 </div>             
                             </div>
                             <div class="button-container">
-                                <input class="button" type="button" value="Save" id="save">  
-                                <input class="button" type="submit" value="Create Account" id="createAccount">  
-                                <input class="button" type="submit" value="Delete Account" id="deleteAccount">    
+                                <div class="buttons-row">
+                                    <input class="button" type="button" value="Save" id="save">  
+                                    <input class="button" type="submit" value="Create Account" id="createAccount">  
+                                </div>
+                                <div class="login-link-row">
+                                    <a id="loginLink" class="login-link">Already have an account? Sign in</a>
+                                </div>
                             </div>
                         `;
         this.#container.appendChild(wrapper);
