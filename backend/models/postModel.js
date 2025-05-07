@@ -49,11 +49,6 @@ const postModel = sequelizePost.define("Posts", {
         type: DataTypes.STRING,
         allowNull: true
     },
-    postedDate: { // depends on how the input field is set up, might be STRING
-        type: DataTypes.DATE,
-        allowNull: true,
-        defaultValue: DataTypes.NOW,
-    },
     hiringPeriodStart: {
         type: DataTypes.DATE,
         allowNull: true
@@ -78,7 +73,6 @@ const postModel = sequelizePost.define("Posts", {
         type: DataTypes.STRING,
         allowNull: false
     },
-
 });
 
 const formatPostForFrontend = (post) => {
@@ -95,7 +89,7 @@ const formatPostForFrontend = (post) => {
         deadline: post.deadline,
         contactName: post.contactName,
         contactEmail: post.contactEmail,
-        postedDate: post.postedDate
+        postedDate: post.updatedAt
     };
 };
 
@@ -108,7 +102,6 @@ const seedResearchPosts = async () => {
         // Mock data for research posts
         const mockPosts = [
             {
-                // id: 1,
                 title: "Software Engineering Research Assistant",
                 description: "We are seeking a motivated undergraduate student to assist in a cutting-edge software engineering research project.",
                 responsibilities: [
@@ -127,11 +120,9 @@ const seedResearchPosts = async () => {
                 applicationInstructions: "Submit your resume and a brief cover letter to Prof. Emily Rodriguez.",
                 deadline: new Date("2024-02-15"),
                 contactName: "Emily Rodriguez",
-                contactEmail: "emily.rodriguez@university.edu",
-                postedDate: new Date("2023-11-01")
+                contactEmail: "emily.rodriguez@university.edu"
             },
             {
-                // id: 2,
                 title: "Machine Learning Research Position",
                 description: "Join our team to work on cutting-edge machine learning algorithms.",
                 responsibilities: [
@@ -150,11 +141,9 @@ const seedResearchPosts = async () => {
                 applicationInstructions: "Send your application to Prof. Michael Chang via email.",
                 deadline: new Date("2024-02-20"),
                 contactName: "Michael Chang",
-                contactEmail: "michael.chang@university.edu",
-                postedDate: new Date("2023-10-25")
+                contactEmail: "michael.chang@university.edu"
             },
             {
-                // id: 3,
                 title: "AI Research Opportunity",
                 description: "Help develop AI models for natural language processing.",
                 responsibilities: [
@@ -173,11 +162,9 @@ const seedResearchPosts = async () => {
                 applicationInstructions: "Apply online through the university's research portal.",
                 deadline: new Date("2024-02-10"),
                 contactName: "Sarah Johnson",
-                contactEmail: "sarah.johnson@university.edu",
-                postedDate: new Date("2023-10-15")
+                contactEmail: "sarah.johnson@university.edu"
             },
             {
-                // id: 4,
                 title: "Software Development Research",
                 description: "Work on innovative software development methodologies.",
                 responsibilities: [
@@ -196,11 +183,9 @@ const seedResearchPosts = async () => {
                 applicationInstructions: "Submit your application to Prof. David Wilson via email.",
                 deadline: new Date("2024-02-25"),
                 contactName: "David Wilson",
-                contactEmail: "david.wilson@university.edu",
-                postedDate: new Date("2023-09-30")
+                contactEmail: "david.wilson@university.edu"
             },
             {
-                // id: 5,
                 title: "Software Engineering Research Assistant",
                 description: "Assist in cutting-edge software development research with a focus on AI-driven solutions.",
                 responsibilities: [
@@ -219,8 +204,7 @@ const seedResearchPosts = async () => {
                 applicationInstructions: "Submit a resume and cover letter via our application portal.",
                 deadline: new Date("2025-04-30"),
                 contactName: "Jane Doe",
-                contactEmail: "jane.doe@researchlab.edu",
-                postedDate: new Date("2023-08-15")
+                contactEmail: "jane.doe@researchlab.edu"
             }
         ];
 

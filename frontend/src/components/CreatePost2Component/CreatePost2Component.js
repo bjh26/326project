@@ -10,22 +10,23 @@ export class CreatePost2Component extends BaseComponent {
         container.classList.add("step");
         container.id = "step2";
         container.innerHTML = ` <div class="post-form">
-
-                                    <label for="qualifications-and-requirements">Qualifications and Requirements</label>
-                                    <textarea type="text" name="qualifications" id="qualifications" rows="6" cols="50"></textarea>
+                                    <label for="qualificationRequirement">Qualifications and Requirements</label>
+                                    <textarea type="text" name="qualificationRequirement" id="qualificationRequirement" rows="6" cols="50"></textarea>
                         
                                     <label for="compensation">Compensation</label>
                                     <input type="text" name="compensation" id="compensation">
                         
-                                    <label for="hiring-period">Hiring Period</label>
-                                    <input type="text" name="hiring-period" id="hiring-period">
+                                    <label for="hiringPeriodStart">Hiring Period Start</label>
+                                    <input type="date" name="hiringPeriodStart" id="hiringPeriodStart">
+                                    
+                                    <label for="hiringPeriodEnd">Hiring Period End</label>
+                                    <input type="date" name="hiringPeriodEnd" id="hiringPeriodEnd">
                         
-                                    <label for="application-instructions">Application Instructions</label>
-                                    <textarea type="text" name="instructions" id="instructions" rows="6" cols="50"></textarea>
+                                    <label for="applicationInstructions">Application Instructions</label>
+                                    <textarea type="text" name="applicationInstructions" id="applicationInstructions" rows="6" cols="50"></textarea>
                         
                                     <label for="deadline">Application Deadline</label>
                                     <input type="date" name="deadline" id="deadline">
-
                                 </div>
 
                                 <div class="buttons">

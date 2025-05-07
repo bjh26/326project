@@ -73,7 +73,7 @@ export class JobDetailsComponent extends BaseComponents {
       <div class="job-details-header">
         <h2>${post.title}</h2>
         <div class="job-meta-info">
-          <p>Posted ${daysAgo} days ago</p>
+          <p>Updated ${daysAgo} days ago</p>
           <p>Application Deadline: ${deadlineDate}</p>
         </div>
       </div>

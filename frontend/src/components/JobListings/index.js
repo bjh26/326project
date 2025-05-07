@@ -464,7 +464,6 @@ export class JobListingsComponent extends BaseComponents {
       if (searchState.sortOption === 'latest') {
         filteredPosts.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
       } else if (searchState.sortOption === 'deadline') {
-        const today = new Date();
         filteredPosts.sort((a, b) => {
           const deadlineA = new Date(a.deadline || '9999-12-31');
           const deadlineB = new Date(b.deadline || '9999-12-31');

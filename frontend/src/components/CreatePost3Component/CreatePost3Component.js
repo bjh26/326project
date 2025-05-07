@@ -10,13 +10,13 @@ export class CreatePost3Component extends BaseComponent {
         container.classList.add("step");
         container.id = "step3";
         container.innerHTML = ` <div class="post-form">
-                                    <label for="contact-name">Contact Name</label>
-                                    <input type="text" name="contact-name" id="contact-name">
+                                    <label for="contactName">Contact Name</label>
+                                    <input type="text" name="contactName" id="contactName">
                                 </div>
                         
                                 <div class="post-form">
-                                    <label for="contact-email">Contact Email</label>
-                                    <input type="email" name="contact-email" id="contact-email">
+                                    <label for="contactEmail">Contact Email</label>
+                                    <input type="email" name="contactEmail" id="contactEmail">
                                 </div>
                         
                                 <div class="buttons">

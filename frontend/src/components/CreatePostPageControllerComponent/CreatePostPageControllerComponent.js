@@ -46,7 +46,10 @@ export class CreatePostPageControllerComponent extends BaseComponent {
         }
 
         const email = await LocalDB.get("sessionEmail");
-        this.#postData = await LocalDB.get("postData") || { author: email };  
+        this.#postData = await LocalDB.get("postData") || { 
+            author: email,
+            postedDate: new Date().toISOString() // Add current date as posted date
+        };  
 
         // load skeleton for current page into container
         this.#loadSkeleton(this.#currentCreatePage);
@@ -85,14 +88,38 @@ export class CreatePostPageControllerComponent extends BaseComponent {
         // load from IndexedDB
         this.#postData = await LocalDB.get("postData");
 
+        // Format responsibilities and qualificationRequirement as JSON arrays if they are strings
+        if (this.#postData.responsibilities && typeof this.#postData.responsibilities === 'string') {
+            this.#postData.responsibilities = this.#postData.responsibilities
+                .split('\n')
+                .filter(item => item.trim() !== '');
+        }
+
+        if (this.#postData.qualificationRequirement && typeof this.#postData.qualificationRequirement === 'string') {
+            this.#postData.qualificationRequirement = this.#postData.qualificationRequirement
+                .split('\n')
+                .filter(item => item.trim() !== '');
+        }
+
         // upload to server
-        await fetch(`/researchPost`, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json" 
-            },
-            body: JSON.stringify(this.#postData)
-        });
+        try {
+            const response = await fetch(`/researchPost`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json" 
+                },
+                body: JSON.stringify(this.#postData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Error saving post to server:", error);
+            throw error;
+        }
     }
 
     #loadSkeleton(page) {    
@@ -128,41 +155,62 @@ export class CreatePostPageControllerComponent extends BaseComponent {
                 }
 
                 if (responsibilitiesTextArea && this.#postData.responsibilities) {
-                    responsibilitiesTextArea.value = this.#postData.responsibilities;
+                    // If responsibilities is an array, convert it to newline-separated string
+                    if (Array.isArray(this.#postData.responsibilities)) {
+                        responsibilitiesTextArea.value = this.#postData.responsibilities.join('\n');
+                    } else {
+                        responsibilitiesTextArea.value = this.#postData.responsibilities;
+                    }
                 }
             }
         } else if (page === 'create2') {
             if (this.#postData) {
-                const qualificationsTextArea = this.#container.querySelector("#qualifications");
+                const qualificationRequirementTextArea = this.#container.querySelector("#qualificationRequirement");
                 const compensationInput = this.#container.querySelector("#compensation");
-                const hiringPeriodInput = this.#container.querySelector("#hiring-period");
-                const instructionsTextArea = this.#container.querySelector("#instructions");
+                const hiringPeriodStartInput = this.#container.querySelector("#hiringPeriodStart");
+                const hiringPeriodEndInput = this.#container.querySelector("#hiringPeriodEnd");
+                const applicationInstructionsTextArea = this.#container.querySelector("#applicationInstructions");
                 const deadlineDateInput = this.#container.querySelector("#deadline");
 
-                if (qualificationsTextArea && this.#postData.qualifications) {
-                    qualificationsTextArea.value = this.#postData.qualifications;
+                if (qualificationRequirementTextArea && this.#postData.qualificationRequirement) {
+                    // If qualificationRequirement is an array, convert it to newline-separated string
+                    if (Array.isArray(this.#postData.qualificationRequirement)) {
+                        qualificationRequirementTextArea.value = this.#postData.qualificationRequirement.join('\n');
+                    } else {
+                        qualificationRequirementTextArea.value = this.#postData.qualificationRequirement;
+                    }
                 }
 
                 if (compensationInput && this.#postData.compensation) {
                     compensationInput.value = this.#postData.compensation;
                 }
 
-                if (hiringPeriodInput && this.#postData.hiringPeriod) {
-                    hiringPeriodInput.value = this.#postData.hiringPeriod;
+                if (hiringPeriodStartInput && this.#postData.hiringPeriodStart) {
+                    // Format date for the date input (YYYY-MM-DD)
+                    const date = new Date(this.#postData.hiringPeriodStart);
+                    hiringPeriodStartInput.value = date.toISOString().split('T')[0];
                 }
 
-                if (instructionsTextArea && this.#postData.applicationInstructions) {
-                    instructionsTextArea.value = this.#postData.applicationInstructions;
+                if (hiringPeriodEndInput && this.#postData.hiringPeriodEnd) {
+                    // Format date for the date input (YYYY-MM-DD)
+                    const date = new Date(this.#postData.hiringPeriodEnd);
+                    hiringPeriodEndInput.value = date.toISOString().split('T')[0];
+                }
+
+                if (applicationInstructionsTextArea && this.#postData.applicationInstructions) {
+                    applicationInstructionsTextArea.value = this.#postData.applicationInstructions;
                 }
 
                 if (deadlineDateInput && this.#postData.deadline) {
-                    deadlineDateInput.value = this.#postData.deadline;
+                    // Format date for the date input (YYYY-MM-DD)
+                    const date = new Date(this.#postData.deadline);
+                    deadlineDateInput.value = date.toISOString().split('T')[0];
                 }
             }
         } else if (page === 'create3') {
             if (this.#postData) {
-                const contactNameInput = this.#container.querySelector("#contact-name");
-                const contactEmailInput = this.#container.querySelector("#Contact-email");
+                const contactNameInput = this.#container.querySelector("#contactName");
+                const contactEmailInput = this.#container.querySelector("#contactEmail");
 
                 if (contactNameInput && this.#postData.contactName) {
                     contactNameInput.value = this.#postData.contactName;
@@ -230,24 +278,18 @@ export class CreatePostPageControllerComponent extends BaseComponent {
                 // post to server
                 try {
                     await this.#saveToServer();
+                    alert("Successfully published post!");
+                    // Navigate to the home page
+                    await this.#hub.publish(Events.NavigateTo, { page: "home" });
                 } catch (error) {
-                    alert(error.message);
-                    return;
+                    alert(`Error publishing post: ${error.message}`);
                 }
-                
-                alert("Successfully published post!");
-                // then navigate to the home page
-                // setTimeout(async () => {
-                //     await this.#hub.publish(Events.NavigateTo, { page: "home" });
-                    
-                // }, 1000);
-                await this.#hub.publish(Events.NavigateTo, { page: "home" });
             });
         }        
     }
 
     async #saveCurrentPageData() {
-        // save different data depending on the current page
+        // Save different data depending on the current page
         if (this.#currentCreatePage === 'create1') {
             const title = this.#container.querySelector("#title")?.value;
             const description = this.#container.querySelector("#description")?.value;
@@ -261,24 +303,26 @@ export class CreatePostPageControllerComponent extends BaseComponent {
                 responsibilities
             };
         } else if (this.#currentCreatePage === 'create2') {
-            const qualifications = this.#container.querySelector("#qualifications")?.value;
+            const qualificationRequirement = this.#container.querySelector("#qualificationRequirement")?.value;
             const compensation = this.#container.querySelector("#compensation")?.value;
-            const hiringPeriod = this.#container.querySelector("#hiring-period")?.value;
-            const applicationInstructions = this.#container.querySelector("#instructions")?.value;
+            const hiringPeriodStart = this.#container.querySelector("#hiringPeriodStart")?.value;
+            const hiringPeriodEnd = this.#container.querySelector("#hiringPeriodEnd")?.value;
+            const applicationInstructions = this.#container.querySelector("#applicationInstructions")?.value;
             const deadline = this.#container.querySelector("#deadline")?.value;
 
             // update profile data with new values
             this.#postData = {
                 ...this.#postData, // keep existing data
-                qualifications,
+                qualificationRequirement,
                 compensation,
-                hiringPeriod,
+                hiringPeriodStart,
+                hiringPeriodEnd,
                 applicationInstructions,
                 deadline
             };
         } else if (this.#currentCreatePage === 'create3') {
-            const contactName = this.#container.querySelector("#contact-name")?.value;
-            const contactEmail = this.#container.querySelector("#Contact-email")?.value;
+            const contactName = this.#container.querySelector("#contactName")?.value;
+            const contactEmail = this.#container.querySelector("#contactEmail")?.value;
 
             // update profile data with new values
             this.#postData = {
@@ -289,14 +333,16 @@ export class CreatePostPageControllerComponent extends BaseComponent {
         }
         try {
             await this.#saveToLocalDB();
+            this.#showSaveMessage("Post information saved");
         } catch (error) {
             alert(`Error saving information: ${error.message}`);
             return;
         }
-        this.#showSaveMessage("Post information saved");
     }
 
     #showSaveMessage(message) {
+        // alert(message);
+        // Alternative implementation for a more elegant message display
         const saveMessageElement = this.#container.querySelector("#saveMessage");
         if (saveMessageElement) {
             saveMessageElement.textContent = message;
@@ -306,6 +352,8 @@ export class CreatePostPageControllerComponent extends BaseComponent {
             setTimeout(() => {
                 saveMessageElement.classList.remove("show");
             }, 3000);
+        } else {
+            alert(message);
         }
     }
 }
