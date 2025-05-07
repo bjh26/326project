@@ -1,5 +1,6 @@
 ﻿# Team 25: Research Connect
 ## Slides
+[Milestone 7](https://docs.google.com/presentation/d/1XXfmId7iT-H9lHpMkALXNNJ_yQNRoxXNgk7D_lfVj-A/edit?usp=sharing)\
 [Milestone 6](https://docs.google.com/presentation/d/1tqRVpSDFX2-xCZx16q56RFbzCKba6W-plDpB2sB0p0U/edit?usp=sharing)\
 [Milestone 5](https://docs.google.com/presentation/d/1OlBOJ9-sP_x-JOfePhgwUFvVw8XBChhxRksLWmSPO9Q/edit?usp=sharing)\
 [Milestone 4](https://docs.google.com/presentation/d/16nZfw48o_uI1C_hrMXpN-gYvfu1tI0B_KnUVseFKxoU/edit?usp=sharing)
