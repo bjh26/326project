@@ -40,7 +40,7 @@ export class LoginPageControllerComponent extends BaseComponent {
                         <input type="password" id="password" required>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" id="loginButton" class="button">Login</button>
+                        <button type="submit" id="loginButton" class="login-button">Login</button>
                     </div>
                 </form>
                 <div class="create-account-link">

@@ -143,16 +143,29 @@ export class SearchBarComponent extends BaseComponents {
   setupSearchHandlers() {
     const searchInput = this.parent.querySelector('#search-input');
     
+    let searchTimeout = null;
+    
     searchInput.addEventListener('input', (event) => {
-      this.searchState.query = event.target.value.trim();
-      
-      if (this.isInSavedPostsMode) {
-        // Publish event for saved posts search
-        this.eventHub.publish('SearchSavedPosts', this.searchState);
-      } else {
-        // Regular search for all posts
-        this.eventHub.publish(Events.SearchPosts, this.searchState);
+      // Clear any existing timeout to debounce rapid typing
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
       }
+      
+      // Set a new timeout
+      searchTimeout = setTimeout(() => {
+        this.searchState.query = event.target.value.trim();
+        
+        if (this.isInSavedPostsMode) {
+          // Publish event for saved posts search
+          this.eventHub.publish('SearchSavedPosts', this.searchState);
+        } else {
+          // Regular search for all posts
+          this.eventHub.publish(Events.SearchPosts, this.searchState);
+        }
+        
+        // Clear the timeout reference
+        searchTimeout = null;
+      }, 300); // 300ms debounce
     });
   }
 
