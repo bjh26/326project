@@ -247,7 +247,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
                                 <div class = "upload-documents">
                                     <div id = "uploadProfileImage" class="profile-image">
                                         <label for="profileImage"> 
-                                            <img src = "./Sample_User_Icon.png" id="dummyProfileImage">
+                                            <img src = "assets/Sample_User_Icon.png" id="dummyProfileImage" alt="User Icon">
                                         </label>
                                         <input type="file" id="profileImage" accept="image/*" style="display: none">
                                     </div> 
