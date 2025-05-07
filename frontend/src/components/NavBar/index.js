@@ -7,6 +7,7 @@ export class NavBarComponent extends BaseComponents {
     super();
     this.parent = document.createElement('header');
     this.eventHub = EventHub.getInstance();
+    
   }
 
   render() {
@@ -15,14 +16,15 @@ export class NavBarComponent extends BaseComponents {
     
     this.parent.innerHTML = `
       <div id="logo" class="logo-container">
-        <img src="../../src/assets/logo.png" alt="Logo" class="img-fluid">
+        <img src="assets/logo.png" alt="Logo" class="img-fluid">
       </div>
       
       <div class="header-actions">
         <button type="button" id="saved_posts">Saved</button>
         <div class="dropdown profile-dropdown">
           <button type="button" id="profile-button">
-            <i class="fa-solid fa-user"></i>
+            <i class="fa-solid fa-user" id="default-profile-icon"></i>
+            <img id="profile-picture" class="hidden" alt="Profile Picture">
           </button>
           <div class="dropdown-content" id="profile-dropdown-menu">
             <button id="view-profile-btn" class="dropdown-btn">View Profile</button>
@@ -33,12 +35,53 @@ export class NavBarComponent extends BaseComponents {
         </div>
       </div>
     `;
-
+  
+    // Load profile picture if available
+    this.#loadProfilePicture();
+  
     // Setup event listeners
     this.#setupEventListeners();
     
     return this.parent;
   }
+  
+  async #loadProfilePicture() {
+    try {
+      let pfp = await LocalDB.get('pfp');
+      let mime = await LocalDB.get('mime');
+      if ((pfp === undefined || mime === undefined)) {
+        const sessionEmail = await LocalDB.get("sessionEmail");
+      
+        const response = await fetch(`/profile/${sessionEmail}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const profileData = await response.json();
+        pfp = profileData.pfp;
+        mime = profileData.mime;
+        await LocalDB.put('pfp', pfp);
+        await LocalDB.put('mime', mime);
+      }
+      
+
+      const profilePicture = this.parent.querySelector('#profile-picture');
+      const defaultIcon = this.parent.querySelector('#default-profile-icon');
+      
+      // Only show the profile picture if both pfp and mime are non-null
+      if (pfp && mime) {
+        profilePicture.src = `data:${mime};base64,${pfp}`;
+        profilePicture.classList.remove('hidden');
+        defaultIcon.classList.add('hidden');
+      } else {
+        // Ensure the default icon is shown
+        profilePicture.classList.add('hidden');
+        defaultIcon.classList.remove('hidden');
+      }
+    } catch (error) {
+      console.error("Error loading profile picture:", error);
+    }
+  }
+  
 
   #setupEventListeners() {
     const profileButton = this.parent.querySelector('#profile-button');

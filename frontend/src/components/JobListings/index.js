@@ -1,6 +1,7 @@
 import { BaseComponents } from '../BaseComponents.js';
 import { EventHub, Events } from '../../lib/EventHub/index.js';
 import { LocalDB } from '../../services/LocalDB.js';
+import { umassMajors, umassMajorAbbreviations } from "../../assets/majors.js";
 
 export class JobListingsComponent extends BaseComponents {
   constructor() {
@@ -8,10 +9,22 @@ export class JobListingsComponent extends BaseComponents {
     this.parent = document.createElement('div');
     this.parent.className = 'job-listings-column';
     this.eventHub = EventHub.getInstance();
-    this.posts = [];
+    this.posts = []; // Current page posts
+    this.allPosts = null; // Complete dataset for filtering (loaded in background)
     this.currentPage = 1;
     this.postsPerPage = 30;
     this.totalPosts = 0;
+    this.isInitialLoad = true;
+    this.isLoadingComplete = false;
+    
+    // Create a mapping from abbreviations to full major names for faster lookups
+    this.abbrevToMajorMap = new Map();
+    for (const [abbrev, major] of Object.entries(umassMajorAbbreviations)) {
+      this.abbrevToMajorMap.set(abbrev.toLowerCase(), major.toLowerCase());
+    }
+    
+    // Create a set of all major names in lowercase for faster lookups
+    this.majorNamesLower = new Set(umassMajors.map(major => major.toLowerCase()));
   }
 
   render() {
@@ -19,35 +32,35 @@ export class JobListingsComponent extends BaseComponents {
     this.loadCSS('components/JobListings', 'style');
     
     this.parent.innerHTML = `
-      <div class="job-listings-header">
-        <h2>Research Opportunities</h2>
-      </div>
-      <div class="job-listings">
-        <div class="loading">Loading research opportunities...</div>
-      </div>
-      <div class="job-listings-footer">
-        <div class="pagination">
-          <button type="button" class="prev-page" disabled><i class="fas fa-chevron-left"></i></button>
-          <div class="page-navigation">
-            <span class="current-page">1</span>
-            <span class="page-separator">of</span>
-            <span class="total-pages">1</span>
-            <div class="page-jump">
-              <input type="number" min="1" max="1" value="1" class="page-input">
-              <button type="button" class="go-btn">Go</button>
-            </div>
+    <div class="job-listings-header">
+      <h2>Research Opportunities</h2>
+    </div>
+    <div class="job-listings">
+      <div class="loading">Loading research opportunities</div>
+    </div>
+    <div class="job-listings-footer">
+      <div class="pagination">
+        <button type="button" class="prev-page" disabled><i class="fas fa-chevron-left"></i></button>
+        <div class="page-navigation">
+          <span class="current-page">1</span>
+          <span class="page-separator">of</span>
+          <span class="total-pages">1</span>
+          <div class="page-jump">
+            <input type="number" min="1" max="1" value="1" class="page-input">
+            <button type="button" class="go-btn">Go</button>
           </div>
-          <button type="button" class="next-page" disabled><i class="fas fa-chevron-right"></i></button>
         </div>
+        <button type="button" class="next-page" disabled><i class="fas fa-chevron-right"></i></button>
       </div>
-    `;
+    </div>
+  `;
 
     // Set up pagination handlers
     this.setupPaginationControls();
 
     // Subscribe to events
     this.eventHub.subscribe(Events.LoadPosts, () => {
-      this.loadPageData(this.currentPage);
+      this.loadInitialData();
     });
 
     // Handle search results
@@ -60,10 +73,11 @@ export class JobListingsComponent extends BaseComponents {
       this.performSearch(searchState);
     });
     
-    // Initial data load with a slight delay to ensure components are ready
-    setTimeout(() => {
-      this.eventHub.publish(Events.LoadPosts);
-    }, 100);
+    // Initial data load - no delay needed
+    if (this.isInitialLoad) {
+      this.loadInitialData();
+      this.isInitialLoad = false;
+    }
     
     return this.parent;
   }
@@ -114,29 +128,111 @@ export class JobListingsComponent extends BaseComponents {
     });
   }
 
-  async loadPageData(page) {
-    // Show loading indicator
-    const jobListingsElement = this.parent.querySelector('.job-listings');
-    jobListingsElement.innerHTML = '<div class="loading">Loading research opportunities...</div>';
-    
+  async loadInitialData() {
     try {
-      // Calculate page start/end indices
-      const startIndex = (page - 1) * this.postsPerPage;
-      // Fetch posts for this page
-      for(let i = 1; i <= Math.min(this.postsPerPage, this.totalPosts); i++) {
-        const response = await fetch(`/researchPost/${startIndex + i}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch posts: ${response.statusText}`);
-        }
-        const res = await response.json();
-        if (res) {
-          this.posts.push(res);
-          this.totalPosts++;
+      // Show loading indicator
+      const jobListingsElement = this.parent.querySelector('.job-listings');
+      jobListingsElement.innerHTML = '<div class="loading">Loading research opportunities</div>';
+      
+      // 1. First, get just the first page of posts and total count
+      const response = await fetch('/researchPost');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.statusText}`);
+      }
+      
+      const allData = await response.json();
+      
+      if (!Array.isArray(allData)) {
+        throw new Error('Expected array of posts from server');
+      }
+      
+      // Store total posts count
+      this.totalPosts = allData.length;
+      
+      // Get just the first page of posts to show
+      const firstPageEnd = Math.min(this.postsPerPage, this.totalPosts);
+      this.posts = allData.slice(0, firstPageEnd);
+      
+      // Render the first page immediately
+      await this.renderJobPosts();
+      
+      // Update pagination UI
+      this.updatePagination();
+      
+      // Select first post if there are posts
+      if (this.posts.length > 0) {
+        const firstPost = this.parent.querySelector('.job-post');
+        if (firstPost) {
+          firstPost.classList.add('active');
+          this.eventHub.publish(Events.PostSelected, this.posts[0]);
         }
       }
       
+      // 2. Start loading full dataset in background for search/filtering
+      this.fetchAllPostsForFiltering(allData);
       
-      // Render the posts
+    } catch (error) {
+      console.error('Error loading initial data:', error);
+      const jobListingsElement = this.parent.querySelector('.job-listings');
+      jobListingsElement.innerHTML = '<div class="error">Failed to load research opportunities. Please try again.</div>';
+    }
+  }
+  
+  async fetchAllPostsForFiltering(initialData) {
+    try {
+      // We already have all the data from the initial fetch, so just store it
+      this.allPosts = initialData;
+      this.isLoadingComplete = true;
+      
+      // Update search placeholder to indicate all data is ready
+      const searchBar = document.querySelector('#search-input');
+      if (searchBar) {
+        searchBar.placeholder = 'Search all research opportunities...';
+      }
+      
+    } catch (error) {
+      console.error('Error loading complete dataset:', error);
+      // This is a background task, so we don't show an error to the user,
+      // but we mark that complete data isn't available
+      this.isLoadingComplete = false;
+    }
+  }
+
+  async loadPageData(page) {
+    // Calculate page start/end indices
+    const startIndex = (page - 1) * this.postsPerPage;
+    const endIndex = Math.min(startIndex + this.postsPerPage, this.totalPosts);
+    
+    // If we have all posts loaded, just slice from them
+    if (this.allPosts && this.allPosts.length > 0) {
+      this.posts = this.allPosts.slice(startIndex, endIndex);
+      await this.renderJobPosts();
+      this.updatePagination();
+      return;
+    }
+    
+    // Otherwise, we need to fetch from server (this is a fallback)
+    try {
+      // Show loading indicator
+      const jobListingsElement = this.parent.querySelector('.job-listings');
+      jobListingsElement.innerHTML = '<div class="loading">Loading page data</div>';
+      
+      const response = await fetch('/researchPost');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.statusText}`);
+      }
+      
+      const allData = await response.json();
+      
+      // Store total posts count and all posts
+      this.totalPosts = allData.length;
+      this.allPosts = allData;
+      this.isLoadingComplete = true;
+      
+      // Get the current page of posts
+      this.posts = allData.slice(startIndex, endIndex);
+      
+      // Render the current page
       await this.renderJobPosts();
       
       // Update pagination UI
@@ -145,7 +241,7 @@ export class JobListingsComponent extends BaseComponents {
     } catch (error) {
       console.error('Error loading page data:', error);
       const jobListingsElement = this.parent.querySelector('.job-listings');
-      jobListingsElement.innerHTML = '<div class="error">Failed to load research opportunities. Please try again.</div>';
+      jobListingsElement.innerHTML = '<div class="error">Failed to load page data. Please try again.</div>';
     }
   }
 
@@ -182,27 +278,70 @@ export class JobListingsComponent extends BaseComponents {
       nextButton.classList.remove('disabled');
     }
   }
+  
+  // Helper method to check if a qualification contains a major or its abbreviation
+  checkQualificationForMajor(qualification, searchMajor) {
+    // Convert to lowercase for case-insensitive comparison
+    const qualLower = qualification.toLowerCase();
+    const searchMajorLower = searchMajor.toLowerCase();
+    
+    // Check if qualification contains the full major name
+    if (qualLower.includes(searchMajorLower)) {
+      return true;
+    }
+    
+    // Find all abbreviations for this major (if any)
+    const abbreviations = [];
+    for (const [abbrev, major] of this.abbrevToMajorMap.entries()) {
+      if (major === searchMajorLower) {
+        abbreviations.push(abbrev);
+      }
+    }
+    
+    // Check if qualification contains any of the abbreviations
+    return abbreviations.some(abbrev => qualLower.includes(abbrev));
+  }
+  
+  // Helper method to check if a post matches a major
+  postMatchesMajor(post, searchMajor) {
+    if (!post.qualificationRequirement) return false;
+    
+    // Handle array of qualifications
+    if (Array.isArray(post.qualificationRequirement)) {
+      return post.qualificationRequirement.some(qual => 
+        this.checkQualificationForMajor(qual, searchMajor)
+      );
+    } 
+    // Handle string qualification
+    else {
+      return this.checkQualificationForMajor(post.qualificationRequirement, searchMajor);
+    }
+  }
 
   async performSearch(searchState) {
     try {
       // Show loading state
       const jobListingsElement = this.parent.querySelector('.job-listings');
-      jobListingsElement.innerHTML = '<div class="loading">Searching opportunities...</div>';
+      jobListingsElement.innerHTML = '<div class="loading">Searching opportunities</div>';
       
       // Reset to page 1 for new searches
       this.currentPage = 1;
       
-      // We'll make the search request to the backend
-      // For now, we'll implement this client-side, but ideally this would be a server endpoint
-      const response = await fetch('/researchPost');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch posts: ${response.statusText}`);
+      // Check if we have the complete dataset for client-side filtering
+      if (!this.isLoadingComplete) {
+        // Wait for complete data to load if it's not ready
+        const response = await fetch('/researchPost');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch posts: ${response.statusText}`);
+        }
+        
+        const allData = await response.json();
+        this.allPosts = allData;
+        this.isLoadingComplete = true;
       }
       
-      const allPosts = await response.json();
-      
-      // Filter by search query
-      let filteredPosts = allPosts.filter(post => {
+      // Now we have all posts, filter based on search criteria
+      let filteredPosts = this.allPosts.filter(post => {
         if (!searchState.query) return true;
         
         const query = searchState.query.toLowerCase();
@@ -217,18 +356,10 @@ export class JobListingsComponent extends BaseComponents {
       // Additional filtering (majors, date ranges, etc.)
       if (searchState.filters?.majors?.length > 0) {
         filteredPosts = filteredPosts.filter(post => {
-          if (!post.qualificationRequirement) return false;
-          
-          // Check if any of the selected majors appear in qualifications
-          return searchState.filters.majors.some(major => {
-            if (Array.isArray(post.qualificationRequirement)) {
-              return post.qualificationRequirement.some(qual => 
-                qual.toLowerCase().includes(major.toLowerCase())
-              );
-            } else {
-              return post.qualificationRequirement.toLowerCase().includes(major.toLowerCase());
-            }
-          });
+          // Check if post matches any of the selected majors
+          return searchState.filters.majors.some(major => 
+            this.postMatchesMajor(post, major)
+          );
         });
       }
       
@@ -336,8 +467,8 @@ export class JobListingsComponent extends BaseComponents {
           <i class="${bookmarkClass} fa-bookmark bookmark-icon"></i>
         </div>
         <div class="job-post-details">
-          <p><strong>Contact:</strong> ${post.contactName}</p>
-          <p><strong>Compensation:</strong> ${post.compensation}</p>
+          <p><strong>Contact:</strong> ${post.contactName || 'Not specified'}</p>
+          <p><strong>Compensation:</strong> ${post.compensation || 'Not specified'}</p>
           <p><strong>Period:</strong> ${hiringPeriodText}</p>
         </div>
       `;
@@ -377,13 +508,6 @@ export class JobListingsComponent extends BaseComponents {
           // Toggle visual indicator
           bookmarkIcon.classList.toggle('fas');
           bookmarkIcon.classList.toggle('far');
-          
-          // Show a brief notification
-          const notificationText = bookmarkIcon.classList.contains('fas') 
-            ? 'Research opportunity saved!' 
-            : 'Research opportunity removed from saved items';
-          
-          this.showNotification(notificationText);
         }
       });
       
@@ -391,36 +515,12 @@ export class JobListingsComponent extends BaseComponents {
     }
     
     // If this is the first load, select the first post
-    if (this.posts.length > 0) {
+    if (this.posts.length > 0 && !this.parent.querySelector('.job-post.active')) {
       const firstPost = this.parent.querySelector('.job-post');
       if (firstPost) {
         firstPost.classList.add('active');
         this.eventHub.publish(Events.PostSelected, this.posts[0]);
       }
     }
-  }
-
-  // Add notification method
-  showNotification(message) {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = 'bookmark-notification';
-    notification.textContent = message;
-    
-    // Add to document
-    document.body.appendChild(notification);
-    
-    // Show notification
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 10);
-    
-    // Remove after delay
-    setTimeout(() => {
-      notification.classList.remove('show');
-      setTimeout(() => {
-        notification.remove();
-      }, 300);
-    }, 3000);
   }
 }
