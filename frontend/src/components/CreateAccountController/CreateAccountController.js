@@ -102,16 +102,15 @@ export class CreateAccountControllerComponent extends BaseComponent {
 
                 try {
                     await this.#saveToServer();
+                    alert("Successfully created account!");
+                    await LocalDB.put("sessionEmail", this.#profileData.email);
+                    await LocalDB.delete("accountCreateData");
+                    await this.#hub.publish(Events.NavigateTo, { page: "profile", info: {email:this.#profileData.email, canEdit:true} });
                 } catch (error) {
                     alert(error.message);
                     return;
                 }
                 
-                // then navigate to the home page
-                alert("Successfully created account!");
-                await LocalDB.put("sessionEmail", this.#profileData.email);
-                await LocalDB.delete("accountCreateData");
-                await this.#hub.publish(Events.NavigateTo, { page: "profile", info: {email:this.#profileData.email, canEdit:true} });
             });
         }
 
