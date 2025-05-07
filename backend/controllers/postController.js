@@ -61,6 +61,16 @@ export const getPostById = async (req, res) => {
     }
 };
 
+export const getPostCount = async (req, res) => {
+    try {
+        const count = await postModel.count();
+        res.json({ count });
+    } catch (error) {
+        console.error('Error fetching post count:', error);
+        res.status(500).json({ message: 'Error fetching post count', error: error.message });
+    }
+};
+
 // Get all unique majors with their post counts
 export const getAllMajors = async (req, res) => {
     try {
