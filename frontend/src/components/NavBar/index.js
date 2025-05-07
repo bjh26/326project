@@ -87,6 +87,8 @@ export class NavBarComponent extends BaseComponents {
       
       // Then navigate
       this.eventHub.publish(Events.NavigateTo, { page: "home" });
+
+      window.location.reload();
     });
     logoContainer.style.cursor = 'pointer'; // Add pointer cursor to indicate clickability
 
