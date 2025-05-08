@@ -40,4 +40,4 @@ Issues: new user page, user profile page, user data structure, multi-step profil
 
 ### Khang Nguyen
 Role: Tasks Tracker\
-Issues: create a post, home page screen, research posting data structure, search bar functionality with filter and sort options, front-end/back-end intergration to get all the posts and update the listings if a new post is created.
+Issues: create a post, home page screen, research posting data structure, search bar functionality with filter and sort options, front-end/back-end integration to get all the posts and update the listings if a new post is created, separate the CSS for each component, fix some path issues, api calls, models fields type, creates models, routes, controllers, fix main issues for everything so it works now :)
