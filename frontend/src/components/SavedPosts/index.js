@@ -287,6 +287,7 @@ export class SavedPostsComponent extends BaseComponent {
                         <div class="job-meta-info">
                             <p>Posted ${daysAgo} days ago</p>
                             <p>Application Deadline: ${deadlineDate}</p>
+                            ${post.author ? `<p>Posted by: <a href="#" class="author-link" data-email="${post.author.email}">${post.author.name || post.contactName}</a></p>` : ''}
                         </div>
                     </div>
                     <div class="job-full-description">
@@ -365,5 +366,22 @@ export class SavedPostsComponent extends BaseComponent {
             const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contactEmail)}&su=${encodeURIComponent(subject)}`;
             window.open(gmailUrl, '_blank');
         });
+        const authorLink = modalContainer.querySelector('.author-link');
+        if (authorLink) {
+            authorLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const authorEmail = e.currentTarget.dataset.email;
+                if (authorEmail) {
+                    modalContainer.classList.remove('show'); // Close the modal
+                    this.eventHub.publish(Events.NavigateTo, { 
+                        page: "profile", 
+                        info: {
+                            email: authorEmail, 
+                            canEdit: false // Default to false; the profile controller will determine actual permissions
+                        }
+                    });
+                }
+            });
+        }
     }
 }

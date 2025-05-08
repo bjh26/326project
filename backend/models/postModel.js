@@ -19,6 +19,17 @@ const postModel = sequelizePost.define("Posts", {
         type: DataTypes.STRING,
         allowNull: false
     }, 
+    author: {
+        type: DataTypes.TEXT, // Will store JSON string
+        allowNull: true,
+        get() {
+            const rawValue = this.getDataValue('author');
+            return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+            this.setDataValue('author', JSON.stringify(value));
+        }
+    },
     description: {
         type: DataTypes.TEXT,
         allowNull: true
@@ -79,6 +90,7 @@ const formatPostForFrontend = (post) => {
     return {
         id: post.id,
         title: post.title,
+        author: post.author,
         description: post.description,
         responsibilities: post.responsibilities,
         qualificationRequirement: post.qualificationRequirement,
