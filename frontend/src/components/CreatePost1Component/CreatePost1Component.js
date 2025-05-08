@@ -26,6 +26,7 @@ export class CreatePost1Component extends BaseComponent {
                                     <input type="button" class="form-button" id="save" value="Save">
                                     <input type="button" class="form-button" id="next" value="Next">
                                 </div>
+                                <div id="saveMessage" class="save-message"></div>
                             `;
         return container;
     }

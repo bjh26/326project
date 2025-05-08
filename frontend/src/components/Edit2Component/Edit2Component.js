@@ -23,7 +23,7 @@ export class Edit2Component extends BaseComponent {
                                     <div class="upload-group">
                                         <label for="resumeArea" class="upload-label">Resume</label>
                                         <div id="resumeArea" class="upload-input">
-                                            <p>Drag & drop your file here, or <span id="resumeFileSelect">browse</span></p>
+                                            <p>Drag & drop your file here, or <span id="resumeFileSelect" class="file-select">browse</span></p>
                                             <input type="file" id="resumeInput" accept="application/pdf" hidden>
                                         </div>
                                     </div>
@@ -34,7 +34,7 @@ export class Edit2Component extends BaseComponent {
                                     <input type="submit" id="back" class="next-button button" value="Back">
                                     <input type="submit" id="next" class="next-button button" value="Next">
                                 </div>
-                                <span id="saveMessage" class="save-message"></span>
+                                <div id="saveMessage" class="save-message"></div>
                             `;
         return container;
     }

@@ -9,14 +9,6 @@ import { LocalDB } from "../frontend/src/services/LocalDB.js";
 import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
-// clear IndexedDB if it contains anything
-// this is done in the server file, so this line only runs when server is started (doesn't run when refreshing page) 
-try {
-    await LocalDB.clear();
-    console.log("cleared IndexedDB");
-} catch (error) {
-    console.log("did not clear IndexedDB: ", error.message);
-}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -26,6 +18,15 @@ const PORT = 3000;
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static("../frontend/src"));
+
+// clear IndexedDB if it contains anything
+// this is done in the server file, so this line only runs when server is started (doesn't run when refreshing page) 
+try {
+    await LocalDB.clear();
+    console.log("cleared IndexedDB");
+} catch (error) {
+    console.log("Did not clear IndexedDB.", error.message);
+}
 
 // test function with dummy data
 async function preloadData() {

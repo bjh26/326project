@@ -38,3 +38,15 @@ body, html {
     opacity: 1;
     transform: translateY(0);
 }
+
+.save-message {
+    border-radius: 4px;
+    color: green;
+    margin: 20px;
+    font-size: 14px;
+    transition: opacity 1s ease-in-out;
+    opacity: 0;
+}
+.save-message.show {
+    opacity: 1;
+}

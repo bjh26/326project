@@ -35,7 +35,7 @@ export class Edit1Component extends BaseComponent {
                                     <input type="submit" id="finish" class="next-button button" value="Exit & Publish Changes">
                                     <input type="submit" id="next" class="next-button button" value="Next">
                                 </div>
-                                <span id="saveMessage" class="save-message"></span>
+                                <div id="saveMessage" class="save-message"></div>
                             `;
         return container;
     }

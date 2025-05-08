@@ -110,7 +110,11 @@ export class CreateAccountControllerComponent extends BaseComponent {
                     await LocalDB.delete("accountCreateData");
                     await this.#hub.publish(Events.NavigateTo, { page: "profile", info: {email:this.#profileData.email, canEdit:true} });
                 } catch (error) {
-                    alert(error.message);
+                    if (error.message === "A profile with this email already exists.") {
+                        alert("A profile with this email already exists.");
+                    } else {
+                        alert("There was a problem when creating your account.", error.message);
+                    }
                     return;
                 }
                 
@@ -160,7 +164,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
             try {
                 await this.#saveFileToLocalDB(file, type);
             } catch (error) {
-                alert("Unable to upload file. ", error.message);
+                alert("Unable to upload file.", error.message);
             }
             if (type === "resume") {
                 div.textContent = "Resume uploaded";
@@ -176,7 +180,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
             try {
                 await this.#saveFileToLocalDB(file, type);
             } catch (error) {
-                alert("Unable to upload file. ", error.message);
+                alert("Unable to upload file.", error.message);
             }
             if (type === "resume") {
                 div.style.backgroundColor = "#881111";
@@ -209,7 +213,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
     }
 
     async #saveToServer() {
-    
+            
         const res = await fetch('/profile', {
             method: "POST",
             headers: {
@@ -250,7 +254,11 @@ export class CreateAccountControllerComponent extends BaseComponent {
             bio
         };
 
-        await LocalDB.put("accountCreateData", this.#profileData);
+        try {
+            await LocalDB.put("accountCreateData", this.#profileData);
+        } catch (error) {
+            alert("Unable to save data locally.", error.message);
+        }
     }
 
     #loadSkeleton() {
