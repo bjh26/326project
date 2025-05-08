@@ -35,7 +35,7 @@ Issues: saved postings, create a post, login page, home page screen, multi-step 
 
 ### Nishil Adina
 Role: Meeting Coordinator\
-Issues: new user page, user profile page, user data structure, multi-step profile creation/update form, profile data load from/save to server
+Issues: new user page, user profile page, user data structure, multi-step profile creation/update form, profile data load from/save to server, consolidation into one server by using app controllers, file transfer and drag and drop for profile picture and resume
 
 
 ### Khang Nguyen
