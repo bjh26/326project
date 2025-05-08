@@ -1,6 +1,3 @@
-// import { TaskListComponent } from '../TaskListComponent/TaskListComponent.js';
-// import { SimpleTaskListViewComponent } from '../SimpleTaskListViewComponent/SimpleTaskListViewComponent.js';
-// import { TaskInputComponent } from '../TaskInputComponent/TaskInputComponent.js';
 import { EventHub } from '../../eventhub/EventHub.js';
 import { Events } from '../../eventhub/Events.js';
 import { LocalDB } from '../../services/LocalDB.js';
@@ -10,15 +7,12 @@ import { LoginPageControllerComponent } from '../LoginPageControllerComponent/Lo
 import { BaseComponent } from '../BaseComponent/BaseComponent.js';
 import { CreateAccountControllerComponent } from '../CreateAccountController/CreateAccountController.js';
 import { CreatePostPageControllerComponent } from '../CreatePostPageControllerComponent/CreatePostPageControllerComponent.js';
-import { HomePage } from '../../pages/HomePage/HomePage.js'
+import { HomePage } from '../HomePageControllerComponent/HomePage.js'
 import { SavedPostsComponent } from '../SavedPosts/index.js';
 
 export class AppControllerComponent extends BaseComponent {
     #container = null; // private container for the component
     #currentPage = null; // track the current view 
-    //   #taskListComponent = null; // Instance of the main task list component
-    //   #taskInputComponent = null; // Instance of the task input component
-    //   #simpleTaskListViewComponent = null; // Instance of the simple view component
     #hub; // EventHub instance for managing events
 
     // constructor is called upon loading site for first time
@@ -32,8 +26,6 @@ export class AppControllerComponent extends BaseComponent {
     // render the AppController component and return the container
     async render() {
         this.#createContainer();
-
-        // this.#setupContainerContent();
 
         // check if current page is in IndexedDB, otherwise default to login page
         this.#currentPage = await LocalDB.get("currentPage");
@@ -107,8 +99,7 @@ export class AppControllerComponent extends BaseComponent {
         } else if (page === "createPost") {
             const createPostPageControllerComponent = new CreatePostPageControllerComponent();
             this.#container.appendChild(await createPostPageControllerComponent.render());
-        }
-        else {
+        } else {
             throw new Error(`Invalid page: ${page}`);
         }
     }

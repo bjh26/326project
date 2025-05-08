@@ -1,12 +1,12 @@
-import { BaseComponent } from '../../components/BaseComponent/BaseComponent.js';
+import { BaseComponent } from '../BaseComponent/BaseComponent.js';
 import { EventHub } from '../../eventhub/EventHub.js';
 import { Events } from '../../eventhub/Events.js';
-import { SearchBarComponent } from '../../components/SearchBar/index.js';
-import { JobListingsComponent } from '../../components/JobListings/index.js';
-import { JobDetailsComponent } from '../../components/JobDetails/index.js';
-import { SavedPostsComponent } from '../../components/SavedPosts/index.js';
+import { SearchBarComponent } from '../SearchBar/index.js';
+import { JobListingsComponent } from '../JobListings/index.js';
+import { JobDetailsComponent } from '../JobDetails/index.js';
+import { SavedPostsComponent } from '../SavedPosts/index.js';
 import { LocalDB } from '../../services/LocalDB.js';
-import { NavBarComponent } from '../../components/NavBar/index.js';
+import { NavBarComponent } from '../NavBar/index.js';
 
 export class HomePage extends BaseComponent {
     constructor() {
@@ -26,7 +26,7 @@ export class HomePage extends BaseComponent {
     }
 
     async render() {
-        this.loadCSS('pages/HomePage', 'HomePage');
+        this.loadCSS('components/HomePageControllerComponent', 'HomePage');
         
         // Clear the container
         this.container.innerHTML = '';
