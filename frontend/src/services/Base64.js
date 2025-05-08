@@ -56,4 +56,4 @@ class Base64Converter {
 
 // Export a singleton instance of the class.
 const Base64 = new Base64Converter();
-export default Base64;
+export { Base64 };
