@@ -30,6 +30,18 @@
     margin-bottom: 16px;
 }
 
+.author-link {
+    color: #881111;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.author-link:hover {
+    color: #6d0e0e;
+    text-decoration: underline;
+}
+
 .job-meta-info {
     display: flex;
     flex-wrap: wrap;

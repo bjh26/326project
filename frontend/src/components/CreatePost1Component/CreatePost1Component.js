@@ -12,14 +12,14 @@ export class CreatePost1Component extends BaseComponent {
         container.classList.add("active");
         container.id = "step1";
         container.innerHTML = ` <div class="post-form">
-                                    <label for="title">Title</label>
-                                    <input type="text" name="title" id="title">
+                                    <label for="title">Title <span class="required">*</span></label>
+                                    <input type="text" name="title" id="title" required>
 
-                                    <label for="description">Research Description</label>
-                                    <textarea type="text" name="description" id="description" rows="6" cols="50"></textarea>
+                                    <label for="description">Research Description <span class="required">*</span></label>
+                                    <textarea type="text" name="description" id="description" rows="6" cols="50" required></textarea>
 
-                                    <label for="responsibilities">Role Responsibilities</label>
-                                    <textarea type="text" name="responsibilities" id="responsibilities" rows="6" cols="50"></textarea>
+                                    <label for="responsibilities">Role Responsibilities <span class="required">*</span></label>
+                                    <textarea type="text" name="responsibilities" id="responsibilities" rows="6" cols="50" required></textarea>
                                 </div>
                                 <div class="buttons">
                                     <input type="button" class="form-button" id="cancel" value="Cancel">
@@ -27,6 +27,7 @@ export class CreatePost1Component extends BaseComponent {
                                     <input type="button" class="form-button" id="next" value="Next">
                                 </div>
                                 <div id="saveMessage" class="save-message"></div>
+                                <div class="form-help">Fields marked with <span class="required">*</span> are required</div>
                             `;
         return container;
     }

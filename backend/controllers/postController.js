@@ -114,9 +114,15 @@ export const createPost = async (req, res) => {
     try {
         const newPost = req.body;
         // Add validation if needed
+
+        const authorInfo = newPost.author ? {
+            name: newPost.author.name || `${newPost.contactName}`,
+            email: newPost.author.email
+        } : null;
         
         await postModel.create({
             title: newPost.title,
+            author: authorInfo,
             description: newPost.description,
             responsibilities: newPost.responsibilities,
             qualificationRequirement: newPost.qualificationRequirement,

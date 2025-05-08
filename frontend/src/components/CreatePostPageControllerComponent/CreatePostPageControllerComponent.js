@@ -46,9 +46,14 @@ export class CreatePostPageControllerComponent extends BaseComponent {
         }
 
         const email = await LocalDB.get("sessionEmail");
+        const userProfile = await this.#getUserProfile(email);
+
         this.#postData = await LocalDB.get("postData") || { 
-            author: email,
-            postedDate: new Date().toISOString() // Add current date as posted date
+            author: {
+            name: userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : '',
+            email: email
+            },
+            postedDate: new Date().toISOString() 
         };  
 
         // load skeleton for current page into container
@@ -61,6 +66,20 @@ export class CreatePostPageControllerComponent extends BaseComponent {
         this.#addEventListeners(this.#currentCreatePage);
 
         return this.#container;
+    }
+
+    async #getUserProfile(email) {
+        try {
+            if (!email) return null;
+            
+            const response = await fetch(`/profile/${email}`);
+            if (!response.ok) return null;
+            
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+            return null;
+        }
     }
 
     async loadPage(page) {
@@ -274,6 +293,11 @@ export class CreatePostPageControllerComponent extends BaseComponent {
                 
                 // save the current page data first
                 await this.#saveCurrentPageData();
+                
+                const isValid = await this.#validateAllFields();
+                if (!isValid) {
+                    return; // Stop if validation fails
+                }
 
                 // post to server
                 try {
@@ -339,6 +363,97 @@ export class CreatePostPageControllerComponent extends BaseComponent {
             return;
         }
     }
+
+    async #validateAllFields() {
+    // First, save current page data to make sure we have the latest input
+    await this.#saveCurrentPageData();
+    
+    // Get latest post data
+    this.#postData = await LocalDB.get("postData") || {};
+    
+    // Define required fields - now including all fields as per your requirements
+    const requiredFields = [
+        'title',
+        'description',
+        'responsibilities',
+        'qualificationRequirement',
+        'compensation',
+        'hiringPeriodStart',  
+        'hiringPeriodEnd',    
+        'applicationInstructions',
+        'deadline',
+        'contactName',
+        'contactEmail',
+    ];
+    
+    // Check for empty required fields
+    const emptyFields = requiredFields.filter(field => {
+        // Check if field is empty or undefined
+        const value = this.#postData[field];
+        return !value || 
+               (typeof value === 'string' && value.trim() === '') ||
+               (Array.isArray(value) && value.length === 0);
+    });
+    
+    if (emptyFields.length > 0) {
+        // Format field names for display (capitalize and add spaces)
+        const formattedFields = emptyFields.map(field => {
+            return field
+                .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+                .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
+        });
+        
+        // Create message with list of missing fields
+        const message = `Please complete the following required fields:\n• ${formattedFields.join('\n• ')}`;
+        
+        // Show validation error
+        alert(message);
+        return false;
+    }
+    
+    // Validate email format
+    if (this.#postData.contactEmail) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.#postData.contactEmail)) {
+            alert('Please enter a valid email address for the contact email.');
+            return false;
+        }
+    }
+    
+    // Validate dates
+    if (this.#postData.hiringPeriodStart && this.#postData.hiringPeriodEnd) {
+        const startDate = new Date(this.#postData.hiringPeriodStart);
+        const endDate = new Date(this.#postData.hiringPeriodEnd);
+        const now = new Date();
+
+        // Check if start or end date is before now (post creation time)
+        if (startDate < now) {
+            alert('Hiring period start date cannot be earlier than the current date.');
+            return false;
+        }
+        if (endDate < now) {
+            alert('Hiring period end date cannot be earlier than the current date.');
+            return false;
+        }
+        if (endDate < startDate) {
+            alert('Hiring period end date cannot be earlier than start date.');
+            return false;
+        }
+    }
+
+    if(this.#postData.deadline) {
+        const deadlineDate = new Date(this.#postData.deadline);
+        const now = new Date();
+
+        // Check if deadline date is before now (post creation time)
+        if (deadlineDate < now) {
+            alert('Deadline cannot be earlier than the current date.');
+            return false;
+        }
+    }
+    // All validations passed
+    return true;
+}
 
     #showSaveMessage(message) {
         // alert(message);

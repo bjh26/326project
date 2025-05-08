@@ -12,23 +12,23 @@ export class CreatePost2Component extends BaseComponent {
         container.classList.add("active");
         container.id = "step2";
         container.innerHTML = ` <div class="post-form">
-                                    <label for="qualificationRequirement">Qualifications and Requirements</label>
-                                    <textarea type="text" name="qualificationRequirement" id="qualificationRequirement" rows="6" cols="50"></textarea>
+                                    <label for="qualificationRequirement">Qualifications and Requirements <span class="required">*</span></label>
+                                    <textarea type="text" name="qualificationRequirement" id="qualificationRequirement" rows="6" cols="50" required></textarea>
                         
-                                    <label for="compensation">Compensation</label>
-                                    <input type="text" name="compensation" id="compensation">
+                                    <label for="compensation">Compensation <span class="required">*</span></label>
+                                    <input type="text" name="compensation" id="compensation" required>
                         
-                                    <label for="hiringPeriodStart">Hiring Period Start</label>
-                                    <input type="date" name="hiringPeriodStart" id="hiringPeriodStart">
+                                    <label for="hiringPeriodStart">Hiring Period Start <span class="required">*</span></label>
+                                    <input type="date" name="hiringPeriodStart" id="hiringPeriodStart" required>
                                     
-                                    <label for="hiringPeriodEnd">Hiring Period End</label>
-                                    <input type="date" name="hiringPeriodEnd" id="hiringPeriodEnd">
+                                    <label for="hiringPeriodEnd">Hiring Period End <span class="required">*</span></label>
+                                    <input type="date" name="hiringPeriodEnd" id="hiringPeriodEnd" required>
                         
-                                    <label for="applicationInstructions">Application Instructions</label>
-                                    <textarea type="text" name="applicationInstructions" id="applicationInstructions" rows="6" cols="50"></textarea>
+                                    <label for="applicationInstructions">Application Instructions <span class="required">*</span></label>
+                                    <textarea type="text" name="applicationInstructions" id="applicationInstructions" rows="6" cols="50" required></textarea>
                         
-                                    <label for="deadline">Application Deadline</label>
-                                    <input type="date" name="deadline" id="deadline">
+                                    <label for="deadline">Application Deadline <span class="required">*</span></label>
+                                    <input type="date" name="deadline" id="deadline" required>
                                 </div>
 
                                 <div class="buttons">
@@ -38,6 +38,7 @@ export class CreatePost2Component extends BaseComponent {
                                     <input type="button" class="form-button" id="next" value="Next">
                                 </div>
                                 <div id="saveMessage" class="save-message"></div>
+                                <div class="form-help">Fields marked with <span class="required">*</span> are required</div>
                             `;
         return container;
     }

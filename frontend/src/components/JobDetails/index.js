@@ -1,6 +1,8 @@
-// Updated JobDetails/index.js
+// Fix for the JobDetailsComponent in components/JobDetails/index.js
+
 import { BaseComponents } from '../BaseComponents.js';
 import { EventHub, Events } from '../../lib/EventHub/index.js';
+import { LocalDB } from '../../services/LocalDB.js';
 
 export class JobDetailsComponent extends BaseComponents {
   constructor() {
@@ -75,6 +77,7 @@ export class JobDetailsComponent extends BaseComponents {
         <div class="job-meta-info">
           <p>Updated ${daysAgo} days ago</p>
           <p>Application Deadline: ${deadlineDate}</p>
+          ${post.author ? `<p>Posted by: <a href="#" class="author-link" data-email="${post.author.email}">${post.author.name || post.contactName}</a></p>` : ''}
         </div>
       </div>
       <div class="job-full-description">
@@ -129,6 +132,18 @@ export class JobDetailsComponent extends BaseComponents {
         this.handleApply(post);
       });
     }
+    
+    // Add event listener for author link
+    const authorLink = jobDetailsContainer.querySelector('.author-link');
+    if (authorLink) {
+        authorLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const authorEmail = e.currentTarget.dataset.email;
+            if (authorEmail) {
+                this.navigateToAuthorProfile(authorEmail);
+            }
+        });
+    }
 
     // For mobile view, create a modal version
     this.createMobileModal(post);
@@ -157,7 +172,7 @@ export class JobDetailsComponent extends BaseComponents {
     
     // Format hiring period
     let hiringPeriodText = 'Not specified';
-    if (post.hiringPeriod && post.hiringPeriodStart && post.hiringPeriodEnd) {
+    if (post.hiringPeriodStart && post.hiringPeriodEnd) {
       const start = new Date(post.hiringPeriodStart).toLocaleDateString('en-US', {
         month: '2-digit',
         day: '2-digit',
@@ -180,6 +195,7 @@ export class JobDetailsComponent extends BaseComponents {
             <div class="job-meta-info">
               <p>Posted ${daysAgo} days ago</p>
               <p>Application Deadline: ${deadlineDate}</p>
+              ${post.author ? `<p>Posted by: <a href="#" class="author-link" data-email="${post.author.email}">${post.author.name || post.contactName}</a></p>` : ''}
             </div>
           </div>
           <div class="job-full-description">
@@ -242,6 +258,36 @@ export class JobDetailsComponent extends BaseComponents {
         this.handleApply(post);
       });
     }
+    
+    // Add event listener for author link in modal
+    const authorLink = modalContainer.querySelector('.author-link');
+    if (authorLink) {
+        authorLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const authorEmail = e.currentTarget.dataset.email;
+            if (authorEmail) {
+                this.navigateToAuthorProfile(authorEmail);
+                modalContainer.classList.remove('show'); // Close the modal
+            }
+        });
+    }
+  }
+
+  // Add method to navigate to author profile
+  navigateToAuthorProfile(email) {
+    // Get current user email to check if this is the user's own profile
+    LocalDB.get("sessionEmail").then(currentUserEmail => {
+        const canEdit = email === currentUserEmail;
+        
+        // Navigate to profile page
+        this.eventHub.publish(Events.NavigateTo, { 
+            page: "profile", 
+            info: {
+                email: email, 
+                canEdit: canEdit
+            }
+        });
+    });
   }
 
   handleApply(post) {

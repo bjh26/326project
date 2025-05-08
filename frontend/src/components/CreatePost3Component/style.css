@@ -86,6 +86,35 @@ body::after,
     gap: 10px;
 }
 
+.required {
+    color: #d32f2f;
+    margin-left: 4px;
+}
+
+.form-help {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Style for invalid fields */
+.post-form input:invalid,
+.post-form textarea:invalid {
+    border-color: #d32f2f;
+}
+
+/* Animation for validation error */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+}
+
 /* Base button style */
 .form-button,
 #cancel,
@@ -157,7 +186,7 @@ body::after,
     transform: translateY(1px);
 }
 
-/* Save message styling
+/* Save message styling */
 #saveMessage {
     margin-top: 10px;
     padding: 12px 16px;
@@ -176,7 +205,7 @@ body::after,
 
 #saveMessage.error {
     background-color: #f44336;
-} */
+}
 
 @keyframes fadeOut {
     from {opacity: 1;}
