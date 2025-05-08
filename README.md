@@ -31,7 +31,7 @@ Issues: fields of study, new user creation, user profile page, drag and drop fea
 
 ### Elizabeth O’Brien
 Role: Timekeeper\
-Issues: saved postings, create a post, login page, home page screen, multi-step validation for create a post form, front-end/back-end integration for research listings, ensure consistency across Create a Post form data and research job postings data
+Issues: saved postings, create a post, login page, home page screen, multi-step validation for create a post form, front-end/back-end integration for research listings, ensure consistency across Create a Post form data and research job postings data, css consistency
 
 ### Nishil Adina
 Role: Meeting Coordinator\
