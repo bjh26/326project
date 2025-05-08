@@ -1,5 +1,6 @@
 class Base64Converter {
   constructor() {
+    // changed file name to lower case.
     // Nothing interesting at the moment.
   }
 
