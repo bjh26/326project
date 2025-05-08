@@ -15,7 +15,12 @@ export const createUser = async (req, res) => {
             lastName: profile.lastName,
             email: profile.email,
             bio: profile.bio,
+            resume: profile.resume,
             department: profile.department,
+            mime: profile.mime,
+            pfp: profile.pfp,
+            displayEmail: true, // default value
+            researchItems: {} // default value
         });
         
         res.status(201).json({ message: "User created successfully" });
