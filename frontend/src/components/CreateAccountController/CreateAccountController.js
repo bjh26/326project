@@ -37,7 +37,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
             const firstNameInput = this.#container.querySelector("#firstName");
             const lastNameInput = this.#container.querySelector("#lastName");
             const emailInput = this.#container.querySelector("#email");
-            const displayEmailCheckbox = this.#container.querySelector("#displayEmail");
             const departmentSelect = this.#container.querySelector("#department");
             const bioTextarea = this.#container.querySelector("#bio");
             
@@ -51,10 +50,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
             
             if (emailInput && this.#profileData.email) {
                 emailInput.value = this.#profileData.email;
-            }
-            
-            if (displayEmailCheckbox && this.#profileData.displayEmail !== undefined) {
-                displayEmailCheckbox.checked = this.#profileData.displayEmail;
             }
             
             if (departmentSelect && this.#profileData.department) {
@@ -96,8 +91,15 @@ export class CreateAccountControllerComponent extends BaseComponent {
                 // Save the current page data first
                 await this.#saveAccountCreateData();
 
-                if (!("email" in this.#profileData ) || this.#profileData.email === "") {
-                    console.log("unable to save due to missing email");
+                const containsRequiredFields = () => (this.#profileData.firstName !== "" && this.#profileData.lastName !== ""  && this.#profileData.email !== "");
+                if (!containsRequiredFields()) {
+                    alert("Please enter your name and UMass email.");
+                    return;
+                }
+
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@umass\.edu$/;
+                if (!emailRegex.test(this.#profileData.email)) {
+                    alert("Please use a UMass email.");
                     return;
                 }
 
@@ -229,7 +231,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
         const firstName = this.#container.querySelector("#firstName")?.value;
         const lastName = this.#container.querySelector("#lastName")?.value;
         const email = this.#container.querySelector("#email")?.value;
-        const displayEmail = this.#container.querySelector("#displayEmail")?.checked;
         const department = this.#container.querySelector("#department")?.value;
         const bio = this.#container.querySelector("#bio")?.value;
 
@@ -239,7 +240,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
             firstName,
             lastName,
             email,
-            displayEmail,
             department,
             bio
         };

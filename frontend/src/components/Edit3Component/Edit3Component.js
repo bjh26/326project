@@ -42,7 +42,7 @@ export class Edit3Component extends BaseComponent {
                                 <div class="form-actions">
                                     <input type="button" id="save" class="save-button button" value="Save">
                                     <input type="submit" id="back" class="next-button button" value="Back">
-                                    <input type="submit" id="finish" class="next-button button" value="Finish">
+                                    <input type="submit" id="finish" class="next-button button" value="Publish Changes">
                                 </div>
                                 <span id="saveMessage" class="save-message"></span>
                             `;

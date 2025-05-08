@@ -30,7 +30,7 @@ export class Edit2Component extends BaseComponent {
                                 </div>
                                 <div class="form-actions">
                                     <input type="button" id="save" class="save-button button" value="Save">
-                                    <input type="submit" id="finish" class="next-button button" value="Save & Quit">
+                                    <input type="submit" id="finish" class="next-button button" value="Exit & Publish Changes">
                                     <input type="submit" id="back" class="next-button button" value="Back">
                                     <input type="submit" id="next" class="next-button button" value="Next">
                                 </div>
