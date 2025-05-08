@@ -139,6 +139,19 @@ export class ProfilePageControllerComponent extends BaseComponent {
             body: JSON.stringify(this.#profileData)
         });
 
+        if (!res.ok) {
+            const contentType = res.headers.get("content-type");
+        
+            if (contentType && contentType.includes("application/json")) {
+                const errorMessage = await res.json();
+                throw new Error(errorMessage.message || "Server returned an error.");
+            } else {
+                const text = await res.text(); // fallback to plain text
+                console.error("Unexpected response:", text);
+                throw new Error(`Server error: ${res.status}`);
+            }
+        }
+
         // convert back to array
         if (arrayFormat) {
             this.#profileData.researchItems = arrayFormat;
@@ -351,14 +364,43 @@ export class ProfilePageControllerComponent extends BaseComponent {
      */
     #addDragAndDropAndManualUploadFunctionality(div, inputElement, type) {
             
+        // div.addEventListener("dragover", e => {
+        //     e.preventDefault(); 
+        //     div.style.backgroundColor = "#881111";
+        // });
+
+        // div.addEventListener("dragleave", () => {
+        //     div.style.backgroundColor = "lightgray";
+        //     div.style.color = "white";
+        // });
+
+        // // drag and drop
+        // div.addEventListener("drop", async e => {
+        //     e.preventDefault();
+        //     const file = e.dataTransfer.files[0]; 
+        //     console.log("Dropped file:", file.name, file.type, file.size);
+
+        //     await this.#saveFileToLocalDB(file, type);
+        // });
+
+
+        // // manual upload
+        // inputElement.addEventListener("change", async e => {
+        //     e.preventDefault();
+        //     const file = e.target.files[0];
+        //     console.log("Uploaded file:", file.name, file.type, file.size);
+
+        //     await this.#saveFileToLocalDB(file, type);
+        // });
+
         div.addEventListener("dragover", e => {
             e.preventDefault(); 
             div.style.backgroundColor = "#881111";
+            div.style.color = "white";
         });
 
         div.addEventListener("dragleave", () => {
-            div.style.backgroundColor = "lightgray";
-            div.style.color = "white";
+            div.style = ""; // go back to default style
         });
 
         // drag and drop
@@ -366,8 +408,14 @@ export class ProfilePageControllerComponent extends BaseComponent {
             e.preventDefault();
             const file = e.dataTransfer.files[0]; 
             console.log("Dropped file:", file.name, file.type, file.size);
-
-            await this.#saveFileToLocalDB(file, type);
+            try {
+                await this.#saveFileToLocalDB(file, type);
+            } catch (error) {
+                alert("Unable to upload file. ", error.message);
+            }
+            if (type === "resume") {
+                div.textContent = "Resume uploaded";
+            }
         });
 
 
@@ -376,8 +424,16 @@ export class ProfilePageControllerComponent extends BaseComponent {
             e.preventDefault();
             const file = e.target.files[0];
             console.log("Uploaded file:", file.name, file.type, file.size);
-
-            await this.#saveFileToLocalDB(file, type);
+            try {
+                await this.#saveFileToLocalDB(file, type);
+            } catch (error) {
+                alert("Unable to upload file. ", error.message);
+            }
+            if (type === "resume") {
+                div.style.backgroundColor = "#881111";
+                div.style.color = "white";
+                div.textContent = "Resume uploaded";
+            }
         });
     }
 

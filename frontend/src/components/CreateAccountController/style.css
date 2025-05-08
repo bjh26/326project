@@ -199,10 +199,17 @@ textarea {
 
 .login-link {
     color: #881111;
-    text-decoration: none;
+    text-decoration: underline;
     font-size: 16px;
     cursor: pointer;
     transition: color 0.3s ease;
+    background: none;
+    border: none;
+    font-weight: bold;
+    text-decoration: underline;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
 }
 
 .login-link:hover {
