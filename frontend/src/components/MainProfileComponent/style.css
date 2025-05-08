@@ -1,0 +1,180 @@
+.main-grid {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.profile-content {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    margin-top: 20px;
+    flex-grow: 1;
+    padding: 0 20px;
+}
+
+body {
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.left-column {
+    padding-top: 20px;
+}
+
+.dot {
+    height: 200px;
+    width: 200px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    margin: 20px auto;
+    opacity: 50%;
+    transition: opacity 0.3s ease;
+}
+
+.pfp {
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border-radius: 50%;
+    image-rendering: auto;
+}
+
+.side-column-text {
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
+    margin: 20px 0;
+}
+
+#resume {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#resume a {
+    display: inline-block;
+    background-color: #A24857;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#resume a:hover {
+    background-color: #881111;
+}
+
+.right-column {
+    padding: 20px 40px 40px 40px;
+    width: 100%; /* Ensure it takes full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+    overflow: hidden; /* Prevent overflow */
+}
+
+.research-element {
+    border-radius: 25px;
+    background-color: #bbb;
+    opacity: 50%;
+    margin: 20px 10px;
+    text-align: center;
+    width: 100%; /* Change from min-width to width */
+    max-width: 100%; /* Add max-width to prevent overflow */
+    min-height: 200px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    transition: opacity 0.3s ease;
+    box-sizing: border-box; /* Add to include padding in width calculation */
+    overflow-wrap: break-word; /* Allow text to wrap */
+    word-break: break-word; /* Handle long words */
+}
+
+
+.research-element h1 {
+    margin-top: 10px;
+    font-size: 24px;
+}
+
+.research-element p {
+    margin: 15px 0;
+    line-height: 1.5;
+}
+
+.research-element a {
+    display: inline-block;
+    background-color: #A24857;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-top: 10px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.research-element a:hover {
+    background-color: #881111;
+}
+
+.dot:hover, .research-element:hover {
+    opacity: 100%;
+    transition: opacity 0.3s ease;
+}
+
+.edit-profile-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.edit-profile-button {
+    background-color: #A24857;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+    width: 80%;
+    max-width: 200px;
+}
+
+/* .edit-profile-button:hover {
+    background-color: #881111;
+} */
+
+@media (max-width: 768px) {
+    .profile-content {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .left-column, .right-column {
+        width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    
+    .research-element {
+        min-width: auto; /* Override min-width on mobile */
+        width: 100%;
+        margin: 20px 0; /* Reduce horizontal margin */
+        padding: 15px; /* Reduce padding */
+    }
+
+    .research-element h1 {
+        font-size: 20px; /* Smaller font size on mobile */
+        word-break: break-word;
+    }
+    
+    .research-element p {
+        word-break: break-word;
+    }
+}

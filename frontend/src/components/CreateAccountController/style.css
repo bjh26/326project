@@ -1,0 +1,242 @@
+#account-creation-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+#wrapper {
+    width: 85%;
+    border: 2px solid #881111;
+    border-radius: 5px;
+    padding: 30px;
+    margin: auto;
+    background-color: white;
+}
+
+.dashboard {
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(4, auto);
+    position: relative;
+}
+
+h2 {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.upload-documents {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+}
+
+.short-response {
+    grid-column: 1 / 2;
+    grid-row: 2;
+    width: 40%;
+    height: 40%;
+}
+
+.long-response {
+    width: 90%;
+    height: 90%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    grid-column: 1 / 3;
+    grid-row: 3;
+}
+
+.short-response label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.long-response label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input[type=text], 
+input[type=email], 
+select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 20px;
+}
+
+textarea {
+    resize: vertical;
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 120px;
+}
+
+.profile-image {
+    align-items: center;
+    justify-content: center;
+    width: 150px; 
+    height: 150px; 
+    background-color: lightgray;
+    border-radius: 50%;
+    border: none; 
+    color: gray; 
+    font-size: 16px; 
+    display: flex;
+    cursor: pointer; 
+    transition: background-color 0.3s ease; 
+    overflow: hidden;
+    position: relative;
+}
+
+.profile-image:hover {
+    background-color: gray;
+}
+
+.profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border-radius: 50%;
+    image-rendering: auto;
+}
+
+.profile-image label {
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.resume-upload {
+    padding: 10px;
+    width: 150px;
+    height: 20px;
+    display: inline-block;
+    border: 3px dashed #881111;
+    background-color: lightgray;
+    color: black;            
+    text-align: center;
+    border-radius: 10px;      
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.resume-upload:hover {
+    background-color: #720e0e;
+    color: white;
+}
+
+.button-container {
+    grid-row: 4; 
+    grid-column: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 0;
+}
+
+.buttons-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.login-link-row {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.button {
+    width: 200px;
+    height: 50px;
+    background-color: #881111;
+    border-radius: 4px;
+    border: none; 
+    color: white; 
+    font-size: 16px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease; 
+}
+
+.button:hover {
+    background-color: #720e0e;
+}
+
+.login-link {
+    color: #881111;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.login-link:hover {
+    color: #720e0e;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .short-response {
+        width: 100%;
+    }
+
+    .long-response {
+        width: 100%;
+    }
+    
+    .upload-documents {
+        align-items: center;
+        margin: 20px 0;
+    }
+    
+    .buttons-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .button {
+        width: 100%;
+        max-width: 250px;
+    }
+}

@@ -1,6 +1,7 @@
-// Updated SearchBar/index.js to match Post.js structure
 import { BaseComponents } from '../BaseComponents.js';
 import { EventHub, Events } from '../../lib/EventHub/index.js';
+import { umassMajors, umassMajorAbbreviations } from "../../assets/majors.js";
+import { LocalDB } from '../../services/LocalDB.js';
 
 export class SearchBarComponent extends BaseComponents {
   constructor() {
@@ -8,6 +9,7 @@ export class SearchBarComponent extends BaseComponents {
     this.parent = document.createElement('div');
     this.parent.className = 'search-container sticky';
     this.eventHub = EventHub.getInstance();
+    this.isInSavedPostsMode = false;
     
     // Search state to track current filters and sort option
     this.searchState = {
@@ -21,11 +23,26 @@ export class SearchBarComponent extends BaseComponents {
       },
       sortOption: 'latest'
     };
+    
+    // Create reverse mapping from abbreviations to full major names for searching
+    this.abbrevToMajorMap = new Map();
+    for (const [abbrev, major] of Object.entries(umassMajorAbbreviations)) {
+      this.abbrevToMajorMap.set(abbrev.toLowerCase(), major);
+    }
+    
+    // Create a mapping from full major names to their abbreviations
+    this.majorToAbbrevsMap = new Map();
+    for (const [abbrev, major] of Object.entries(umassMajorAbbreviations)) {
+      if (!this.majorToAbbrevsMap.has(major)) {
+        this.majorToAbbrevsMap.set(major, []);
+      }
+      this.majorToAbbrevsMap.get(major).push(abbrev);
+    }
   }
 
-  render() {
+  async render() {
     // Load component CSS
-    this.loadCSS('src/components/SearchBar', 'style');
+    this.loadCSS('components/SearchBar', 'style');
     
     this.parent.innerHTML = `
       <div class="search-wrapper">
@@ -80,6 +97,45 @@ export class SearchBarComponent extends BaseComponents {
     this.setupSearchHandlers();
     this.setupFilterHandlers();
     this.setupSortHandlers();
+
+    // Check current page mode without triggering new navigations
+    const isHomePage = await LocalDB.get('isHomePage');
+    if (isHomePage === false) {
+      this.isInSavedPostsMode = true;
+      const searchInput = this.parent.querySelector('#search-input');
+      if (searchInput) {
+        searchInput.placeholder = "Search saved posts...";
+      }
+    } else {
+      this.isInSavedPostsMode = false;
+      const searchInput = this.parent.querySelector('#search-input');
+      if (searchInput) {
+        searchInput.placeholder = "Search all research opportunities...";
+      }
+    }
+
+    // Listen for real mode changes
+    this.eventHub.subscribe('SearchModeChanged', (mode) => {
+      if (mode === 'saved') {
+        this.isInSavedPostsMode = true;
+        const searchInput = this.parent.querySelector('#search-input');
+        if (searchInput) {
+          searchInput.placeholder = "Search saved posts...";
+          // Clear previous search
+          searchInput.value = "";
+          this.searchState.query = "";
+        }
+      } else if (mode === 'home') {
+        this.isInSavedPostsMode = false;
+        const searchInput = this.parent.querySelector('#search-input');
+        if (searchInput) {
+          searchInput.placeholder = "Search all research opportunities...";
+          // Clear previous search
+          searchInput.value = "";
+          this.searchState.query = "";
+        }
+      }
+    });
     
     return this.parent;
   }
@@ -87,9 +143,29 @@ export class SearchBarComponent extends BaseComponents {
   setupSearchHandlers() {
     const searchInput = this.parent.querySelector('#search-input');
     
+    let searchTimeout = null;
+    
     searchInput.addEventListener('input', (event) => {
-      this.searchState.query = event.target.value.trim();
-      this.eventHub.publish(Events.SearchPosts, this.searchState);
+      // Clear any existing timeout to debounce rapid typing
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      
+      // Set a new timeout
+      searchTimeout = setTimeout(() => {
+        this.searchState.query = event.target.value.trim();
+        
+        if (this.isInSavedPostsMode) {
+          // Publish event for saved posts search
+          this.eventHub.publish('SearchSavedPosts', this.searchState);
+        } else {
+          // Regular search for all posts
+          this.eventHub.publish(Events.SearchPosts, this.searchState);
+        }
+        
+        // Clear the timeout reference
+        searchTimeout = null;
+      }, 300); // 300ms debounce
     });
   }
 
@@ -123,12 +199,22 @@ export class SearchBarComponent extends BaseComponents {
     
     dateFromInput.addEventListener('change', () => {
       this.searchState.filters.dateRange.from = dateFromInput.value || null;
-      this.eventHub.publish(Events.SearchPosts, this.searchState);
+      
+      if (this.isInSavedPostsMode) {
+        this.eventHub.publish('SearchSavedPosts', this.searchState);
+      } else {
+        this.eventHub.publish(Events.SearchPosts, this.searchState);
+      }
     });
     
     dateToInput.addEventListener('change', () => {
       this.searchState.filters.dateRange.to = dateToInput.value || null;
-      this.eventHub.publish(Events.SearchPosts, this.searchState);
+      
+      if (this.isInSavedPostsMode) {
+        this.eventHub.publish('SearchSavedPosts', this.searchState);
+      } else {
+        this.eventHub.publish(Events.SearchPosts, this.searchState);
+      }
     });
 
     // Prevent dropdown from closing when clicking inside it
@@ -163,7 +249,13 @@ export class SearchBarComponent extends BaseComponents {
       radio.addEventListener('change', () => {
         if (radio.checked) {
           this.searchState.sortOption = radio.value;
-          this.eventHub.publish(Events.SearchPosts, this.searchState);
+          
+          if (this.isInSavedPostsMode) {
+            this.eventHub.publish('SearchSavedPosts', this.searchState);
+          } else {
+            this.eventHub.publish(Events.SearchPosts, this.searchState);
+          }
+          
           sortDropdown.classList.remove('show');
         }
       });
@@ -187,9 +279,28 @@ export class SearchBarComponent extends BaseComponents {
     await this.populateMajorsList(searchQuery);
   }
 
+  // Helper method to check if major or its abbreviations match the search query
+  matchesMajorSearch(major, searchQuery) {
+    if (!searchQuery) return true;
+    
+    // Check if the major name contains the search query
+    if (major.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return true;
+    }
+    
+    // Check if this is an abbreviation that matches a major
+    if (this.abbrevToMajorMap.has(searchQuery.toLowerCase())) {
+      return this.abbrevToMajorMap.get(searchQuery.toLowerCase()) === major;
+    }
+    
+    // Check if any of the major's abbreviations match the search query
+    const abbrevs = this.majorToAbbrevsMap.get(major) || [];
+    return abbrevs.some(abbrev => abbrev.toLowerCase().includes(searchQuery.toLowerCase()));
+  }
+
   async populateMajorsList(searchQuery = '') {
     try {
-      const response = await fetch('/api/majors');
+      const response = await fetch('/researchPost/majors/all');
       if (!response.ok) {
         throw new Error(`Failed to fetch majors: ${response.statusText}`);
       }
@@ -201,32 +312,54 @@ export class SearchBarComponent extends BaseComponents {
       majorResultsContainer.innerHTML = '';
       
       // If there's no search query and we're not showing selected majors only, display prompt
-      if (!searchQuery) {
-        // If there are selected majors, show them
-        if (this.searchState.filters.majors.length > 0) {
-          const selectedSection = document.createElement('div');
-          selectedSection.innerHTML = '<div class="selected-majors-header">Selected majors:</div>';
-          majorResultsContainer.appendChild(selectedSection);
-          
-          this.searchState.filters.majors.forEach(major => {
-            const count = majorsMap.get(major) || 0;
-            this.addMajorItemToResults(major, count, true, majorResultsContainer);
-          });
-        }
+      if (!searchQuery && this.searchState.filters.majors.length === 0) {
+        majorResultsContainer.innerHTML = '<div class="major-search-prompt">Type to search for majors</div>';
         return;
+      }
+      
+      // If there are selected majors, always show them
+      if (this.searchState.filters.majors.length > 0) {
+        const selectedSection = document.createElement('div');
+        selectedSection.innerHTML = '<div class="selected-majors-header">Selected majors:</div>';
+        majorResultsContainer.appendChild(selectedSection);
+        
+        this.searchState.filters.majors.forEach(major => {
+          const count = majorsMap.get(major) || 0;
+          this.addMajorItemToResults(major, count, true, majorResultsContainer);
+        });
+        
+        // If there's no search query, we're done after showing selected majors
+        if (!searchQuery) {
+          return;
+        }
       }
       
       let foundResults = false;
       
+      // First check for exact matches to abbreviations
+      if (this.abbrevToMajorMap.has(searchQuery)) {
+        const fullMajor = this.abbrevToMajorMap.get(searchQuery);
+        const count = majorsMap.get(fullMajor) || 0;
+        const isChecked = this.searchState.filters.majors.includes(fullMajor);
+        this.addMajorItemToResults(fullMajor, count, isChecked, majorResultsContainer);
+        foundResults = true;
+      }
+      
+      // Then check for partial matches to major names or abbreviations
       majorsMap.forEach((count, major) => {
-        if (major.toLowerCase().includes(searchQuery.toLowerCase())) {
+        // Skip if this major was already added from abbreviation match
+        if (foundResults && major === this.abbrevToMajorMap.get(searchQuery)) {
+          return;
+        }
+        
+        if (this.matchesMajorSearch(major, searchQuery)) {
           foundResults = true;
           const isChecked = this.searchState.filters.majors.includes(major);
           this.addMajorItemToResults(major, count, isChecked, majorResultsContainer);
         }
       });
       
-      if (!foundResults) {
+      if (!foundResults && searchQuery) {
         majorResultsContainer.innerHTML = '<div class="no-results">No majors found matching your search.</div>';
       }
     } catch (error) {
@@ -238,52 +371,36 @@ export class SearchBarComponent extends BaseComponents {
     const majorElement = document.createElement('div');
     majorElement.className = 'major-item';
     
+    // Simple display with just the major name
     majorElement.innerHTML = `
       <label class="major-label">
-        <span>${major} (${count})</span>
+        <span>${major}</span>
         <input type="checkbox" class="major-checkbox" value="${major}" ${isChecked ? 'checked' : ''}>
       </label>
     `;
       
-      // Add major checkbox change handler
-      const checkbox = majorElement.querySelector('.major-checkbox');
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          // Add major to selected filters
-          if (!this.searchState.filters.majors.includes(major)) {
-            this.searchState.filters.majors.push(major);
-          }
-        } else {
-          // Remove major from selected filters
-          this.searchState.filters.majors = this.searchState.filters.majors.filter(m => m !== major);
+    // Add major checkbox change handler
+    const checkbox = majorElement.querySelector('.major-checkbox');
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        // Add major to selected filters
+        if (!this.searchState.filters.majors.includes(major)) {
+          this.searchState.filters.majors.push(major);
         }
-        
+      } else {
+        // Remove major from selected filters
+        this.searchState.filters.majors = this.searchState.filters.majors.filter(m => m !== major);
+      }
+      
+      if (this.isInSavedPostsMode) {
+        this.eventHub.publish('SearchSavedPosts', this.searchState);
+      } else {
         this.eventHub.publish(Events.SearchPosts, this.searchState);
-      });
+      }
       
-      container.appendChild(majorElement);
-    }
-  
-    showNotification(message) {
-      // Create notification element
-      const notification = document.createElement('div');
-      notification.className = 'update-notification';
-      notification.textContent = message;
+      this.populateMajorsList(''); // Refresh to show selected items
+    });
       
-      // Add to document
-      document.body.appendChild(notification);
-      
-      // Animate in
-      setTimeout(() => {
-        notification.classList.add('show');
-      }, 10);
-      
-      // Remove after delay
-      setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-          notification.remove();
-        }, 300);
-      }, 5000);
-    }
+    container.appendChild(majorElement);
   }
+}

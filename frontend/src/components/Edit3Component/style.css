@@ -1,0 +1,212 @@
+@media screen and (max-width: 600px) {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    form {
+        width: 100%;
+        max-width: none;
+    }
+
+    .form-grid {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .grid-row {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+}
+
+.form {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px 50px 50px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+label:not(.non-bold) {
+    display: block;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    margin-left: 10px;
+    font-size: larger;
+}
+
+textarea.user-input {
+    min-width: 30%;
+    align-items: center;
+    min-height: 100px;
+    width: 100%;
+    resize: vertical;
+    padding: 12px 15px !important;
+}
+
+select.user-input {
+    padding-right: 40px; /* Space for the arrow */
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none; /* Safari/Chrome */
+    -moz-appearance: none; /* Firefox */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%233c4043" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 16px center; /* Adjust arrow position */
+    background-size: 16px;
+    padding: 12px 36px 12px 24px; /* top-right-bottom-left */
+}
+
+label:first-of-type {
+    margin-top: 0;
+}
+
+.user-input {
+    background-color: #f0f0f0; /* new background color */
+    border-radius: 24px;
+    border: 1px solid #ccc; /* subtle border */
+    box-shadow: none; /* remove shadow */
+    box-sizing: border-box;
+    color: #3c4043;
+    cursor: pointer;
+    font-family: "Google Sans", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    height: 48px;
+    letter-spacing: .25px;
+    line-height: normal;
+    max-width: 100%;
+    padding: 2px 24px;
+}
+
+.user-input:hover {
+    background-color: #e0e0e0; /* slightly darker on hover */
+}
+
+.user-input:active {
+    box-shadow: none; /* ensure no shadow on click */
+    outline: none;
+}
+
+.user-input:focus {
+    outline: none;
+    border: 2px solid maroon;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.button {
+    background-color: #A24857;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #881111; /* slightly darker maroon */
+}
+
+.form-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5%;
+}
+
+.full-row {
+    grid-column: span 3;
+}
+
+.description-input {
+    width: 100%;
+    height: 96px;
+    resize: none; /* disable resizing */
+    padding: 12px 24px;
+    border-radius: 24px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    font-family: "Google Sans", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    color: #3c4043;
+    box-sizing: border-box;
+    outline: none;
+    line-height: normal;
+    letter-spacing: .25px;
+}
+
+.full-width-button {
+    width: 100% !important;
+    margin-top: 20px;
+}
+
+.research-item {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 20px;
+    margin: 30px 0px;
+}
+
+.research-item h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.research-item p {
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.research-item-actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.research-item-actions button {
+    font-weight: bold;
+    background-color: #A24857;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+}
+
+.research-item-actions button:hover {
+    background-color: #881111; /* slightly darker maroon */
+}
+
+.research-items-container {
+    margin-top: 30px;
+}
+
+.save-message {
+    color: green;
+    margin-left: 10px;
+    font-size: 14px;
+    transition: opacity 1s ease-in-out;
+    opacity: 0;
+}
+
+.save-message.show {
+    opacity: 1;
+}

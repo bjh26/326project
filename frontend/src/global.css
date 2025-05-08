@@ -51,21 +51,6 @@ button:focus {
     color: #d32f2f;
 }
 
-/* Dropdown base styling */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px, rgba(0, 0, 0, .14) 0 6px 10px 0;
-    border-radius: 8px;
-    z-index: 1000;
-    font-family: "Google Sans", Roboto, Arial, sans-serif;
-}
-
-.dropdown-content.show {
-    display: block;
-}
-
 /* Notification styling */
 .update-notification {
     position: fixed;

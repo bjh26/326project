@@ -1,8 +1,11 @@
 /* /frontend/src/components/JobListings/style.css */
 .job-listings-column {
     border-right: 1px solid #e0e0e0;
-    overflow-y: auto;
     background-color: white;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 140px); /* Adjust height to fit viewport minus header and search */
+    min-width: 300px;
 }
 
 .job-listings-header {
@@ -11,95 +14,192 @@
     align-items: center;
     padding: 15px 20px;
     border-bottom: 1px solid #e0e0e0;
+    background-color: white;
+    flex-shrink: 0;
 }
 
 .job-listings-header h2 {
     margin: 0;
     font-size: 1.2rem;
+    color: #333;
 }
 
 .job-listings {
-    max-height: calc(100vh - 240px);
+    flex: 1;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #aaa #f1f1f1;
 }
 
+/* Scrollbar styling */
+.job-listings::-webkit-scrollbar {
+    width: 6px;
+}
+
+.job-listings::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.job-listings::-webkit-scrollbar-thumb {
+    background: #aaa;
+    border-radius: 3px;
+}
+
+.job-listings::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+/* Improved pagination styling for JobListings/style.css */
+
 .job-listings-footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0;
+    padding: 10px 12px;
     border-top: 1px solid #e0e0e0;
+    background-color: white;
+    flex-shrink: 0;
 }
 
 .pagination {
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-.pagination button {
-    background-color: #f4f4f4;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    border-radius: 4px;
+/* Navigation buttons */
+.prev-page, .next-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    color: #333;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     cursor: pointer;
-    height: 35px;
+    transition: all 0.2s ease;
 }
 
-.pagination button:disabled {
+.prev-page:hover, .next-page:hover {
+    background-color: #e0e0e0;
+}
+
+.prev-page:disabled, .next-page:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
+/* Page navigation container */
+.page-navigation {
+    display: flex;
+    align-items: center;
+    background-color: #f5f5f5;
+    border-radius: 18px;
+    padding: 4px 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Current page and total display */
+.page-separator, .current-page, .total-pages {
+    margin: 0 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Page jump container - hidden by default */
+.page-jump {
+    display: none;
+    align-items: center;
+    margin-left: 8px;
+}
+
+/* Show page jump when the page-navigation is hovered */
+.page-navigation:hover .page-jump {
+    display: flex;
+}
+
+/* Page input styling */
+.page-input {
+    width: 40px;
+    height: 28px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-right: 4px;
+}
+
+/* Go button styling */
+.go-btn {
+    height: 28px;
+    padding: 0 8px;
+    background-color: #881111;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.go-btn:hover {
+    background-color: #6d0e0e;
+}
+
 .job-post {
-    padding: 15px 20px;
+    padding: 16px;
     border-bottom: 1px solid #e0e0e0;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.job-post.active {
-    background-color: #f9f9f9;
-    border-left: 3px solid #881111;
 }
 
 .job-post:hover {
     background-color: #f9f9f9;
 }
 
+.job-post.active {
+    background-color: #f0f0f0;
+    border-left: 3px solid #881111;
+}
+
 .job-post-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+    align-items: flex-start;
+    margin-bottom: 8px;
 }
 
 .job-post-header h3 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 16px;
+    font-weight: 600;
     color: #333;
 }
 
 .bookmark-icon {
-    color: #888;
+    color: #aaa;
     cursor: pointer;
+    font-size: 18px;
 }
 
 .bookmark-icon:hover {
-    color: #555;
+    color: #881111;
 }
 
 .bookmark-icon.fas {
-    color: #881111; /* Highlight color when bookmarked */
+    color: #881111;
 }
 
 .job-post-details p {
-    margin: 5px 0;
-    font-size: 0.9rem;
+    margin: 4px 0;
+    font-size: 14px;
     color: #666;
 }
 
-/* Loading and error states */
+/* Loading, error and no results messages */
 .loading, .error, .no-results {
     padding: 30px;
     text-align: center;
@@ -110,9 +210,42 @@
     color: #d32f2f;
 }
 
+/* Bookmark notification styling */
+.bookmark-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #333;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 2000;
+}
+
+.bookmark-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .job-listings-column {
-        max-height: 60vh;
+        width: 100% !important;
+        border-right: none;
+        height: calc(100vh - 200px);
+    }
+    
+    .job-listings {
+        max-height: calc(100vh - 250px);
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        height: auto;
     }
 }
