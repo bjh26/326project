@@ -37,7 +37,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
             const firstNameInput = this.#container.querySelector("#firstName");
             const lastNameInput = this.#container.querySelector("#lastName");
             const emailInput = this.#container.querySelector("#email");
-            const displayEmailCheckbox = this.#container.querySelector("#displayEmail");
             const departmentSelect = this.#container.querySelector("#department");
             const bioTextarea = this.#container.querySelector("#bio");
             
@@ -51,10 +50,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
             
             if (emailInput && this.#profileData.email) {
                 emailInput.value = this.#profileData.email;
-            }
-            
-            if (displayEmailCheckbox && this.#profileData.displayEmail !== undefined) {
-                displayEmailCheckbox.checked = this.#profileData.displayEmail;
             }
             
             if (departmentSelect && this.#profileData.department) {
@@ -96,8 +91,15 @@ export class CreateAccountControllerComponent extends BaseComponent {
                 // Save the current page data first
                 await this.#saveAccountCreateData();
 
-                if (!("email" in this.#profileData ) || this.#profileData.email === "") {
-                    console.log("unable to save due to missing email");
+                const containsRequiredFields = () => (this.#profileData.firstName !== "" && this.#profileData.lastName !== ""  && this.#profileData.email !== "");
+                if (!containsRequiredFields()) {
+                    alert("Please enter your name and UMass email.");
+                    return;
+                }
+
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@umass\.edu$/;
+                if (!emailRegex.test(this.#profileData.email)) {
+                    alert("Please use a UMass email.");
                     return;
                 }
 
@@ -108,7 +110,11 @@ export class CreateAccountControllerComponent extends BaseComponent {
                     await LocalDB.delete("accountCreateData");
                     await this.#hub.publish(Events.NavigateTo, { page: "profile", info: {email:this.#profileData.email, canEdit:true} });
                 } catch (error) {
-                    alert(error.message);
+                    if (error.message === "A profile with this email already exists.") {
+                        alert("A profile with this email already exists.");
+                    } else {
+                        alert("There was a problem when creating your account.", error.message);
+                    }
                     return;
                 }
                 
@@ -143,11 +149,11 @@ export class CreateAccountControllerComponent extends BaseComponent {
         div.addEventListener("dragover", e => {
             e.preventDefault(); 
             div.style.backgroundColor = "#881111";
+            div.style.color = "white";
         });
 
         div.addEventListener("dragleave", () => {
-            div.style.backgroundColor = "lightgray";
-            div.style.color = "white";
+            div.style = ""; // go back to default style
         });
 
         // drag and drop
@@ -155,8 +161,14 @@ export class CreateAccountControllerComponent extends BaseComponent {
             e.preventDefault();
             const file = e.dataTransfer.files[0]; 
             console.log("Dropped file:", file.name, file.type, file.size);
-
-            await this.#saveFileToLocalDB(file, type);
+            try {
+                await this.#saveFileToLocalDB(file, type);
+            } catch (error) {
+                alert("Unable to upload file.", error.message);
+            }
+            if (type === "resume") {
+                div.textContent = "Resume uploaded";
+            }
         });
 
 
@@ -165,8 +177,16 @@ export class CreateAccountControllerComponent extends BaseComponent {
             e.preventDefault();
             const file = e.target.files[0];
             console.log("Uploaded file:", file.name, file.type, file.size);
-
-            await this.#saveFileToLocalDB(file, type);
+            try {
+                await this.#saveFileToLocalDB(file, type);
+            } catch (error) {
+                alert("Unable to upload file.", error.message);
+            }
+            if (type === "resume") {
+                div.style.backgroundColor = "#881111";
+                div.style.color = "white";
+                div.textContent = "Resume uploaded";
+            }
         });
     }
 
@@ -193,21 +213,13 @@ export class CreateAccountControllerComponent extends BaseComponent {
     }
 
     async #saveToServer() {
-        const profile = this.#profileData;
-        profile.researchItems = [];
-        console.log(profile);
             
-        if(document.getElementById('email').value === '' || document.getElementById('email').value === null){
-            alert("Please enter in your email.");
-            return;
-        }
-    
         const res = await fetch('/profile', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(profile),
+            body: JSON.stringify(this.#profileData),
         });
 
         if (!res.ok) {
@@ -215,7 +227,7 @@ export class CreateAccountControllerComponent extends BaseComponent {
         
             if (contentType && contentType.includes("application/json")) {
                 const errorMessage = await res.json();
-                throw new Error(errorMessage.error || "Server returned an error.");
+                throw new Error(errorMessage.message || "Server returned an error.");
             } else {
                 const text = await res.text(); // fallback to plain text
                 console.error("Unexpected response:", text);
@@ -229,7 +241,6 @@ export class CreateAccountControllerComponent extends BaseComponent {
         const firstName = this.#container.querySelector("#firstName")?.value;
         const lastName = this.#container.querySelector("#lastName")?.value;
         const email = this.#container.querySelector("#email")?.value;
-        const displayEmail = this.#container.querySelector("#displayEmail")?.checked;
         const department = this.#container.querySelector("#department")?.value;
         const bio = this.#container.querySelector("#bio")?.value;
 
@@ -239,12 +250,15 @@ export class CreateAccountControllerComponent extends BaseComponent {
             firstName,
             lastName,
             email,
-            displayEmail,
             department,
             bio
         };
 
-        await LocalDB.put("accountCreateData", this.#profileData);
+        try {
+            await LocalDB.put("accountCreateData", this.#profileData);
+        } catch (error) {
+            alert("Unable to save data locally.", error.message);
+        }
     }
 
     #loadSkeleton() {
@@ -284,7 +298,8 @@ export class CreateAccountControllerComponent extends BaseComponent {
                                     <input class="button" type="submit" value="Create Account" id="createAccount">  
                                 </div>
                                 <div class="login-link-row">
-                                    <a id="loginLink" class="login-link">Already have an account? Sign in</a>
+                                    <p>Already have an account? <button id="loginLink" class="login-link">Sign in</button></p>
+
                                 </div>
                             </div>
                         `;

@@ -37,6 +37,7 @@ export class CreatePost2Component extends BaseComponent {
                                     <input type="button" class="form-button" id="back" value="Back">
                                     <input type="button" class="form-button" id="next" value="Next">
                                 </div>
+                                <div id="saveMessage" class="save-message"></div>
                             `;
         return container;
     }

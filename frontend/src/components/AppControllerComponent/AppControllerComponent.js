@@ -27,20 +27,6 @@ export class AppControllerComponent extends BaseComponent {
 
         // store EventHub instance for convenience
         this.#hub = EventHub.getInstance();
-
-        // // check if current page is in IndexedDB, otherwise default to login page
-        // this.#currentView = await LocalDB.get("currentPage");
-        // if (this.#currentView === undefined) {
-        //     this.#currentView = "login"; // default to login
-        //     LocalDB.put("currentPage", "login");
-        // }
-
-
-
-
-        // this.#taskListComponent = new TaskListComponent();
-        // this.#taskInputComponent = new TaskInputComponent();
-        // this.#simpleTaskListViewComponent = new SimpleTaskListViewComponent();
     }
 
     // render the AppController component and return the container
@@ -58,19 +44,8 @@ export class AppControllerComponent extends BaseComponent {
 
         // load current page into container
         await this.#renderPage(this.#currentPage);
-        // await this.#renderPage(this.#currentPage, {email:"nadina@umass.edu", canEdit:true});
 
         this.#setupEventListeners();
-
-        // this.#setupContainerContent();
-        // this.#attachEventListeners();
-
-        // this.#taskInputComponent.render();
-        // this.#taskListComponent.render();
-        // this.#simpleTaskListViewComponent.render();
-
-        // // Initially render the main view
-        // this.#renderCurrentView();
 
         return this.#container;
     }
@@ -147,63 +122,4 @@ export class AppControllerComponent extends BaseComponent {
             await this.#renderPage(data.page, data.info);
         });
     }
-
-    // // Sets up the HTML structure for the container
-    // #setupContainerContent() {
-    //     this.#container.innerHTML = `
-    //     <div id="viewContainer"></div>
-    //     <button id="switchViewBtn">Switch to Simple View</button>
-    //     `;
-    // }
-
-    // // Attaches the necessary event listeners
-    // #attachEventListeners() {
-    //     const switchViewBtn = this.#container.querySelector('#switchViewBtn');
-
-    //     // Event listener for switching views
-    //     switchViewBtn.addEventListener('click', () => {
-    //         this.#toggleView();
-    //     });
-
-    //     // Subscribe to events from the EventHub to manage switching
-    //     this.#hub.subscribe('SwitchToSimpleView', () => {
-    //         this.#currentView = 'simple';
-    //         this.#renderCurrentView();
-    //     });
-
-    //     this.#hub.subscribe('SwitchToMainView', () => {
-    //         this.#currentView = 'main';
-    //         this.#renderCurrentView();
-    //     });
-    // }
-
-    // // Toggles the view between main and simple
-    // #toggleView() {
-    //     if (this.#currentView === 'main') {
-    //         this.#currentView = 'simple';
-    //         this.#hub.publish('SwitchToSimpleView', null);
-    //     } else {
-    //         this.#currentView = 'main';
-    //         this.#hub.publish('SwitchToMainView', null);
-    //     }
-    // }
-
-    // // Renders the current view based on the #currentView state
-    // #renderCurrentView() {
-    //     const viewContainer = this.#container.querySelector('#viewContainer');
-    //     viewContainer.innerHTML = ''; // Clear existing content
-
-    //     // Update the button text based on the current view
-    //     const switchViewBtn = this.#container.querySelector('#switchViewBtn');
-    //     switchViewBtn.textContent = this.#currentView === 'main' ? 'Switch to Simple View' : 'Switch to Main View';
-
-    //     if (this.#currentView === 'main') {
-    //         // Render the main task list view
-    //         viewContainer.appendChild(this.#taskInputComponent.render());
-    //         viewContainer.appendChild(this.#taskListComponent.render());
-    //     } else {
-    //         // Render the simple task list view
-    //         viewContainer.appendChild(this.#simpleTaskListViewComponent.render());      
-    //     }
-    // }
 }

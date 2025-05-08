@@ -157,7 +157,7 @@ body::after,
     transform: translateY(1px);
 }
 
-/* Save message styling */
+/* Save message styling
 #saveMessage {
     margin-top: 10px;
     padding: 12px 16px;
@@ -176,7 +176,7 @@ body::after,
 
 #saveMessage.error {
     background-color: #f44336;
-}
+} */
 
 @keyframes fadeOut {
     from {opacity: 1;}

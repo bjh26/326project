@@ -7,7 +7,7 @@ export const createUser = async (req, res) => {
         
         // Check if email already exists
         if (await userModel.findOne({ where: { email: profile.email } }) !== null) {
-            return res.status(400).json({ error: "A profile with this email already exists." });
+            return res.status(400).json({ message: "A profile with this email already exists." });
         }
         
         await userModel.create({
@@ -15,7 +15,12 @@ export const createUser = async (req, res) => {
             lastName: profile.lastName,
             email: profile.email,
             bio: profile.bio,
+            resume: profile.resume,
             department: profile.department,
+            mime: profile.mime,
+            pfp: profile.pfp,
+            displayEmail: true, // default value
+            researchItems: {} // default value
         });
         
         res.status(201).json({ message: "User created successfully" });

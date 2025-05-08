@@ -27,7 +27,7 @@ export class MainProfileComponent extends BaseComponent {
         mainContent.innerHTML = canEdit ?
                                 `<div id="sideColumn" class="left-column">
                                     <div id="pfp">
-                                        <span class="dot"></span>
+                                        <img src="assets/Sample_User_Icon.png" id="pfpDisplay" alt="User Icon" class="pfp dot">
                                     </div>
                                     <div id="info" class="side-column-text">
                                         <b id="fullName"></b>

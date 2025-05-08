@@ -56,9 +56,20 @@ export class ProfilePageControllerComponent extends BaseComponent {
         if (this.#refreshed) { // page was refreshed
             // load from IndexedDB
             this.#profileData = await LocalDB.get("profileData");
+
+            if (!this.#profileData) {
+                this.#container.textContent = "Error: profile not found";
+            }
+            return this.#container;
         } else {
-            // load profile data from server into IndexedDB
-            await this.#loadDataFromServer(this.#email);
+            try {
+                // load profile data from server into IndexedDB
+                await this.#loadDataFromServer(this.#email);
+            } catch (error) {
+                this.#container.textContent = `Error: ${error.message}`;
+                return this.#container;
+            }
+            
         }        
 
         // load skeleton for current page into container
@@ -92,22 +103,32 @@ export class ProfilePageControllerComponent extends BaseComponent {
 
     async #loadDataFromServer(email) {
         const response = await fetch(`/profile/${email}`);
-        if (response.status === 404) {
-            throw new Error(`Error: profile not found for email ${email}`);
-        } else {
-            console.log(`loading data from server for ${email}`);
-            this.#profileData = await response.json();
 
-            const jsonFormat = this.#profileData.researchItems;
-            if (jsonFormat) {
-                const keys = Object.keys(jsonFormat);
-                const arrayFormat = new Array(keys.length);
-                keys.forEach(i => arrayFormat[i] = jsonFormat[i]);
-                this.#profileData.researchItems = arrayFormat;
+        if (!response.ok) {
+            const contentType = response.headers.get("content-type");
+        
+            if (contentType && contentType.includes("application/json")) {
+                const errorMessage = await response.json();
+                throw new Error(errorMessage.message || "Server returned an error.");
+            } else {
+                const text = await response.text(); // fallback to plain text
+                console.error("Unexpected response:", text);
+                throw new Error(`Server error: ${response.status}`);
             }
-
-            await this.#saveToLocalDB();
         }
+
+        console.log(`loading data from server for ${email}`);
+        this.#profileData = await response.json();
+
+        const jsonFormat = this.#profileData.researchItems;
+        if (jsonFormat) {
+            const keys = Object.keys(jsonFormat);
+            const arrayFormat = new Array(keys.length);
+            keys.forEach(i => arrayFormat[i] = jsonFormat[i]);
+            this.#profileData.researchItems = arrayFormat;
+        }
+
+        await this.#saveToLocalDB();
     }
 
     async #saveToLocalDB() {
@@ -131,13 +152,26 @@ export class ProfilePageControllerComponent extends BaseComponent {
         }
 
         // upload to server
-        await fetch(`/profile/${this.#profileData.email}`, {
+        const res = await fetch(`/profile/${this.#profileData.email}`, {
             method: "PUT",
             headers: { 
                 "Content-Type": "application/json" 
             },
             body: JSON.stringify(this.#profileData)
         });
+
+        if (!res.ok) {
+            const contentType = res.headers.get("content-type");
+        
+            if (contentType && contentType.includes("application/json")) {
+                const errorMessage = await res.json();
+                throw new Error(errorMessage.message || "Server returned an error.");
+            } else {
+                const text = await res.text(); // fallback to plain text
+                console.error("Unexpected response:", text);
+                throw new Error(`Server error: ${res.status}`);
+            }
+        }
 
         // convert back to array
         if (arrayFormat) {
@@ -201,16 +235,11 @@ export class ProfilePageControllerComponent extends BaseComponent {
                 }
 
                 // display pfp
-                const pfpDiv = this.#container.querySelector("#pfp");
-                if (pfpDiv && this.#profileData.pfp && this.#profileData.mime) {
-                    pfpDiv.innerHTML = "";
-                    const pfpDisplay = document.createElement("img");
-                    pfpDisplay.classList.add('pfp');
-                    pfpDisplay.classList.add('dot');
+                const pfpDisplay = this.#container.querySelector("#pfpDisplay");
+                if (pfpDisplay && this.#profileData.pfp && this.#profileData.mime) {
                     const imgFile = Base64.convertBase64ToFile(this.#profileData.pfp, this.#profileData.mime);
                     const imageURL = URL.createObjectURL(imgFile);
                     pfpDisplay.src = imageURL;
-                    pfpDiv.appendChild(pfpDisplay);
                 }
 
                 // display resume
@@ -219,29 +248,12 @@ export class ProfilePageControllerComponent extends BaseComponent {
                     // Create data URL
                     const resumeDataUrl = `data:application/pdf;base64,${this.#profileData.resume}`;
 
-                    // // Create download link
-                    // const link = document.createElement("a");
-                    // link.href = resumeDataUrl;
-                    // link.download = "resume.pdf";
-                    // link.textContent = "Download Resume";
-                    // link.target = "_blank";
-
                     // View in new tab
                     const link = document.createElement("a");
-                    link.href = "#";
                     link.textContent = "View Resume";
 
-                    // // Create iframe to display PDF
-                    // const iframe = document.createElement("iframe");
-                    // iframe.src = resumeDataUrl;
-                    // iframe.width = "100%";
-                    // iframe.height = "600px";
-                    // iframe.style.border = "1px solid #ccc";
-                    // iframe.style.marginTop = "10px";
-
-                    // Append both to the container
+                    // Append to the container
                     resumeDiv.appendChild(link);
-                    // resumeDiv.appendChild(iframe);
 
                     link.addEventListener("click", e => {
                         e.preventDefault();
@@ -263,13 +275,6 @@ export class ProfilePageControllerComponent extends BaseComponent {
                         }
                     });
                 }
-
-                // resumeDiv.innerHTML = "";
-                    // const resumeDisplay = document.createElement("???");
-                    // const resumeFile = Base64.convertBase64ToFile(this.#profileData.pfp, "application/pdf");
-                    // const imageURL = URL.createObjectURL(imgFile);
-                    // pfpDisplay.src = imageURL;
-                    // pfpDiv.appendChild(pfpDisplay);
             }
 
             // display research items
@@ -350,15 +355,15 @@ export class ProfilePageControllerComponent extends BaseComponent {
      * @param {string} type - Either "pfp" or "resume".
      */
     #addDragAndDropAndManualUploadFunctionality(div, inputElement, type) {
-            
+        
         div.addEventListener("dragover", e => {
             e.preventDefault(); 
             div.style.backgroundColor = "#881111";
+            div.style.color = "white";
         });
 
         div.addEventListener("dragleave", () => {
-            div.style.backgroundColor = "lightgray";
-            div.style.color = "white";
+            div.style = ""; // go back to default style
         });
 
         // drag and drop
@@ -366,8 +371,12 @@ export class ProfilePageControllerComponent extends BaseComponent {
             e.preventDefault();
             const file = e.dataTransfer.files[0]; 
             console.log("Dropped file:", file.name, file.type, file.size);
-
-            await this.#saveFileToLocalDB(file, type);
+            try {
+                await this.#saveFileToLocalDB(file, type);
+            } catch (error) {
+                alert("Unable to upload file. ", error.message);
+            }
+            div.textContent = "File uploaded";
         });
 
 
@@ -376,8 +385,14 @@ export class ProfilePageControllerComponent extends BaseComponent {
             e.preventDefault();
             const file = e.target.files[0];
             console.log("Uploaded file:", file.name, file.type, file.size);
-
-            await this.#saveFileToLocalDB(file, type);
+            try {
+                await this.#saveFileToLocalDB(file, type);
+            } catch (error) {
+                alert("Unable to upload file. ", error.message);
+            }
+            div.style.backgroundColor = "#881111";
+            div.style.color = "white";
+            div.textContent = "File uploaded";
         });
     }
 
@@ -398,6 +413,7 @@ export class ProfilePageControllerComponent extends BaseComponent {
             if (file.type.startsWith("image/")) {
                 this.#profileData.mime = file.type;
             }
+            this.#showSaveMessage(`Successfully uploaded ${file.name}`);
             await this.#saveToLocalDB();
         }
         reader.readAsDataURL(file);
@@ -431,7 +447,6 @@ export class ProfilePageControllerComponent extends BaseComponent {
         const homeButton = this.#container.querySelector("#home");
         if (homeButton) {
             homeButton.addEventListener("click", async () => {
-                console.log("home button clicked");
                 await this.#hub.publish(Events.NavigateTo, { page: "home" });
             });
         }
@@ -440,7 +455,6 @@ export class ProfilePageControllerComponent extends BaseComponent {
         const saveButton = this.#container.querySelector("#save");
         if (saveButton) {
             saveButton.addEventListener("click", async () => {
-                console.log("Save button clicked on", this.#currentProfilePage);
                 await this.#saveCurrentPageData();
             });
         }
@@ -536,6 +550,14 @@ export class ProfilePageControllerComponent extends BaseComponent {
             resumeText.addEventListener("click", () => resumeInputElement.click());
         }
 
+        const emailBox = this.#container.querySelector("#email");
+        if (emailBox) {
+            console.log("added listener")
+            emailBox.addEventListener("click", () => {
+                alert("Sorry, email changes are not allowed.");
+            });
+        }
+
     }
 
     #renderResearchItems() {
@@ -581,6 +603,7 @@ export class ProfilePageControllerComponent extends BaseComponent {
                 this.#deleteResearchItem(index);
             });
         });
+
     }
 
     #editResearchItem(index) {
@@ -619,12 +642,14 @@ export class ProfilePageControllerComponent extends BaseComponent {
             // update this.#profileData and save to IndexedDB
             await this.#saveProfileData();
         } else if (this.#currentProfilePage === 'edit2') {
-            // TODO: implement uploading files to IndexedDB
-            this.#showSaveMessage("Profile picture and resume settings saved");
+            // already handled by drag and drop function
+            await this.#saveToLocalDB();
+            this.#showSaveMessage("Profile picture and resume saved");
         } else if (this.#currentProfilePage === 'edit3') {
             // this is already handled by add/edit/delete research item functions
             // so this.#profileData will have already been updated
             // all that's left is to save to IndexedDB
+            this.#showSaveMessage("Research items saved");
             await this.#saveToLocalDB();
         } 
     }
