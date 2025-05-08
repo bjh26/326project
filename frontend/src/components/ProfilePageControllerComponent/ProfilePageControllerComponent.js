@@ -1,6 +1,6 @@
 import { EventHub } from '../../eventhub/EventHub.js';
 import { Events } from '../../eventhub/Events.js';
-import Base64 from '../../services/base64.js';
+import { Base64 } from '../../services/base64.js';
 import { LocalDB } from '../../services/LocalDB.js';
 import { BaseComponent } from '../BaseComponent/BaseComponent.js';
 import { Edit1Component } from '../Edit1Component/Edit1Component.js';
